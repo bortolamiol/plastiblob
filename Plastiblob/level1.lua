@@ -24,6 +24,7 @@ function scene:show( event )
 	if phase == "will" then
 		-- Called when the scene is still off screen and is about to move on screen
 	elseif phase == "did" then
+
 		--We display the plastic beach backgrounds that need to scroll. We put the X and Y anchor to 0 so that the image is out of
 		--frame when it reaches the negative of its actual width and the function sets it back at the center.
 		local plastic = display.newImageRect("Immagini/plastic beach.png",display.actualContentWidth, display.actualContentHeight)
@@ -56,6 +57,7 @@ Runtime:addEventListener("enterFrame",plastic)
 plastic.enterFrame = scroll
 Runtime:addEventListener("enterFrame",plastic_next)
 plastic_next.enterFrame = scroll
+
 	end
 end
 
