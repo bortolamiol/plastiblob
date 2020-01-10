@@ -27,13 +27,13 @@ function scene:show( event )
 
 		--We display the plastic beach backgrounds that need to scroll. We put the X and Y anchor to 0 so that the image is out of
 		--frame when it reaches the negative of its actual width and the function sets it back at the center.
-		local plastic = display.newImageRect("Immagini/plastic beach.png",display.actualContentWidth, display.actualContentHeight)
+		local plastic = display.newImageRect("/immagini/livello-1/plastic-beach.png",display.actualContentWidth, display.actualContentHeight)
 		plastic.anchorX=0
 		plastic.anchorY=0
 		plastic.x = display.contentCenterX-640
 		plastic.y = display.contentCenterY-360
 		
-		local plastic_next = display.newImageRect("Immagini/plastic beach.png",display.actualContentWidth,display.actualContentHeight)
+		local plastic_next = display.newImageRect("/immagini/livello-1/plastic-beach.png",display.actualContentWidth,display.actualContentHeight)
 		plastic_next.anchorX=0
 		plastic_next.anchorY=0
 		plastic_next.x = display.contentCenterX+640
