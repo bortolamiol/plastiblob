@@ -19,48 +19,61 @@ local playBtn
 local function onPlayBtnRelease()
 	
 	-- go to level1.lua scene
-	composer.gotoScene( "level1", "fade", 500 )
+	composer.gotoScene( "level-1", "fade", 1000 )
 	
 	return true	-- indicates successful touch
 end
 
 function scene:create( event )
 	local sceneGroup = self.view
+	
+	--CREAZIONE DI UN DATABASE PER CONTENERE I LIVELLI
+	-- Require the SQLite library
+	local sqlite3 = require( "sqlite3" )	
 
-	-- Called when the scene's view does not exist.
+	-- Create a file path for the database file "data.db"
+	local path = system.pathForFile( "data.db", system.DocumentsDirectory )
+
+	-- Open the database for access
+	local db = sqlite3.open( path )
+
+	local tableSetup = [[CREATE TABLE IF NOT EXISTS levels ( ID INTEGER PRIMARY KEY, INTEGER level );]]
+	db:exec( tableSetup )
+
+	local insertQuery = [[INSERT INTO levels VALUES ( NULL, "1" );]]
+	db:exec( insertQuery )
+
+	local people = {}
+ 
+	-- Loop through database table rows via a SELECT query
+	for row in db:nrows( "SELECT * FROM levels" ) do
+	
+		print( "Row:", row.level )
+	
+		-- Create sub-table at next available index of "people" table
+		people[#people+1] =
+		{
+			FirstName = row.FirstName,
+			print( "Row:", row.ID, " ", row.level )
+		}
+	end
+	local insertQuery = [[DROP TABLE levels;]]
+	db:exec( insertQuery )
+		-- Called when the scene's view does not exist.
 	-- 
 	-- INSERT code here to initialize the scene
 	-- e.g. add display objects to 'sceneGroup', add touch listeners, etc.
 
 	-- display a background image
-	local background = display.newImageRect( "immagini/menu/sfondo-menu.png", display.actualContentWidth, display.actualContentHeight )
+	local background = display.newImageRect( "immagini/menu/sfondo-menu-livelli.png", display.actualContentWidth, display.actualContentHeight )
 	background.anchorX = 0
 	background.anchorY = 0
 	background.x = 0 + display.screenOriginX 
 	background.y = 0 + display.screenOriginY
 	
-	-- create/position logo/title image on upper-half of the screen
-	--[[
-	local titleLogo = display.newImageRect( "logo.png", 264, 42 )
-	titleLogo.x = display.contentCenterX
-	titleLogo.y = 100
-	]]--
-	
-	-- create a widget button (which will loads level1.lua on release)
-	playBtn = widget.newButton{
-		labelColor = { default={255}, over={128} },
-		defaultFile="/immagini/menu/button-play.png",
-		overFile="/immagini/menu/button-over.png",
-		width=400, height=250,
-		onRelease = onPlayBtnRelease	-- event listener function
-	}
-	playBtn.x = display.contentCenterX
-	playBtn.y = display.contentHeight - 195
 	
 	-- all display objects must be inserted into group
 	sceneGroup:insert( background )
-	--sceneGroup:insert( titleLogo )
-	sceneGroup:insert( playBtn )
 end
 
 function scene:show( event )
@@ -98,11 +111,6 @@ function scene:destroy( event )
 	-- 
 	-- INSERT code here to cleanup the scene
 	-- e.g. remove display objects, remove touch listeners, save state, etc.
-	
-	if playBtn then
-		playBtn:removeSelf()	-- widgets must be manually removed
-		playBtn = nil
-	end
 end
 
 ---------------------------------------------------------------------------------
@@ -114,5 +122,6 @@ scene:addEventListener( "hide", scene )
 scene:addEventListener( "destroy", scene )
 
 -----------------------------------------------------------------------------------------
+
 
 return scene
