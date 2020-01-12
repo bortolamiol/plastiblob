@@ -45,7 +45,6 @@ function scene:show( event )
 local function scroll(self,event)
     if self.x<-(display.contentWidth-speed*2) then
 		self.x = display.contentWidth
-		print(x)
 	else
 		self.x =self.x - speed
 		
