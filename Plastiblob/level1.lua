@@ -98,3 +98,20 @@ scene:addEventListener( "destroy", scene )
 -----------------------------------------------------------------------------------------
 
 return scene
+
+--[[we add the first cloud 
+local opt = { width = 300, height = 200, numFrames = 6}
+local cloudSheet = graphics.newImageSheet("Immagini/livello-1/nuvola1.png", opt)
+local seqs ={{
+	          name = "nuvola1",
+			  start = 1,
+              count = 6,
+              time = 300,
+			  loopCount = 0,
+			  loopDirection ="bounce"
+	    	 }
+			} 
+local nuvola1=display.newSprite(cloudSheet,seqs)
+plane.x = display.contentCenterX - 90
+plane.y = display.contentCenterY - 90
+]]--
