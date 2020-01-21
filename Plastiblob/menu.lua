@@ -13,8 +13,6 @@ local widget = require "widget"
 --------------------------------------------
 
 -- forward declarations and other locals
-local playBtn
-
 -- 'onRelease' event listener for playBtn
 local function onPlayBtnRelease()
 	
@@ -47,7 +45,33 @@ function scene:create( event )
 	]]--
 	
 	-- create a widget button (which will loads level1.lua on release)
-	playBtn = widget.newButton{
+	-- Example assumes 'imageSheet' is already created from graphics.newImageSheet()
+ 
+	-- consecutive frames
+	local playButtonOptions =
+	{
+		width = 500,
+		height = 200,
+		numFrames = 10
+	}
+	local playBtnSheet = graphics.newImageSheet( "/immagini/menu/play-bottle-200.png", playButtonOptions )
+	local sequenceDataPlay =
+	{
+		name="play",
+		start=1,
+		count=10,
+		time=800,
+		loopCount = 0,   -- Optional ; default is 0 (loop indefinitely)
+		loopDirection = "bounce"    -- Optional ; values include "forward" or "bounce"
+	}
+	
+	local playBtn = display.newSprite( playBtnSheet, sequenceDataPlay )
+	playBtn.x = display.contentCenterX
+	playBtn.y = display.contentHeight - 195
+	playBtn:addEventListener("touch", onPlayBtnRelease)
+	playBtn:play()
+
+	--[[playBtn = widget.newButton{
 		labelColor = { default={255}, over={128} },
 		defaultFile="/immagini/menu/button-play.png",
 		overFile="/immagini/menu/button-over.png",
@@ -55,7 +79,7 @@ function scene:create( event )
 		onRelease = onPlayBtnRelease	-- event listener function
 	}
 	playBtn.x = display.contentCenterX
-	playBtn.y = display.contentHeight - 195
+	playBtn.y = display.contentHeight - 195]]--
 	
 	-- all display objects must be inserted into group
 	sceneGroup:insert( background )

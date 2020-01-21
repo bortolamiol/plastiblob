@@ -40,22 +40,43 @@ function scene:show( event )
 		plastic_next.y = display.contentCenterY-360
 
 		local speed = 4
+		local cloudOptions =
+		{
+			width = 300,
+			height = 200,
+			numFrames = 6
+		}
+		local cloudSheet = graphics.newImageSheet( "/immagini/livello-1/nuvola1.png", cloudOptions )
+		local sequenceDataCloud =
+		{
+			name="play",
+			start=1,
+			count=6,
+			time=1800,
+			loopCount = 0,   -- Optional ; default is 0 (loop indefinitely)
+			loopDirection = "bounce"    -- Optional ; values include "forward" or "bounce"
+		}
+		
+		local cloud = display.newSprite( cloudSheet, sequenceDataCloud )
+		cloud.x = display.contentCenterX
+		cloud.y = display.contentHeight - 500
+		cloud:play()
 
 	--We define the scroll function
-local function scroll(self,event)
-    if self.x<-(display.contentWidth-speed*2) then
-		self.x = display.contentWidth
-	else
-		self.x =self.x - speed
-		
+	local function scroll(self,event)
+		if self.x<-(display.contentWidth-speed*2) then
+			self.x = display.contentWidth
+		else
+			self.x =self.x - speed
+			
+		end	
 	end	
-end	
 
-plastic.enterFrame = scroll
-Runtime:addEventListener("enterFrame",plastic)
-plastic.enterFrame = scroll
-Runtime:addEventListener("enterFrame",plastic_next)
-plastic_next.enterFrame = scroll
+	plastic.enterFrame = scroll
+	Runtime:addEventListener("enterFrame",plastic)
+	plastic.enterFrame = scroll
+	Runtime:addEventListener("enterFrame",plastic_next)
+	plastic_next.enterFrame = scroll
 
 	end
 end
