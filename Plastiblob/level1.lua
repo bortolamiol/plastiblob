@@ -40,6 +40,9 @@ function scene:show( event )
 		plastic_next.y = display.contentCenterY-360
 
 		local speed = 4
+		
+		--PRIMA NUVOLA
+		
 		local cloudOptions =
 		{
 			width = 300,
@@ -52,32 +55,72 @@ function scene:show( event )
 			name="play",
 			start=1,
 			count=6,
-			time=1800,
+			time=2800,
 			loopCount = 0,   -- Optional ; default is 0 (loop indefinitely)
 			loopDirection = "bounce"    -- Optional ; values include "forward" or "bounce"
 		}
 		
+		--SECONDA NUVOLA
+		
+		local cloudOptions2 =
+		{
+			width = 200,
+			height = 100,
+			numFrames = 6
+		}
+		local cloudSheet2 = graphics.newImageSheet( "/immagini/livello-1/nuvola2.png", cloudOptions2)
+		local sequenceDataCloud2 =
+		{
+			name="play",
+			start=1,
+			count=6,
+			time=3000,
+			loopCount = 0,   -- Optional ; default is 0 (loop indefinitely)
+			loopDirection = "bounce"    -- Optional ; values include "forward" or "bounce"
+		}
+		--DISPLAY PRIMA NUVOLA E PLAY ANIMAZIONE
 		local cloud = display.newSprite( cloudSheet, sequenceDataCloud )
-		cloud.x = display.contentCenterX
-		cloud.y = display.contentHeight - 500
+		cloud.x = display.contentCenterX+800
+		cloud.y = display.contentHeight-500;
 		cloud:play()
 
-	--We define the scroll function
-	local function scroll(self,event)
-		if self.x<-(display.contentWidth-speed*2) then
+		--DISPLAY SECONDA NUVOLA E PLAY ANIMAZIONE
+		local cloud_next = display.newSprite(cloudSheet2,sequenceDataCloud2)
+		cloud_next.x= display.contentCenterX;
+		cloud_next.y=display.contentCenterY-200;
+		cloud_next:play()
+
+		--We define the scroll function for the background
+		local function scroll(self,event)
+		if 	self.x<-(display.contentWidth-speed*2) then
 			self.x = display.contentWidth
 		else
 			self.x =self.x - speed
-			
 		end	
-	end	
+	end
+
+	--We define the scroll function for the clouds at a different speed
+	local function scroll_clouds(self,event)
+		if self.x<-(display.contentWidth/4-speed*2) then
+				self.x = display.contentWidth+(math.random(50,200));
+				self.y = display.contentHeight-(math.random(500,620));
+				--print(self.X);
+				print(self.y);
+			else
+				self.x =self.x - speed/2
+				
+		end	
+	end
 
 	plastic.enterFrame = scroll
 	Runtime:addEventListener("enterFrame",plastic)
 	plastic.enterFrame = scroll
 	Runtime:addEventListener("enterFrame",plastic_next)
 	plastic_next.enterFrame = scroll
-
+	cloud.enterFrame = scroll_clouds
+	Runtime:addEventListener("enterFrame",cloud)
+	cloud_next.enterFrame = scroll_clouds
+	Runtime:addEventListener("enterFrame",cloud_next)
 	end
 end
 
