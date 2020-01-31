@@ -11,12 +11,10 @@ local scene = composer.newScene()
 -- include Corona's "widget" library
 local widget = require "widget"
 
-
-
 function scene:create( event )
 	local backgroundImage = self.view
 	local menu = self.view
-
+	
 	--creo una variabile che contenga i livelli a cui sono arrivato, se non ho passato nessun livello partirà da 1
 	local livellicompletati 
 	--CREAZIONE DI UN DATABASE PER CONTENERE I LIVELLI
@@ -69,25 +67,59 @@ function scene:create( event )
 			--assegno al percorso dell'immagine l'immagine corrispondente al livello in modalità BLOCCATA
 			impath = "immagini/menu/livelli/locked"..i..".png"
 		end
-		print("percorso: ", impath)
+		--IMPORTANTE: ogni oggetto ha un proprio nome dato dalla sua posizione nel contatore i, per esempio l'immagine del livello 1 avrà nome "1"
 		levels[i] = display.newImageRect( menu, impath, 200, 200 )
+		levels[i].name = tostring(i)
 		levels[i].anchorX = 0
 		levels[i].anchorY = 0
 		levels[i].x = checkImagePositionX(i)
 		levels[i].y = checkImagePositionY(i)
 	end
 
+	--questa funzione serve per capire quando ho cliccato su un'immagine per andare sul livello cliccato
+	function levels:touch( event )
+		if event.phase == "began" then
+			--grazie al nome dell'oggetto riesco a capire su quale immagine ho cliccato
+			local nlevel = tostring(event.target.name)
+			--controllo se ho accesso al livello in quanto devo aver superato quello prima
+			if(tonumber(livellicompletati) >= tonumber(nlevel)) then
+				local leveltargetpath = ".levels.level" .. nlevel;
+				composer.gotoScene( leveltargetpath, "fade", 500 )
+			end
+			return true
+		end
+	end
+
+	--immagine di sfondo
 	local background = display.newImageRect( "immagini/menu/sfondo-menu-livelli.png", display.actualContentWidth, display.actualContentHeight )
 	background.anchorX = 0
 	background.anchorY = 0
 	background.x = 0 + display.screenOriginX 
 	background.y = 0 + display.screenOriginY
-	
 	backgroundImage:insert( background )
+
+	--bottone per tornare indietro alla schermata precedente
+	local goback = display.newImageRect( "immagini/menu/goback.png", 100, 70 )
+	goback.anchorX = 0
+	goback.anchorY = 0
+
+	--funzione per tornare indietro nel menu
+	function goback:touch( event )
+		if event.phase == "began" then
+			--grazie al nome dell'oggetto riesco a capire su quale immagine ho cliccato
+			composer.gotoScene( "menu", "fade", 500 )
+			return true
+		end
+	end
+	goback:addEventListener( "touch", goback )
+	menu:insert(goback)
+
 	for i=1, 8 do
-		--inserisco dentro la scena del gruppo le foto dei miei livelli
+		--inserisco dentro la scena del gruppo le foto dei miei livelli e assegno un listener per ognuno degli oggetti
+		levels[i]:addEventListener( "touch", levels )
 		menu:insert(levels[i])
 	end
+	
 end
 
 function checkImagePositionX(i)
