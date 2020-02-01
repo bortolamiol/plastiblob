@@ -75,7 +75,7 @@ function scene:create( event )
 	local deletedata = display.newImageRect( "immagini/menu/x.png", 80, 80 )
 	deletedata.anchorX =  0
 	deletedata.anchorY =  0
-	deletedata.x = display.actualContentWidth - 300
+	deletedata.x = display.actualContentWidth - 100
 	deletedata.y = display.actualContentHeight - 100
 
 	--funzione per cancellare i dati dal database
