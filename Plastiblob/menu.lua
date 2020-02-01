@@ -31,7 +31,7 @@ function scene:create( event )
 	-- e.g. add display objects to 'sceneGroup', add touch listeners, etc.
 
 	-- display a background image
-	local background = display.newImageRect( "immagini/menu/sfondo-menù.png", display.actualContentWidth, display.actualContentHeight )
+	local background = display.newImageRect( "immagini/menu/sfondomenu.png", display.actualContentWidth, display.actualContentHeight )
 	background.anchorX = 0
 	background.anchorY = 0
 	background.x = 0 + display.screenOriginX 
@@ -54,7 +54,7 @@ function scene:create( event )
 		height = 200,
 		numFrames = 10
 	}
-	local playBtnSheet = graphics.newImageSheet( "/immagini/menu/play-bottle-200.png", playButtonOptions )
+	local playbtnsheet = graphics.newImageSheet( "immagini/menu/playbottle200.png", playButtonOptions )
 	local sequenceDataPlay =
 	{
 		name="play",
@@ -65,26 +65,40 @@ function scene:create( event )
 		loopDirection = "bounce"    -- Optional ; values include "forward" or "bounce"
 	}
 	
-	local playBtn = display.newSprite( playBtnSheet, sequenceDataPlay )
+	local playBtn = display.newSprite( playbtnsheet, sequenceDataPlay )
 	playBtn.x = display.contentCenterX
 	playBtn.y = display.contentHeight - 195
 	playBtn:addEventListener("touch", onPlayBtnRelease)
 	playBtn:play()
 
-	--[[playBtn = widget.newButton{
-		labelColor = { default={255}, over={128} },
-		defaultFile="/immagini/menu/button-play.png",
-		overFile="/immagini/menu/button-over.png",
-		width=400, height=250,
-		onRelease = onPlayBtnRelease	-- event listener function
-	}
-	playBtn.x = display.contentCenterX
-	playBtn.y = display.contentHeight - 195]]--
-	
-	-- all display objects must be inserted into group
+	--bottone per cancellare i dati dal database
+	local deletedata = display.newImageRect( "immagini/menu/x.png", 80, 80 )
+	deletedata.anchorX =  0
+	deletedata.anchorY =  0
+	deletedata.x = display.actualContentWidth - 300
+	deletedata.y = display.actualContentHeight - 100
+
+	--funzione per cancellare i dati dal database
+	function deletedata:touch( event )
+		if event.phase == "began" then
+			--cancello i  dati dal database
+			-- Require the SQLite library
+			local sqlite3 = require( "sqlite3" )	
+			-- Create a file path for the database file "data.db"
+			local path = system.pathForFile( "data.db", system.DocumentsDirectory )
+			-- Open the database for access
+			local db = sqlite3.open( path )
+			--controllo se la tabella 'levels' esiste già, sennò la devo creare
+			local deletedb = [[DROP TABLE levels;]]
+			local s = db:exec( deletedb )
+			print(s)
+			return true
+		end
+	end
+	deletedata:addEventListener( "touch", goback )
 	sceneGroup:insert( background )
-	--sceneGroup:insert( titleLogo )
 	sceneGroup:insert( playBtn )
+	sceneGroup:insert(deletedata)
 end
 
 function scene:show( event )

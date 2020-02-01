@@ -29,6 +29,7 @@ function scene:create( event )
 	--controllo se la tabella 'levels' esiste già, sennò la devo creare
 	local checkifdbexists = [[SELECT * from levels]]
 	local dbexists = db:exec( checkifdbexists )
+	print("il database esiste: "..dbexists)
 	if(dbexists == 0) then
 		--Se dbexists ritorna 0 allora il Database già esiste nella memoria, mi serve prendere i dati
 		local levels = {}
@@ -42,16 +43,17 @@ function scene:create( event )
 				level = row.level,
 				print( "ID del giocatore:", row.ID, " - Livello: ", row.level ),
 			}
-			livellicompletati = levels[1].level
-			
+			livellicompletati = levels[1].level		
 		end
 	else
-	--Se dbexists ritorna 1 allora il Database non esiste, vuol dire perciò che dovrà essere creato
-		local tableSetup = [[CREATE TABLE IF NOT EXISTS levels ( ID INTEGER PRIMARY KEY autoincrement,  level );]]
+	--Se dbexists ritorna 1 allora la tabella non esiste, vuol dire perciò che dovrà essere creata
+		local tableSetup = [[CREATE TABLE levels ( ID INTEGER PRIMARY KEY autoincrement, level );]]
 		db:exec( tableSetup )
 		--inserisco la riga di default nel database, se l'ho appena creato andrò al livello 1
 		local insertQuery = [[INSERT INTO levels VALUES ( null, "1" );]]
 		db:exec( insertQuery )
+		--dato che la tabella non esisteva vuol dire che è la prima volta che l'utente gioca, perciò lo faccio iniziare dal livello 1
+		livellicompletati = 1
 	end
 	
 	--inserisco le immagini dei livelli dentro un vettore/tabella
@@ -60,7 +62,7 @@ function scene:create( event )
 	for i=1, 8 do
 		local impath
 		--controllo se ho già passato il livello nell'identificativo su cui è posizionata 1
-		if (tonumber(livellicompletati) >= i) then
+		if tonumber(livellicompletati) >= tonumber(i) then
 			--assegno al percorso dell'immagine l'immagine corrispondente al livello in modalità SBLOCCATA
 			impath = "immagini/menu/livelli/"..i..".png"
 		else
@@ -83,7 +85,7 @@ function scene:create( event )
 			local nlevel = tostring(event.target.name)
 			--controllo se ho accesso al livello in quanto devo aver superato quello prima
 			if(tonumber(livellicompletati) >= tonumber(nlevel)) then
-				local leveltargetpath = ".levels.level" .. nlevel;
+				local leveltargetpath = "levels.level" .. nlevel;
 				composer.gotoScene( leveltargetpath, "fade", 500 )
 			end
 			return true
