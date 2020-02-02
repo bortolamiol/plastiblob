@@ -23,31 +23,11 @@ function scene:create( event )
     -- Shows collision engine outlines only
     --physics.setDrawMode( "debug" )  
     local sceneGroup = self.view
-    local ground = display.newRect( 0, 0, display.contentWidth, 120 )
+    local ground = display.newRect( 0, 0, display.contentWidth, 80 )
     ground.x = display.contentCenterX
-    ground.y = display.contentHeight - 80
-    physics.addBody(ground, "static",{ friction=0.5, bounce=0.3 } )
+    ground.y = display.contentHeight - 40
+    physics.addBody(ground, "static",{ friction=0.5, bounce=0 } )
 
-    --disegno lo sprite del mio personaggio
-    local opt ={ 
-        numFrames = 6,
-        width = 100,
-        height= 100 
-    }
-    local catSheet = graphics.newImageSheet("immagini/livello-1/spriterunning.png",opt)
-    local runningSeq = { 
-        count = 6,
-        start = 1,
-        name = "run",
-        loopCount = 0,
-        loopDirection = "forward",
-        time = 800
-    }
-    local cat = display.newSprite(catSheet,runningSeq)
-    cat.x=display.contentCenterX
-    cat.y=display.contentCenterY
-    cat:play()
-    physics.addBody(cat,"dynamic",{bounce=0, friction= 2.0}) 
     end
 
 function scene:show( event )
@@ -89,7 +69,40 @@ function scene:show( event )
             end
         end
 
+        -- Example assumes 'imageSheet' already created using graphics.newImageSheet()
+        
+        -- 1st image sheet
+        local sheetData1 = { width=200, height=200, numFrames=8, sheetContentWidth=1600, sheetContentHeight=200 }
+        local sheet1 = graphics.newImageSheet( "immagini/livello-1/spritewalk2.png", sheetData1 )
+        
+        -- 2nd image sheet
+        local sheetData2 = { width=200, height=200, numFrames=7, sheetContentWidth=1400, sheetContentHeight=200 }
+        local sheet2 = graphics.newImageSheet( "immagini/livello-1/spritejump.png", sheetData2 )
+        
+        -- In your sequences, add the parameter 'sheet=', referencing which image sheet the sequence should use
+        local sequenceData = {
+                        { name="seq1", sheet=sheet1, start=1, count=6, time=500, loopCount=0 },
+                        { name="seq2", sheet=sheet2, start=1, count=1, time=500, loopCount=0 }
+                        }
+        
+        local myAnimation = display.newSprite( sheet1, sequenceData )
+        myAnimation.x = display.contentWidth/2 ; myAnimation.y = display.contentHeight/2
+        myAnimation:play()
+        
+        -- After a short time, swap the sequence to 'seq2' which uses the second image sheet
+        local function running()
+                myAnimation:setSequence( "seq1" )
+                myAnimation:play()
+        end
+        local function jump()
+            myAnimation:setSequence( "seq2" )
+            myAnimation:play()
+        end
+        
+        physics.addBody(myAnimation)
+        timer.performWithDelay( 2000, running ) 
         Runtime:addEventListener( "enterFrame", move )
+        Runtime:addEventListener( "touch", jump )
 	end
 end
 
