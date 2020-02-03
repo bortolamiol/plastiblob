@@ -11,7 +11,6 @@ display.setStatusBar( display.HiddenStatusBar )
 local composer = require "composer"
 
 -- load menu screen
--- ciao
 --NON CANCELLARE LA PROSSIMA RIGA
 --composer.gotoScene( "menu" )
 composer.gotoScene( "levels.level2" )
