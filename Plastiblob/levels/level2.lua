@@ -45,7 +45,7 @@ function scene:show( event )
             local _h = display.actualContentHeight  -- Height of screen
             local _x = 0  -- Horizontal centre of screen
             local _y = 0  -- Vertical centre of screen
-            local speed = 8 --questa sarà la velocità dello scorrimento del nostro sfondo, in base a questa velocità alzeremo anche quella del gioco
+            local speed = 20 --questa sarà la velocità dello scorrimento del nostro sfondo, in base a questa velocità alzeremo anche quella del gioco
 
             bg={}
                 bg[1] = display.newImageRect("immagini/livello-1/plastic-beach.png", _w, _h)
@@ -85,15 +85,7 @@ function scene:show( event )
         
         --questa funzione muove il background di sfondo
         function move(self)
-           --[[ print("ci sono entrato")
-            bg[1].x = bg[1].x-speed
-            bg[2].x = bg[2].x-speed
-            print("posizione: " .. bg[1].x + bg[1].width .. "  - posizione 2: " .. bg[2].x  )
-            if(bg[1].x < -(bg[1].contentWidth ))then
-                bg[1].x = _w
-            elseif(bg[2].x < -(bg[2].contentWidth))then
-                bg[2].x = _w
-            end--]]
+            print("ciao, mi ha chiamato:"..tostring(self))
             if 	self.x<-(display.contentWidth-speed*2) then
                 self.x = display.contentWidth
             else
@@ -106,21 +98,37 @@ function scene:show( event )
             myAnimation:setSequence( "seq1" )
             myAnimation:play()
         end
+
         local function startGame()
-            print("started")
-            timer.performWithDelay( 200, move ) 
+            timer.performWithDelay( 200, move(bg[1]), -1) 
+            timer.performWithDelay( 200, move(bg[2]), -1)
         end
 
         -- }
-
+        local listener = {}
+        function listener:timer( event )
+            if 	bg[1].x<-(display.contentWidth-speed*2) then
+                bg[1].x = display.contentWidth
+            else
+                bg[1].x =bg[1].x - speed
+            end	
+            if 	bg[2].x<-(display.contentWidth-speed*2) then
+                bg[2].x = display.contentWidth
+            else
+                bg[2].x =bg[2].x - speed
+            end	
+        end
+    
+        timer.performWithDelay( 33, listener, -1)
         --PARTE FINALE: richiamo le funzioni e aggiungo gli elementi allo schermo e ai gruppi
         physics.addBody(myAnimation)
         timer.performWithDelay( 2000, running ) 
+        --local timer1 = timer.performWithDelay(200,move(bg[1]),0)
+        --local timer2 = timer.performWithDelay(200,move(bg[2]),0)
         --Runtime:addEventListener( "enterFrame", move )
-        bg[1].enterFrame = move
-        Runtime:addEventListener("enterFrame",bg[1])
-        bg[2].enterFrame = move
-        Runtime:addEventListener("enterFrame",bg[2])
+        --bg[1].touch = move
+        --touch:addEventListener("enterFrame",bg[1])
+        --bg[2].enterFrame = move
 	end
 end
 
@@ -162,20 +170,3 @@ scene:addEventListener( "destroy", scene )
 -----------------------------------------------------------------------------------------
 
 return scene
-
---[[we add the first cloud 
-local opt = { width = 300, height = 200, numFrames = 6}
-local cloudSheet = graphics.newImageSheet("Immagini/livello-1/nuvola1.png", opt)
-local seqs ={{
-	          name = "nuvola1",
-			  start = 1,
-              count = 6,
-              time = 300,
-			  loopCount = 0,
-			  loopDirection ="bounce"
-	    	 }
-			} 
-local nuvola1=display.newSprite(cloudSheet,seqs)
-plane.x = display.contentCenterX - 90
-plane.y = display.contentCenterY - 90
-]]--
