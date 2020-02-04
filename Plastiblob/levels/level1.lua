@@ -125,6 +125,7 @@ function scene:show( event )
             --crea un oggetto di un nuovo sprite nemico e lo aggiunge alla tabella enemies[]
             --da implementare meglio, mi faccio passare che tipo di nemico devo inserire
 			local enemy = display.newSprite( enemyWalkingSheet, enemyData )
+			enemy:play()
 			sceneGroup:insert(enemy) 
             enemy.x = display.actualContentWidth + 200
             enemy.y = composer.getVariable( "posY_ground" )
