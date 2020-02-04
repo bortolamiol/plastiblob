@@ -13,23 +13,7 @@ function scene:create( event )
 	-- 
 	-- INSERT code here to initialize the scene
     -- e.g. add display objects to 'sceneGroup', add touch listeners, etc.
-    --richiedo la libreria necessaria per inserire la fisica all'interno del livello
-    local physics = require("physics")
-    physics.start()
-    -- Overlays collision outlines on normal display objects
-    physics.setDrawMode( "hybrid" )
-    -- The default Corona renderer, with no collision outlines
-    --physics.setDrawMode( "normal" )
-    -- Shows collision engine outlines only
-    --physics.setDrawMode( "debug" )  
-    local sceneGroup = self.view
-    local groundHeight = 100
-    local ground = display.newRect( 0, 0,99999, groundHeight )
-    sceneGroup:insert(ground)
-    ground.x = display.contentCenterX
-    ground.y = display.contentHeight- groundHeight/2
-    composer.setVariable( "posY_ground", ground.y )
-    physics.addBody(ground, "static",{bounce=0, friction=1 } )
+    
 
 end
 
@@ -40,6 +24,23 @@ function scene:show( event )
 	
 	if phase == "will" then
 		-- Called when the scene is still off screen and is about to move on screen
+		--richiedo la libreria necessaria per inserire la fisica all'interno del livello
+		local physics = require("physics")
+		physics.start()
+		-- Overlays collision outlines on normal display objects
+		physics.setDrawMode( "hybrid" )
+		-- The default Corona renderer, with no collision outlines
+		--physics.setDrawMode( "normal" )
+		-- Shows collision engine outlines only
+		--physics.setDrawMode( "debug" )  
+		local sceneGroup = self.view
+		local groundHeight = 100
+		local ground = display.newRect( 0, 0,99999, groundHeight )
+		sceneGroup:insert(ground)
+		ground.x = display.contentCenterX
+		ground.y = display.contentHeight- groundHeight/2
+		composer.setVariable( "posY_ground", ground.y )
+		physics.addBody(ground, "static",{bounce=0, friction=1 } )
     elseif phase == "did" then
         -- INIZIALIZZO LE VARIABILI CHE VERRANNO USATE NEL GIOCO
 
@@ -54,13 +55,15 @@ function scene:show( event )
                 bg[1].anchorY = 0
                 bg[1].anchorX = 0
                 bg[1].x = 0
-                bg[1].y = _y
+				bg[1].y = _y
+				background:insert(bg[1])
                 bg[2] = display.newImageRect("immagini/livello-1/plastic-beach.png", _w, _h)
                 bg[2].anchorY = 0
                 bg[2].anchorX = 0
                 bg[2].x = _w
                 bg[2].y = _y
-
+				background:insert(bg[2])
+				
             local enemies = {} --vettore che conterrà i nemici che inserirò dentro il gioco
 
             ------------------------------------------------------------
@@ -84,9 +87,10 @@ function scene:show( event )
             { name="jumping", sheet=spriteJumpingSheet, start=1, count=7, time=500, loopCount=0 }
         }
         --metto assieme tutti i dettagli dello sprite, elencati in precedenza
-        local sprite = display.newSprite( spriteWalkingSheet, spriteData )
+		local sprite = display.newSprite( spriteWalkingSheet, spriteData )
+		sceneGroup:insert(sprite)   
         local posY_sprite = composer.getVariable( "posY_ground" )
-        sprite.x = display.contentWidth/2-300 ; sprite.y = posY_sprite-100
+        sprite.x = (display.contentWidth/2)-300 ; sprite.y = posY_sprite-100
         local outlinePersonaggio = graphics.newOutline(20, spriteWalkingSheet)
         physics.addBody(sprite, { outline=outlinePersonaggio, density=10, bounce=0, friction=1})
 
@@ -120,7 +124,8 @@ function scene:show( event )
         local function createEnemies()
             --crea un oggetto di un nuovo sprite nemico e lo aggiunge alla tabella enemies[]
             --da implementare meglio, mi faccio passare che tipo di nemico devo inserire
-            local enemy = display.newSprite( enemyWalkingSheet, enemyData )
+			local enemy = display.newSprite( enemyWalkingSheet, enemyData )
+			sceneGroup:insert(enemy) 
             enemy.x = display.actualContentWidth + 200
             enemy.y = composer.getVariable( "posY_ground" )
             print(enemy.y)
@@ -194,8 +199,16 @@ function scene:show( event )
         deletedata.anchorX =  0
         deletedata.anchorY =  0
         deletedata.x = display.actualContentWidth - 100
-        deletedata.y = display.actualContentHeight - 100
+        deletedata.y = 80
+        sceneGroup:insert(deletedata)
 
+        function deletedata:touch( event )
+            if event.phase == "ended" then
+                composer.gotoScene( "menu-levels", "fade", 500 )
+            end
+        end
+
+        deletedata:addEventListener( "touch", touch )
         local gameLoop = timer.performWithDelay( time_speed, loop, 0 )
         local callingEnemies = timer.performWithDelay( enemyTimeSpawn, enemiesLoop, 0 )
         --PARTE FINALE: richiamo le funzioni e aggiungo gli elementi allo schermo e ai gruppi
