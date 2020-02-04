@@ -38,71 +38,81 @@ function scene:show( event )
 	if phase == "will" then
 		-- Called when the scene is still off screen and is about to move on screen
     elseif phase == "did" then
-        -- Set up a few local variables for convenience
-        local _w = display.contentWidth  -- Width of screen
-        local _h = display.contentHeight  -- Height of screen
-        local _x = 0  -- Horizontal centre of screen
-        local _y = 0  -- Vertical centre of screen
+        -- INIZIALIZZO LE VARIABILI CHE VERRANNO USATE NEL GIOCO
 
-        bg={}
-            bg[1] = display.newImageRect("immagini/livello-1/plastic-beach.png", _w, _h)
-            bg[1].anchorY = 0
-            bg[1].anchorX = 0
-            bg[1].x = 0
-            bg[1].y = _y
-            bg[2] = display.newImageRect("immagini/livello-1/plastic-beach.png", _w, _h)
-            bg[2].anchorY = 0
-            bg[2].anchorX = 0
-            bg[2].x = _w
-            bg[2].y = _y
-                
+        -- VARIABILI PER LO SFONDO DI BACKGROUND {
+            local _w = display.contentWidth  -- Width of screen
+            local _h = display.contentHeight  -- Height of screen
+            local _x = 0  -- Horizontal centre of screen
+            local _y = 0  -- Vertical centre of screen
+            local speed = 8 --questa sarà la velocità dello scorrimento del nostro sfondo, in base a questa velocità alzeremo anche quella del gioco
 
-        local speed = 5 -- I increased this to speed up testing
-            
-        function move()
-            bg[1].x = bg[1].x-speed
-            bg[2].x = bg[2].x-speed
-            if(bg[1].x < -(bg[1].contentWidth - speed*2))then
-                bg[1].x = _w
-            elseif(bg[2].x < -(bg[2].contentWidth - speed*2))then
+            bg={}
+                bg[1] = display.newImageRect("immagini/livello-1/plastic-beach.png", _w, _h)
+                bg[1].anchorY = 0
+                bg[1].anchorX = 0
+                bg[1].x = 0
+                bg[1].y = _y
+                bg[2] = display.newImageRect("immagini/livello-1/plastic-beach.png", _w, _h)
+                bg[2].anchorY = 0
+                bg[2].anchorX = 0
                 bg[2].x = _w
-            end
-        end
+                bg[2].y = _y
+        --}
 
-        -- Example assumes 'imageSheet' already created using graphics.newImageSheet()
-        
-        -- 1st image sheet
+        --VARIABILI PER LO SPRITE DEL PERSONAGGIO { 
+        -- primo sprite per il personaggio che corre
         local sheetData1 = { width=200, height=200, numFrames=8, sheetContentWidth=1600, sheetContentHeight=200 }
         local sheet1 = graphics.newImageSheet( "immagini/livello-1/spritewalk2.png", sheetData1 )
         
-        -- 2nd image sheet
+        -- primo sprite per il personaggio che salto
         local sheetData2 = { width=200, height=200, numFrames=7, sheetContentWidth=1400, sheetContentHeight=200 }
         local sheet2 = graphics.newImageSheet( "immagini/livello-1/spritejump.png", sheetData2 )
         
         -- In your sequences, add the parameter 'sheet=', referencing which image sheet the sequence should use
         local sequenceData = {
-                        { name="seq1", sheet=sheet1, start=1, count=6, time=500, loopCount=0 },
-                        { name="seq2", sheet=sheet2, start=1, count=1, time=500, loopCount=0 }
-                        }
+            { name="seq1", sheet=sheet1, start=1, count=6, time=500, loopCount=0 },
+            { name="seq2", sheet=sheet2, start=1, count=1, time=500, loopCount=0 }
+        }
+        --}
+        
         
         local myAnimation = display.newSprite( sheet1, sequenceData )
         myAnimation.x = display.contentWidth/2 ; myAnimation.y = display.contentHeight/2
         myAnimation:play()
+           
+         --FUNZIONI {
         
-        -- After a short time, swap the sequence to 'seq2' which uses the second image sheet
-        local function running()
-                myAnimation:setSequence( "seq1" )
-                myAnimation:play()
+        --questa funzione muove il background di sfondo
+        function move()
+            print("ci sono entrato")
+            bg[1].x = bg[1].x-1
+            bg[2].x = bg[2].x-1
+            print("posizione: " .. bg[1].x + bg[1].width .. "  - posizione 2: " .. bg[2].x  )
+            if(bg[1].x < -(bg[1].contentWidth ))then
+                bg[1].x = _w
+            elseif(bg[2].x < -(bg[2].contentWidth ))then
+                bg[2].x = _w
+            end
         end
-        local function jump()
-            myAnimation:setSequence( "seq2" )
+
+        --questa funzione sceglie la sequenza per far correre il nostro personaggio
+        local function running()
+            myAnimation:setSequence( "seq1" )
             myAnimation:play()
         end
-        
+        local function startGame()
+            print("started")
+            timer.performWithDelay( 200, move ) 
+        end
+
+        -- }
+
+        --PARTE FINALE: richiamo le funzioni e aggiungo gli elementi allo schermo e ai gruppi
         physics.addBody(myAnimation)
         timer.performWithDelay( 2000, running ) 
-        Runtime:addEventListener( "enterFrame", move )
-        Runtime:addEventListener( "touch", jump )
+        Runtime:addEventListener( "touch", startGame )
+
 	end
 end
 
