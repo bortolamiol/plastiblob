@@ -54,13 +54,12 @@ function scene:show( event )
                 bg[1].anchorX = 0
                 bg[1].x = 0
                 bg[1].y = _y
-                background:insert( bg[1] )
                 bg[2] = display.newImageRect("immagini/livello-1/plastic-beach.png", _w, _h)
                 bg[2].anchorY = 0
                 bg[2].anchorX = 0
                 bg[2].x = _w
                 bg[2].y = _y
-                background:insert( bg[2] )
+
             local enemies = {} --vettore che conterrà i nemici che inserirò dentro il gioco
 
             ------------------------------------------------------------
@@ -85,7 +84,6 @@ function scene:show( event )
         }
         --metto assieme tutti i dettagli dello sprite, elencati in precedenza
         local sprite = display.newSprite( spriteWalkingSheet, spriteData )
-        sceneGroup:insert(sprite)
         local posY_sprite = composer.getVariable( "posY_ground" )
         sprite.x = display.contentWidth/2 ; sprite.y = posY_sprite - 150
         physics.addBody(sprite)
@@ -119,13 +117,11 @@ function scene:show( event )
             --crea un oggetto di un nuovo sprite nemico e lo aggiunge alla tabella enemies[]
             --da implementare meglio, mi faccio passare che tipo di nemico devo inserire
             local enemy = display.newSprite( enemyWalkingSheet, enemyData )
-            sceneGroup:insert(enemy)
             enemy.x = display.actualContentWidth + 200
             enemy.y = composer.getVariable( "posY_ground" )
             print(enemy.y)
             physics.addBody(enemy)
             table.insert(enemies, enemy)
-            enemy:play()
             return enemy
         end
         ------------------------------------------------
@@ -165,20 +161,12 @@ function scene:show( event )
         deletedata.anchorX =  0
         deletedata.anchorY =  0
         deletedata.x = display.actualContentWidth - 100
-        deletedata.y = 100  
-        sceneGroup:insert(deletedata)
-        --funzione per cancellare i dati dal database
-        function deletedata:touch( event )
-            if event.phase == "ended" then
-                composer.gotoScene( "menu-levels" )
-            end
-        end
+        deletedata.y = display.actualContentHeight - 100
 
         local gameLoop = timer.performWithDelay( time_speed, loop, 0 )
         local callingEnemies = timer.performWithDelay( enemyTimeSpawn, enemiesLoop, 1  )
         --PARTE FINALE: richiamo le funzioni e aggiungo gli elementi allo schermo e ai gruppi
-
-        deletedata:addEventListener( "touch", goback )
+        sceneGroup:insert(deletedata)
 	end
 end
 
@@ -193,15 +181,14 @@ function scene:hide( event )
 		-- INSERT code here to pause the scene
 		-- e.g. stop timers, stop animation, unload sounds, etc.)
 	
-        print("sono passato")
 	elseif phase == "did" then
 		-- Called when the scene is now off screen
-        print("sono passato")
 	end	
 	
 end
 
 function scene:destroy( event )
+
 	-- Called prior to the removal of scene's "view" (sceneGroup)
 	-- 
 	-- INSERT code here to cleanup the scene
