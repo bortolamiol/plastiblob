@@ -209,8 +209,8 @@ function scene:show( event )
         end
 
         deletedata:addEventListener( "touch", touch )
-        local gameLoop = timer.performWithDelay( time_speed, loop, 0 )
-        local callingEnemies = timer.performWithDelay( enemyTimeSpawn, enemiesLoop, 0 )
+        gameLoop = timer.performWithDelay( time_speed, loop, 0 )
+        callingEnemies = timer.performWithDelay( enemyTimeSpawn, enemiesLoop, 0 )
         --PARTE FINALE: richiamo le funzioni e aggiungo gli elementi allo schermo e ai gruppi
         sceneGroup:insert(deletedata)
 	end
@@ -226,9 +226,15 @@ function scene:hide( event )
 		--
 		-- INSERT code here to pause the scene
 		-- e.g. stop timers, stop animation, unload sounds, etc.)
-	
+
+		--QUI BISOGNA SALVARE I DATI DEL GIOCATORE COME IL PUNTEGGIO
+		timer.cancel( gameLoop )
+		timer.cancel( callingEnemies )
+		physics.pause()
 	elseif phase == "did" then
 		-- Called when the scene is now off screen
+		--cancella tutto il contenuto all'interno di una scena senza salvare i contenuti
+		composer.removeScene( "levels.level1" )
 	end	
 	
 end
