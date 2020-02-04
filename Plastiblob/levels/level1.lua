@@ -39,7 +39,7 @@ function scene:show( event )
 		plastic_next.x = display.contentCenterX+640
 		plastic_next.y = display.contentCenterY-360
 
-		local speed = 4
+		local speed = 6
 		
 		--PRIMA NUVOLA
 		
@@ -114,9 +114,8 @@ function scene:show( event )
 
 	plastic.enterFrame = scroll
 	Runtime:addEventListener("enterFrame",plastic)
-	plastic.enterFrame = scroll
-	Runtime:addEventListener("enterFrame",plastic_next)
 	plastic_next.enterFrame = scroll
+	Runtime:addEventListener("enterFrame",plastic_next)
 	cloud.enterFrame = scroll_clouds
 	Runtime:addEventListener("enterFrame",cloud)
 	cloud_next.enterFrame = scroll_clouds

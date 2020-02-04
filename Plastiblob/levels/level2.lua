@@ -17,9 +17,9 @@ function scene:create( event )
     local physics = require("physics")
     physics.start()
     -- Overlays collision outlines on normal display objects
-    --physics.setDrawMode( "hybrid" )
+    physics.setDrawMode( "hybrid" )
     -- The default Corona renderer, with no collision outlines
-    physics.setDrawMode( "normal" )
+    --physics.setDrawMode( "normal" )
     -- Shows collision engine outlines only
     --physics.setDrawMode( "debug" )  
     local sceneGroup = self.view
@@ -41,8 +41,8 @@ function scene:show( event )
         -- INIZIALIZZO LE VARIABILI CHE VERRANNO USATE NEL GIOCO
 
         -- VARIABILI PER LO SFONDO DI BACKGROUND {
-            local _w = display.contentWidth  -- Width of screen
-            local _h = display.contentHeight  -- Height of screen
+            local _w = display.actualContentWidth  -- Width of screen
+            local _h = display.actualContentHeight  -- Height of screen
             local _x = 0  -- Horizontal centre of screen
             local _y = 0  -- Vertical centre of screen
             local speed = 8 --questa sarà la velocità dello scorrimento del nostro sfondo, in base a questa velocità alzeremo anche quella del gioco
@@ -84,16 +84,21 @@ function scene:show( event )
          --FUNZIONI {
         
         --questa funzione muove il background di sfondo
-        function move()
-            print("ci sono entrato")
-            bg[1].x = bg[1].x-1
-            bg[2].x = bg[2].x-1
+        function move(self)
+           --[[ print("ci sono entrato")
+            bg[1].x = bg[1].x-speed
+            bg[2].x = bg[2].x-speed
             print("posizione: " .. bg[1].x + bg[1].width .. "  - posizione 2: " .. bg[2].x  )
             if(bg[1].x < -(bg[1].contentWidth ))then
                 bg[1].x = _w
-            elseif(bg[2].x < -(bg[2].contentWidth ))then
+            elseif(bg[2].x < -(bg[2].contentWidth))then
                 bg[2].x = _w
-            end
+            end--]]
+            if 	self.x<-(display.contentWidth-speed*2) then
+                self.x = display.contentWidth
+            else
+                self.x =self.x - speed
+            end	
         end
 
         --questa funzione sceglie la sequenza per far correre il nostro personaggio
@@ -111,8 +116,11 @@ function scene:show( event )
         --PARTE FINALE: richiamo le funzioni e aggiungo gli elementi allo schermo e ai gruppi
         physics.addBody(myAnimation)
         timer.performWithDelay( 2000, running ) 
-        Runtime:addEventListener( "touch", startGame )
-
+        --Runtime:addEventListener( "enterFrame", move )
+        bg[1].enterFrame = move
+        Runtime:addEventListener("enterFrame",bg[1])
+        bg[2].enterFrame = move
+        Runtime:addEventListener("enterFrame",bg[2])
 	end
 end
 
