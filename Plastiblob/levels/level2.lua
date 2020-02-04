@@ -86,7 +86,10 @@ function scene:show( event )
         local sprite = display.newSprite( spriteWalkingSheet, spriteData )
         local posY_sprite = composer.getVariable( "posY_ground" )
         sprite.x = display.contentWidth/2 ; sprite.y = posY_sprite - 150
-        physics.addBody(sprite)
+        local outlinePersonaggio = graphics.newOutline(20, spriteWalkingSheet)
+        physics.addBody(sprite, { outline=outlinePersonaggio, density=10, bounce=0.5, friction=0.1 })
+
+        sprite.isJumping = false
         --^_^----^_^----^_^----^_^----^_^----^_^----^_^----^_^----^_^----^_^----^_^----^_^----^_^----^_^----^_^----^_^----^_^----^_^--
         
         -- PRIMO NEMICO
@@ -152,8 +155,47 @@ function scene:show( event )
             end
         end
         ------------------------------------------------
+       
+        --funzione che capisce se c'è collisione
+        function sprite.collision( self, event )
+            if( event.phase == "began" and self.isJumping ) then		
+                self.isJumping = false
+                self:setSequence("walk")
+                self:play()
+                print("Landed @ ", system.getTimer())
+                print("------------------------\n")
+            end
+        end
+        sprite:addEventListener("collision")
+        
+        ------------------------------------------------
+       --[[ function sprite.touch( self,event)
+            if( event.phase == "began" and not self.isJumping ) then
+                self:applyLinearImpulse(0,0.001)
+               self.isJumping = true
+                self:setSequence("jump")
+                self:play()
+                print("Jumped @ ", system.getTimer())
+            end
+        end
+        Runtime:addEventListener( "touch", sprite )--]]
+        ------------------------------------------------
+
+        function sprite.touch( self,event)
+            if( event.phase == "began" and not self.isJumping ) then
+                self:applyLinearImpulse(0,50 )
+                self.isJumping = true
+                self:setSequence("jump")
+                self:play()
+                print("Jumped @ ", system.getTimer())
+            end
+        end
+        Runtime:addEventListener( "touch", sprite )
+
+        ------------------------------------------------
         local function touchListener()
         --funzione che capirà quale evento scatenare al click sullo schermo
+           -- if
         end
     
         -- }

@@ -8,14 +8,17 @@ local composer = require( "composer" )
 local scene = composer.newScene()
 
 function scene:create( event )
-
+	
+	local sceneGroup = self.view
 	-- Called when the scene's view does not exist.
 	-- 
 	-- INSERT code here to initialize the scene
 	-- e.g. add display objects to 'sceneGroup', add touch listeners, etc.
+	
+ 
+end 
 
-	local sceneGroup = self.view
-end
+
 
 function scene:show( event )
 	local sceneGroup = self.view
@@ -41,6 +44,9 @@ function scene:show( event )
 
 		local speed = 6
 		
+		local pauseBtn = display.newImageRect ("Immagini/pausa/pausa.png", 112, 117)
+		pauseBtn.y = display.contentCenterY
+		pauseBtn.x = display.contentCenterX
 		--PRIMA NUVOLA
 		
 		local cloudOptions =
@@ -112,6 +118,16 @@ function scene:show( event )
 		end	
 	end
 
+	local function btnTap(event)
+	
+		event.target.xScale = 0.95
+		event.target.yScale = 0.95
+		--
+		storyboard.showOverlay( "pauseoverlay" ,{effect = "fade"  ,  params ={levelNum = "level01"}, isModal = true} )
+	 
+		return true
+	end
+
 	plastic.enterFrame = scroll
 	Runtime:addEventListener("enterFrame",plastic)
 	plastic_next.enterFrame = scroll
@@ -120,6 +136,10 @@ function scene:show( event )
 	Runtime:addEventListener("enterFrame",cloud)
 	cloud_next.enterFrame = scroll_clouds
 	Runtime:addEventListener("enterFrame",cloud_next)
+
+	--pauseBtn.destination = "pauseBtn"
+	pauseBtn:addEventListener("tap", btnTap)
+	sceneGroup:insert(pauseBtn)
 	end
 end
 
