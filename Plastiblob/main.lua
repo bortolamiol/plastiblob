@@ -14,4 +14,4 @@ local composer = require "composer"
 --NON CANCELLARE LA PROSSIMA RIGA
 --composer.gotoScene( "menu" )
 --composer.gotoScene( "levels.level1" )
-composer.gotoScene( "levels.level2" )
+composer.gotoScene( "levels.level1" )
