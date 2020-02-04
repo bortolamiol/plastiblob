@@ -24,7 +24,7 @@ function scene:create( event )
     --physics.setDrawMode( "debug" )  
     local sceneGroup = self.view
     local groundHeight = 100
-    local ground = display.newRect( 0, 0, display.contentWidth, groundHeight )
+    local ground = display.newRect( 0, 0,99999, groundHeight )
     ground.x = display.contentCenterX
     ground.y = display.contentHeight- groundHeight/2
     composer.setVariable( "posY_ground", ground.y )
@@ -86,17 +86,17 @@ function scene:show( event )
         local sprite = display.newSprite( spriteWalkingSheet, spriteData )
         local posY_sprite = composer.getVariable( "posY_ground" )
         sprite.x = display.contentWidth/2 ; sprite.y = posY_sprite - 150
-        
+        physics.addBody(sprite)
         --^_^----^_^----^_^----^_^----^_^----^_^----^_^----^_^----^_^----^_^----^_^----^_^----^_^----^_^----^_^----^_^----^_^----^_^--
         
         -- PRIMO NEMICO
         local enemyWalkingSheetData = { width=200, height=200, numFrames=6, sheetContentWidth=1200, sheetContentHeight=200 }
         local enemyWalkingSheet = graphics.newImageSheet( "immagini/livello-1/zombiewalking.png", enemyWalkingSheetData )
         local enemyData = {
-            { name="walking", sheet=enemyWalkingSheet, start=1, count=8, time=500, loopCount=0 }
+            { name="walking", sheet=enemyWalkingSheet, start=1, count=6, time=500, loopCount=0 }
         }
         --enemy.x = display.contentWidth + 200 ; sprite.y = posY_sprite
-        local enemyTimeSpawn = 3000
+        local enemyTimeSpawn = 500
 
         --}
         
@@ -117,16 +117,17 @@ function scene:show( event )
             --crea un oggetto di un nuovo sprite nemico e lo aggiunge alla tabella enemies[]
             --da implementare meglio, mi faccio passare che tipo di nemico devo inserire
             local enemy = display.newSprite( enemyWalkingSheet, enemyData )
-            local posY_enemy = composer.getVariable( "posY_ground" )
+            enemy.x = display.actualContentWidth + 200
+            enemy.y = composer.getVariable( "posY_ground" )
+            print(enemy.y)
+            physics.addBody(enemy)
             table.insert(enemies, enemy)
             return enemy
         end
         ------------------------------------------------
         local function enemyScroll(self, event)
             --fa scorrere il nemico nello schermo
-            self.x = self.x - frame_speed
-            print("posizione x nemico: " .. tostring(self.x) )
-            self.y = composer.getVariable( "posY_ground" )
+            self.x = self.x - frame_speed*0.45
         end
         ------------------------------------------------
         local function loop( event )
@@ -138,15 +139,15 @@ function scene:show( event )
         end
         ------------------------------------------------
         local function enemiesLoop()
-            print("sono entrato nella riproduzione di un nemico")
             local enemy = createEnemies()
             enemy.enterFrame = enemyScroll
             Runtime:addEventListener("enterFrame",enemy)
             for i,thisEnemy in ipairs(enemies) do
                 if thisEnemy.x < -200 then
-                Runtime:removeEventListener("enterFrame",thisEnemy)
-                display.remove(thisEnemy)
-                table.remove(enemies,i)
+                    Runtime:removeEventListener("enterFrame",thisEnemy)
+                    display.remove(thisEnemy)
+                    print("cancellato")
+                    table.remove(enemies,i)
                 end
             end
         end
@@ -156,10 +157,16 @@ function scene:show( event )
         end
     
         -- }
+        local deletedata = display.newImageRect( "immagini/menu/x.png", 80, 80 )
+        deletedata.anchorX =  0
+        deletedata.anchorY =  0
+        deletedata.x = display.actualContentWidth - 100
+        deletedata.y = display.actualContentHeight - 100
+
         local gameLoop = timer.performWithDelay( time_speed, loop, 0 )
-        local callingEnemies = timer.performWithDelay( enemyTimeSpawn, enemiesLoop, 0 )
+        local callingEnemies = timer.performWithDelay( enemyTimeSpawn, enemiesLoop, 1  )
         --PARTE FINALE: richiamo le funzioni e aggiungo gli elementi allo schermo e ai gruppi
-        physics.addBody(sprite)
+        sceneGroup:insert(deletedata)
 	end
 end
 
