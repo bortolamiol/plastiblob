@@ -25,6 +25,7 @@ function scene:create( event )
     local sceneGroup = self.view
     local groundHeight = 100
     local ground = display.newRect( 0, 0,99999, groundHeight )
+    sceneGroup:insert(ground)
     ground.x = display.contentCenterX
     ground.y = display.contentHeight- groundHeight/2
     composer.setVariable( "posY_ground", ground.y )
