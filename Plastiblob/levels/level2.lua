@@ -71,7 +71,7 @@ function scene:show( event )
         
         -- In your sequences, add the parameter 'sheet=', referencing which image sheet the sequence should use
         local sequenceData = {
-            { name="seq1", sheet=sheet1, start=1, count=6, time=500, loopCount=0 },
+            { name="walking", sheet=sheet1, start=1, count=6, time=500, loopCount=0 },
             { name="seq2", sheet=sheet2, start=1, count=1, time=500, loopCount=0 }
         }
         --}
@@ -85,7 +85,6 @@ function scene:show( event )
         
         --questa funzione muove il background di sfondo
         function move(self)
-            print("ciao, mi ha chiamato:"..tostring(self))
             if 	self.x<-(display.contentWidth-speed*2) then
                 self.x = display.contentWidth
             else
@@ -95,31 +94,18 @@ function scene:show( event )
 
         --questa funzione sceglie la sequenza per far correre il nostro personaggio
         local function running()
-            myAnimation:setSequence( "seq1" )
+            myAnimation:setSequence( "walking" )
             myAnimation:play()
         end
-
-        local function startGame()
-            timer.performWithDelay( 200, move(bg[1]), -1) 
-            timer.performWithDelay( 200, move(bg[2]), -1)
+        -- 
+        local function loop( event )
+            --qui dentro metteremo tutte le cose che necessitano di un loop all'interno del gioco
+            --richiamo le due funzioni per muovere lo sfondo
+            move(bg[1])
+            move(bg[2])
         end
-
         -- }
-        local listener = {}
-        function listener:timer( event )
-            if 	bg[1].x<-(display.contentWidth-speed*2) then
-                bg[1].x = display.contentWidth
-            else
-                bg[1].x =bg[1].x - speed
-            end	
-            if 	bg[2].x<-(display.contentWidth-speed*2) then
-                bg[2].x = display.contentWidth
-            else
-                bg[2].x =bg[2].x - speed
-            end	
-        end
-    
-        timer.performWithDelay( 33, listener, -1)
+        local gameLoop = timer.performWithDelay( 30, loop, 0 )
         --PARTE FINALE: richiamo le funzioni e aggiungo gli elementi allo schermo e ai gruppi
         physics.addBody(myAnimation)
         timer.performWithDelay( 2000, running ) 
