@@ -23,12 +23,14 @@ function scene:create( event )
     -- Shows collision engine outlines only
     --physics.setDrawMode( "debug" )  
     local sceneGroup = self.view
-    local ground = display.newRect( 0, 0, display.contentWidth, 80 )
+    local groundHeight = 100
+    local ground = display.newRect( 0, 0, display.contentWidth, groundHeight )
     ground.x = display.contentCenterX
-    ground.y = display.contentHeight - 40
-    physics.addBody(ground, "static",{ friction=0.5, bounce=0 } )
+    ground.y = display.contentHeight- groundHeight/2
+    composer.setVariable( "posY_ground", ground.y )
+    physics.addBody(ground, "static",{bounce=0 } )
 
-    end
+end
 
 function scene:show( event )
     local background = self.view
@@ -45,9 +47,8 @@ function scene:show( event )
             local _h = display.actualContentHeight  -- Height of screen
             local _x = 0  -- Horizontal centre of screen
             local _y = 0  -- Vertical centre of screen
-            local speed = 20 --questa sarà la velocità dello scorrimento del nostro sfondo, in base a questa velocità alzeremo anche quella del gioco
-
-            bg={}
+            
+            local bg={} -- 'vettore' che conterrà i due sfondi del gioco
                 bg[1] = display.newImageRect("immagini/livello-1/plastic-beach.png", _w, _h)
                 bg[1].anchorY = 0
                 bg[1].anchorX = 0
@@ -58,63 +59,107 @@ function scene:show( event )
                 bg[2].anchorX = 0
                 bg[2].x = _w
                 bg[2].y = _y
+
+            local enemies = {} --vettore che conterrà i nemici che inserirò dentro il gioco
+
+            ------------------------------------------------------------
+            -- VARIABILI MOLTO IMPORTANTI PER IL GIOCO: VELOCITA' DI GIOCO
+            local frame_speed = 10 --questa sarà la velocità dello scorrimento del nostro sfondo, in base a questa velocità alzeremo anche quella del gioco
+            local time_speed = 30 -- ogni quanti millisecondi verranno chiamate le funzioni di loop (esempio di sfondo background)
+            ------------------------------------------------------------
         --}
 
-        --VARIABILI PER LO SPRITE DEL PERSONAGGIO { 
-        -- primo sprite per il personaggio che corre
-        local sheetData1 = { width=200, height=200, numFrames=8, sheetContentWidth=1600, sheetContentHeight=200 }
-        local sheet1 = graphics.newImageSheet( "immagini/livello-1/spritewalk2.png", sheetData1 )
-        
-        -- primo sprite per il personaggio che salto
-        local sheetData2 = { width=200, height=200, numFrames=7, sheetContentWidth=1400, sheetContentHeight=200 }
-        local sheet2 = graphics.newImageSheet( "immagini/livello-1/spritejump.png", sheetData2 )
-        
+        --VARIABILI PER GLI SPRITE { 
+
+        --PERSONAGGIO DEL GIOCO
+        local spriteWalkingSheetData = { width=200, height=200, numFrames=8, sheetContentWidth=1600, sheetContentHeight=200 }
+        local spriteWalkingSheet = graphics.newImageSheet( "immagini/livello-1/spritewalking.png", spriteWalkingSheetData )
+        -- primo sprite per il personaggio che salta
+        local spriteJumpingSheet = { width=200, height=200, numFrames=7, sheetContentWidth=1400, sheetContentHeight=200 }
+        local spriteJumpingSheet = graphics.newImageSheet( "immagini/livello-1/spritejump.png", spriteJumpingSheet )
         -- In your sequences, add the parameter 'sheet=', referencing which image sheet the sequence should use
-        local sequenceData = {
-            { name="walking", sheet=sheet1, start=1, count=6, time=500, loopCount=0 },
-            { name="seq2", sheet=sheet2, start=1, count=1, time=500, loopCount=0 }
+        local spriteData = {
+            { name="walking", sheet=spriteWalkingSheet, start=1, count=8, time=500, loopCount=0 },
+            { name="jumping", sheet=spriteJumpingSheet, start=1, count=7, time=500, loopCount=0 }
         }
+        --metto assieme tutti i dettagli dello sprite, elencati in precedenza
+        local sprite = display.newSprite( spriteWalkingSheet, spriteData )
+        local posY_sprite = composer.getVariable( "posY_ground" )
+        sprite.x = display.contentWidth/2 ; sprite.y = posY_sprite - 150
+        
+        --^_^----^_^----^_^----^_^----^_^----^_^----^_^----^_^----^_^----^_^----^_^----^_^----^_^----^_^----^_^----^_^----^_^----^_^--
+        
+        -- PRIMO NEMICO
+        local enemyWalkingSheetData = { width=200, height=200, numFrames=6, sheetContentWidth=1200, sheetContentHeight=200 }
+        local enemyWalkingSheet = graphics.newImageSheet( "immagini/livello-1/zombiewalking.png", enemyWalkingSheetData )
+        local enemyData = {
+            { name="walking", sheet=enemyWalkingSheet, start=1, count=8, time=500, loopCount=0 }
+        }
+        --enemy.x = display.contentWidth + 200 ; sprite.y = posY_sprite
+        local enemyTimeSpawn = 3000
+
         --}
         
-        
-        local myAnimation = display.newSprite( sheet1, sequenceData )
-        myAnimation.x = display.contentWidth/2 ; myAnimation.y = display.contentHeight/2
-        myAnimation:play()
+
            
-         --FUNZIONI {
+        --FUNZIONI {
         
-        --questa funzione muove il background di sfondo
-        function move(self)
-            if 	self.x<-(display.contentWidth-speed*2) then
+        local function moveBackground(self)
+            --questa funzione muove il background di sfondo
+            if 	self.x<-(display.contentWidth-frame_speed*2) then
                 self.x = display.contentWidth
             else
-                self.x =self.x - speed
+                self.x =self.x - frame_speed
             end	
         end
-
-        --questa funzione sceglie la sequenza per far correre il nostro personaggio
-        local function running()
-            myAnimation:setSequence( "walking" )
-            myAnimation:play()
+        ------------------------------------------------
+        local function createEnemies()
+            --crea un oggetto di un nuovo sprite nemico e lo aggiunge alla tabella enemies[]
+            --da implementare meglio, mi faccio passare che tipo di nemico devo inserire
+            local enemy = display.newSprite( enemyWalkingSheet, enemyData )
+            local posY_enemy = composer.getVariable( "posY_ground" )
+            table.insert(enemies, enemy)
+            return enemy
         end
-        -- 
+        ------------------------------------------------
+        local function enemyScroll(self, event)
+            --fa scorrere il nemico nello schermo
+            self.x = self.x - frame_speed
+            print("posizione x nemico: " .. tostring(self.x) )
+            self.y = composer.getVariable( "posY_ground" )
+        end
+        ------------------------------------------------
         local function loop( event )
             --qui dentro metteremo tutte le cose che necessitano di un loop all'interno del gioco
             --richiamo le due funzioni per muovere lo sfondo
-            move(bg[1])
-            move(bg[2])
+            moveBackground(bg[1])
+            moveBackground(bg[2])
+            sprite:play()
         end
+        ------------------------------------------------
+        local function enemiesLoop()
+            print("sono entrato nella riproduzione di un nemico")
+            local enemy = createEnemies()
+            enemy.enterFrame = enemyScroll
+            Runtime:addEventListener("enterFrame",enemy)
+            for i,thisEnemy in ipairs(enemies) do
+                if thisEnemy.x < -200 then
+                Runtime:removeEventListener("enterFrame",thisEnemy)
+                display.remove(thisEnemy)
+                table.remove(enemies,i)
+                end
+            end
+        end
+        ------------------------------------------------
+        local function touchListener()
+        --funzione che capirà quale evento scatenare al click sullo schermo
+        end
+    
         -- }
-        local gameLoop = timer.performWithDelay( 30, loop, 0 )
+        local gameLoop = timer.performWithDelay( time_speed, loop, 0 )
+        local callingEnemies = timer.performWithDelay( enemyTimeSpawn, enemiesLoop, 0 )
         --PARTE FINALE: richiamo le funzioni e aggiungo gli elementi allo schermo e ai gruppi
-        physics.addBody(myAnimation)
-        timer.performWithDelay( 2000, running ) 
-        --local timer1 = timer.performWithDelay(200,move(bg[1]),0)
-        --local timer2 = timer.performWithDelay(200,move(bg[2]),0)
-        --Runtime:addEventListener( "enterFrame", move )
-        --bg[1].touch = move
-        --touch:addEventListener("enterFrame",bg[1])
-        --bg[2].enterFrame = move
+        physics.addBody(sprite)
 	end
 end
 
