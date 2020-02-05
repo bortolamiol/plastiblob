@@ -92,6 +92,7 @@ function scene:show( event )
             --VARIABILI PER GLI ELEMENTI DELLO SCHERMO{
             local groundHeight = 100
             local ground = display.newRect( 0, 0,99999, groundHeight )
+            ground.name = "ground"
             group_elements:insert(ground)
             ground.x = display.contentCenterX
             ground.y = display.contentHeight- groundHeight/2
@@ -128,6 +129,7 @@ function scene:show( event )
             }
             --metto assieme tutti i dettagli dello sprite, elencati in precedenza
             sprite = display.newSprite( spriteWalkingSheet, spriteData )
+            sprite.name = "sprite"
             group_elements:insert(sprite)   
             local posY_sprite =  ground.y 
             sprite.x = (display.contentWidth/2)-300 ; sprite.y = posY_sprite-100
@@ -191,6 +193,7 @@ function scene:show( event )
                 --crea un oggetto di un nuovo sprite nemico e lo aggiunge alla tabella enemies[]
                 --da implementare meglio, mi faccio passare che tipo di nemico devo inserire
                 local enemy = display.newSprite( enemyWalkingSheet, enemyData )
+                enemy.name = "enemy"
                 enemy:play()
                 group_elements:insert(enemy) 
                 enemy.x = display.actualContentWidth + 200
@@ -225,6 +228,8 @@ function scene:show( event )
                     --fa scorrere il nemico nello schermo
                     if stop == 0 then
                         self.x = self.x - (frame_speed*0.7)
+                        local spostamentoaria = math.random(-5, 5)
+                        self.y = self.y + spostamentoaria
                     end
                 end
                 ------------------------------------------------
@@ -232,11 +237,11 @@ function scene:show( event )
                     --crea un oggetto di un nuovo sprite nemico e lo aggiunge alla tabella table_plasticbag[]
                     --da implementare meglio, mi faccio passare che tipo di nemico devo inserire
                     local plasticbag = display.newSprite( plasticbagSheet, plasticbagData )
+                    plasticbag.name = "plasticbag"
                     plasticbag:play()
                     group_elements:insert(plasticbag) 
                     plasticbag.x = display.actualContentWidth + 200
                     plasticbag.y = 200
-                    print("posizione y del sacchetto di plastica: " .. plasticbag.y)
                     local frameIndePlasticbag = 1;
                     local outlinePlasticbag = graphics.newOutline(20, plasticbagSheet, frameIndePlasticbag)
                     physics.addBody(plasticbag, { outline=outlinePlasticbag, density=1, bounce=0, friction=1})
@@ -253,7 +258,6 @@ function scene:show( event )
                         if thisPlasticbag.x < -200 then
                             Runtime:removeEventListener("enterFrame",thisPlasticbag)
                             display.remove(thisPlasticbag)
-                            print("cancellato")
                             table.remove(table_plasticbag,i)
                         end
                     end
@@ -264,12 +268,21 @@ function scene:show( event )
             
             --funzione che capisce se c'è collisione
             function sprite.collision( self, event )
-                if( event.phase == "began" and self.isJumping ) then		
-                    self.isJumping = false
-                    self:setSequence("walking")
-                    self:play()
-                    print("Landed @ ", system.getTimer())
-                    print("------------------------\n")
+                if( event.phase == "began" ) then		
+                    --print( self.name .. ": collision began with " .. event.other.name)
+                    if(event.other.name ==  "plasticbag") then
+                        print("Collisione con la plastica")
+                    end
+                    if(event.other.name ==  "enemy") then
+                        print("Collisione con il nemico")
+                    end
+                    if(self.isJumping) then 
+                        self.isJumping = false
+                        self:setSequence("walking")
+                        self:play()
+                       --print("Landed @ ", system.getTimer())
+                        --print("------------------------\n")
+                    end
                 end
             end
             sprite:addEventListener("collision")
