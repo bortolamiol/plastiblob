@@ -1,15 +1,19 @@
 -----------------------------------------------------------------------------------------
 --
--- level1.lua
+-- PRIMO LIVELLO DEL GIOCO: SALTARE I NEMICI E RACCOGLIERE LA PLASTICA DAL CIELO
 --
 -----------------------------------------------------------------------------------------
 
-local composer = require( "composer" )
-local scene = composer.newScene()
-local tutorial = 1
-local bg
-local punteggio
-local sprite
+-- dichiaro delle variabili che andrò a usare in varie scene del livello
+local composer = require( "composer" ) --richiedo la libreria composer
+local scene = composer.newScene() --nuova scena composer
+local tutorial = 1 --ho completato il tutorial? se è 0 devo ancora farlo!
+local bg --variabile che durante lo show conterrà le due immagini di sfondo che andranno una dopo l'altra
+local punteggio --variabile che conterrà il mio punteggio del livello
+local sprite --sprite del personaggio
+local enemies --sprite dei nemici
+local deletedata --bottone per uscire dal livello e tornare alla home dei livelli
+local stop =  0 --variabile che servirà per capire se stoppare il gioco
 
 function scene:create( event )
 
@@ -18,10 +22,13 @@ function scene:create( event )
 	-- INSERT code here to initialize the scene
     -- e.g. add display objects to 'sceneGroup', add touch listeners, etc.
     local sceneGroup = self.view
-    background = display.newGroup()
-    elements = display.newGroup()
-    sceneGroup:insert( background )
-    sceneGroup:insert( elements )
+    --creo due nuovi gruppi che inserirò all'interno del gruppo 'padre' sceneGroup
+    group_tutorial = display.newGroup() --group_background conterrà la foto di sfondo che scrollerà
+    group_background = display.newGroup() --group_background conterrà la foto di sfondo che scrollerà
+    group_elements = display.newGroup() --group_elements conterrà tutti gli altri elementi dello schermo: sprite del personaggio, nemici e bottoni per uscire dal gioco
+    sceneGroup:insert( group_tutorial ) --inserisco il gruppo group_background dentro la scena
+    sceneGroup:insert( group_background ) --inserisco il gruppo group_background dentro la scena
+    sceneGroup:insert( group_elements ) --inserisco il gruppo group_elements dentro la scena
 end
 
 function scene:show( event )
@@ -29,10 +36,8 @@ function scene:show( event )
 	
     if phase == "will" then
 		-- Called when the scene is still off screen and is about to move on screen
-		--richiedo la libreria necessaria per inserire la fisica all'interno del livello
-		local physics = require("physics")
-		physics.start()
-		-- Overlays collision outlines on normal display objects
+		local physics = require("physics") --richiedo la libreria necessaria per inserire la fisica all'interno del livello
+		physics.start() --faccio partire la fisica all'interno del livello
 		physics.setDrawMode( "hybrid" )
 		-- The default Corona renderer, with no collision outlines
 		--physics.setDrawMode( "normal" )
@@ -40,7 +45,18 @@ function scene:show( event )
 		--physics.setDrawMode( "debug" )  
 		
     elseif phase == "did" then
-        if(tutorial == 1) then
+        if(tutorial == 0) then 
+            --[[ DA FARE
+            
+
+            --visualizzare il tutorial del gioco, all'interno del gruppo 'group_tutorial'
+
+
+            ]]--
+        elseif(tutorial == 1) then
+            print("sno qui")
+
+            --ELIMINARE IL GRUPPO DEL TUTORIAL 
             -- INIZIALIZZO LE VARIABILI CHE VERRANNO USATE NEL GIOCO
 
             -- VARIABILI PER LO SFONDO DI BACKGROUND {
@@ -55,26 +71,26 @@ function scene:show( event )
                     bg[1].anchorX = 0
                     bg[1].x = 0
                     bg[1].y = _y
-                    background:insert(bg[1])
+                    group_background:insert(bg[1])
                     bg[2] = display.newImageRect("immagini/livello-1/plastic-beach.png", _w, _h)
                     bg[2].anchorY = 0
                     bg[2].anchorX = 0
                     bg[2].x = _w
                     bg[2].y = _y
-                    background:insert(bg[2])
+                    group_background:insert(bg[2])
                     
-                local enemies = {} --vettore che conterrà i nemici che inserirò dentro il gioco
+                enemies = {} --vettore che conterrà i nemici che inserirò dentro il gioco
 
                 ------------------------------------------------------------
                 -- VARIABILI MOLTO IMPORTANTI PER IL GIOCO: VELOCITA' DI GIOCO
                 local frame_speed = 10 --questa sarà la velocità dello scorrimento del nostro sfondo, in base a questa velocità alzeremo anche quella del gioco
-                local time_speed = 30 -- ogni quanti millisecondi verranno chiamate le funzioni di loop (esempio di sfondo background)
+                local time_speed = 30 -- ogni quanti millisecondi verranno chiamate le funzioni di loop (esempio di sfondo group_background)
                 ------------------------------------------------------------
             --}
             --VARIABILI PER GLI ELEMENTI DELLO SCHERMO{
             local groundHeight = 100
             local ground = display.newRect( 0, 0,99999, groundHeight )
-            elements:insert(ground)
+            group_elements:insert(ground)
             ground.x = display.contentCenterX
             ground.y = display.contentHeight- groundHeight/2
             physics.addBody(ground, "static",{bounce=0, friction=1 } )
@@ -85,8 +101,8 @@ function scene:show( event )
             local spriteWalkingSheetData = { width=200, height=200, numFrames=8, sheetContentWidth=1600, sheetContentHeight=200 }
             local spriteWalkingSheet = graphics.newImageSheet( "immagini/livello-1/spritewalking.png", spriteWalkingSheetData )
             -- primo sprite per il personaggio che salta
-            local spriteJumpingSheet = { width=200, height=200, numFrames=7, sheetContentWidth=1400, sheetContentHeight=200 }
-            local spriteJumpingSheet = graphics.newImageSheet( "immagini/livello-1/spritejump.png", spriteJumpingSheet )
+            local spriteJumpingSheetData = { width=200, height=200, numFrames=7, sheetContentWidth=1400, sheetContentHeight=200 }
+            local spriteJumpingSheet = graphics.newImageSheet( "immagini/livello-1/spritejump.png", spriteJumpingSheetData )
             -- In your sequences, add the parameter 'sheet=', referencing which image sheet the sequence should use
             local spriteData = {
                 { name="walking", sheet=spriteWalkingSheet, start=1, count=8, time=500, loopCount=0 },
@@ -94,7 +110,7 @@ function scene:show( event )
             }
             --metto assieme tutti i dettagli dello sprite, elencati in precedenza
             sprite = display.newSprite( spriteWalkingSheet, spriteData )
-            elements:insert(sprite)   
+            group_elements:insert(sprite)   
             local posY_sprite =  ground.y 
             sprite.x = (display.contentWidth/2)-300 ; sprite.y = posY_sprite-100
             local outlinePersonaggio = graphics.newOutline(20, spriteWalkingSheet)
@@ -118,7 +134,7 @@ function scene:show( event )
             --FUNZIONI {
             
             local function moveBackground(self)
-                --questa funzione muove il background di sfondo
+                --questa funzione muove il group_background di sfondo
                 if 	self.x<-(display.contentWidth-frame_speed*2) then
                     self.x = display.contentWidth
                 else
@@ -131,7 +147,7 @@ function scene:show( event )
                 --da implementare meglio, mi faccio passare che tipo di nemico devo inserire
                 local enemy = display.newSprite( enemyWalkingSheet, enemyData )
                 enemy:play()
-                elements:insert(enemy) 
+                group_elements:insert(enemy) 
                 enemy.x = display.actualContentWidth + 200
                 enemy.y = ground.y 
                 print(enemy.y)
@@ -143,7 +159,9 @@ function scene:show( event )
             ------------------------------------------------
             local function enemyScroll(self, event)
                 --fa scorrere il nemico nello schermo
-                self.x = self.x - frame_speed*0.45
+                if stop == 0 then
+                    self.x = self.x - (frame_speed*0.45)
+                end
             end
             ------------------------------------------------
             local function loop( event )
@@ -201,15 +219,16 @@ function scene:show( event )
             end
         
             -- }
-            local deletedata = display.newImageRect( "immagini/menu/x.png", 80, 80 )
+            deletedata = display.newImageRect( "immagini/menu/x.png", 80, 80 )
             deletedata.anchorX =  0
             deletedata.anchorY =  0
             deletedata.x = display.actualContentWidth - 100
             deletedata.y = 80
-            elements:insert(deletedata)
+            group_elements:insert(deletedata)
 
             function deletedata:touch( event )
                 if event.phase == "ended" then
+                    stop = 1
                     composer.gotoScene( "menu-levels", "fade", 500 )
                 end
             end
@@ -233,10 +252,25 @@ function scene:hide( event )
 		-- INSERT code here to pause the scene
 		-- e.g. stop timers, stop animation, unload sounds, etc.)
 
-		--QUI BISOGNA SALVARE I DATI DEL GIOCATORE COME IL PUNTEGGIO
+        --QUI BISOGNA SALVARE I DATI DEL GIOCATORE COME IL PUNTEGGIO
+
+        --CANCELLO I LOOP
 		timer.cancel( gameLoop )
 		timer.cancel( callingEnemies )
-		physics.pause()
+        physics.pause()
+
+       
+        --ELIMINO I LISTENERS
+        Runtime:removeEventListener("enterFrame",enemy)
+        Runtime:removeEventListener( "touch", sprite )
+        deletedata:removeEventListener( "touch", touch ) 
+        
+        --SVUOTO LE TABELLE
+        for i=1, #enemies do
+            enemies[i]:removeSelf() -- Optional Display Object Removal
+            enemies[i] = nil        -- Nil Out Table Instance
+        end
+
 	elseif phase == "did" then
 		-- Called when the scene is now off screen
 		--cancella tutto il contenuto all'interno di una scena senza salvare i contenuti
