@@ -36,9 +36,12 @@ function scene:show( event )
 	
     if phase == "will" then
 		-- Called when the scene is still off screen and is about to move on screen
-		local physics = require("physics") --richiedo la libreria necessaria per inserire la fisica all'interno del livello
-		physics.start() --faccio partire la fisica all'interno del livello
-		physics.setDrawMode( "hybrid" )
+		--richiedo la libreria necessaria per inserire la fisica all'interno del livello
+		local physics = require("physics")
+		physics.start()
+		-- Overlays collision outlines on normal display objects
+        physics.setGravity( 0,20 )
+        physics.setDrawMode( "hybrid" )
 		-- The default Corona renderer, with no collision outlines
 		--physics.setDrawMode( "normal" )
 		-- Shows collision engine outlines only
@@ -98,10 +101,26 @@ function scene:show( event )
             --VARIABILI PER GLI SPRITE { 
 
             --PERSONAGGIO DEL GIOCO
-            local spriteWalkingSheetData = { width=200, height=200, numFrames=8, sheetContentWidth=1600, sheetContentHeight=200 }
+            local spriteWalkingSheetData = 
+            { 
+                width=200, 
+                height=200, 
+                numFrames=8, 
+                sheetContentWidth=1600, 
+                sheetContentHeight=200
+            }
+
             local spriteWalkingSheet = graphics.newImageSheet( "immagini/livello-1/spritewalking.png", spriteWalkingSheetData )
             -- primo sprite per il personaggio che salta
-            local spriteJumpingSheetData = { width=200, height=200, numFrames=7, sheetContentWidth=1400, sheetContentHeight=200 }
+            local spriteJumpingSheetData = 
+            { 
+                width=200, 
+                height=200, 
+                numFrames=7, 
+                sheetContentWidth=1400, 
+                sheetContentHeight=200 
+            }
+
             local spriteJumpingSheet = graphics.newImageSheet( "immagini/livello-1/spritejump.png", spriteJumpingSheetData )
             -- In your sequences, add the parameter 'sheet=', referencing which image sheet the sequence should use
             local spriteData = {
@@ -113,9 +132,11 @@ function scene:show( event )
             group_elements:insert(sprite)   
             local posY_sprite =  ground.y 
             sprite.x = (display.contentWidth/2)-300 ; sprite.y = posY_sprite-100
-            local outlinePersonaggio = graphics.newOutline(20, spriteWalkingSheet)
-            physics.addBody(sprite, { outline=outlinePersonaggio, density=10, bounce=0, friction=1})
-
+            local frameIndex = 8
+            local outlinePersonaggio = graphics.newOutline(2, spriteWalkingSheet, frameIndex)   --outline personaggio
+            physics.addBody(sprite, { outline=outlinePersonaggio, density=10, bounce=0, friction=1})    --sprite diventa corpo con fisica
+            sprite.gravityScale = 3.8
+            sprite.isFixedRotation = true --rotazione bloccata
             sprite.isJumping = false
             --^_^----^_^----^_^----^_^----^_^----^_^----^_^----^_^----^_^----^_^----^_^----^_^----^_^----^_^----^_^----^_^----^_^----^_^--
             
@@ -125,7 +146,7 @@ function scene:show( event )
             local enemyData = {
                 { name="walking", sheet=enemyWalkingSheet, start=1, count=6, time=500, loopCount=0 }
             }
-            local enemyTimeSpawn = math.random(1000,15000);
+            local enemyTimeSpawn = math.random(4000,15000);
 
             --}
             
@@ -149,10 +170,14 @@ function scene:show( event )
                 enemy:play()
                 group_elements:insert(enemy) 
                 enemy.x = display.actualContentWidth + 200
-                enemy.y = ground.y 
+                enemy.y = ground.y-150
                 print(enemy.y)
-                local outlineNemico = graphics.newOutline(20, enemyWalkingSheet)
-                physics.addBody(enemy, { outline=outlineNemico, density=1, bounce=0.3, friction=0.1 })
+                frameIndexNemico = 1;
+                local outlineNemico = graphics.newOutline(20, enemyWalkingSheet, frameIndexNemico)
+                physics.addBody(enemy, { outline=outlineNemico, density=5, bounce=0, friction=1})
+                enemy.bodyType = "static"
+                enemy.isFixedRotation = true
+                enemy.gravityScale = 5
                 table.insert(enemies, enemy)
                 return enemy
             end
@@ -160,7 +185,7 @@ function scene:show( event )
             local function enemyScroll(self, event)
                 --fa scorrere il nemico nello schermo
                 if stop == 0 then
-                    self.x = self.x - (frame_speed*0.45)
+                    self.x = self.x - (frame_speed*0.7)
                 end
             end
             ------------------------------------------------
@@ -200,10 +225,10 @@ function scene:show( event )
             sprite:addEventListener("collision")
             
             ------------------------------------------------
-        
+            --quando avviene touch personaggio salta e avvia animazione salto
             function sprite.touch( self,event)
                 if( event.phase == "began" and not self.isJumping ) then
-                    self:setLinearVelocity(60,-400)
+                    self:setLinearVelocity(0,-1200)
                     self.isJumping = true
                     self:setSequence("jumping")
                     self:play()
