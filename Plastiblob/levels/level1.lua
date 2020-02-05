@@ -155,7 +155,7 @@ function scene:show( event )
                 enemy.y = ground.y-150
                 print(enemy.y)
                 frameIndexNemico = 1;
-                local outlineNemico = graphics.newOutline(20, enemyWalkingSheet, frameIndexNemico)
+                local outlineNemico = graphics.newOutline(5, enemyWalkingSheet, frameIndexNemico)
                 physics.addBody(enemy, { outline=outlineNemico, density=5, bounce=0, friction=1})
                 enemy.bodyType = "static"
                 enemy.isFixedRotation = true
