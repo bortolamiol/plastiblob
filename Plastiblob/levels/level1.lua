@@ -219,7 +219,6 @@ function scene:show( event )
                     if thisEnemy.x < -200 then
                         Runtime:removeEventListener("enterFrame",thisEnemy)
                         display.remove(thisEnemy)
-                        print("cancellato")
                         table.remove(enemies,i)
                     end
                 end
@@ -243,27 +242,25 @@ function scene:show( event )
                     plasticbag.name = "plasticbag"
                     plasticbag:play()
                     group_elements:insert(plasticbag) 
-                    plasticbag.x = display.actualContentWidth + 200
+                    plasticbag.x = display.actualContentWidth
                     plasticbag.y = 200
                     local frameIndePlasticbag = 1;
                     local outlinePlasticbag = graphics.newOutline(20, plasticbagSheet, frameIndePlasticbag)
                     physics.addBody(plasticbag, { outline=outlinePlasticbag, density=1, bounce=0, friction=1})
                     plasticbag.bodyType = "static"
                     table.insert(table_plasticbag, plasticbag)
-                    plasticbag.id = #table_plasticbag --l'ID di questa plastic bag è la posizione che ha all'interno del vettore table_plasticbag  
-                    --print(table.concat(table_plasticbag, ", "))
                     return plasticbag
                 end
                 ------------------------------------------------
                 local function plasticbagLoop()
-                    plasticbag = createPlasticbag()
-                    plasticbag.enterFrame = plasticbagScroll
-                    Runtime:addEventListener("enterFrame", plasticbag)
-                    for i,thisPlasticbag in ipairs(table_plasticbag) do
-                        if thisPlasticbag.x < -200 then
-                            Runtime:removeEventListener("enterFrame",thisPlasticbag)
-                            display.remove(thisPlasticbag)
-                            table.remove(table_plasticbag,i)
+                    plasticbag = createPlasticbag() --creo un'istanza di un oggetto sprite plastic bag
+                    plasticbag.enterFrame = plasticbagScroll --lo faccio scrollare, grazie alla funzione plasticbagScroll
+                    Runtime:addEventListener("enterFrame", plasticbag) --assegno all'evento enterframe lo scroll
+                    for i,thisPlasticbag in ipairs(table_plasticbag) do  --ipairs ritorna: an iteration Function, a Table, and 0. (?? trovata online)
+                        if thisPlasticbag.x < -200 then --se c'è un sacchetto di plastica che ha superato il limite di -200, lo togliamo!
+                            Runtime:removeEventListener("enterFrame",thisPlasticbag) --rimuovo l'ascoltatore che lo fa scrollare
+                            display.remove(thisPlasticbag) --rimuove QUEL sacchetto di plastica dal display display
+                            table.remove(table_plasticbag,i) --lo rimuove anche dalla tabella dei sacchetti di plastica
                         end
                     end
                 end
@@ -271,16 +268,21 @@ function scene:show( event )
                 ------------------------------------------------
             --}
             
-            --funzione che capisce se c'è collisione
+            --funzione che capisce se c'è collisione con un elemento
             function sprite.collision( self, event )
                 if( event.phase == "began" ) then		
-                    --print( self.name .. ": collision began with " .. event.other.name)
-                    if(event.other.name ==  "plasticbag") then
-                        --Mi sono scontrato con il sacchetto in plastica
-                        --[[Runtime:removeEventListener("enterFrame", event.other)
-                        display:remove(event.other)
-                        group_elements:remove(event.other)
-                        table.remove(table_plasticbag,event.other.id)]]--
+                    --tutte le informazioni dell'elemento che ho toccato le troviamo dentro event.other
+                    if(event.other.name ==  "plasticbag") then --mi sono scontrato con il sacchetto
+                        --[[
+
+                            INSERIRE QUI IL DARE PUNTEGGIO PER AVER RACCOLTO LA PLASTICA
+
+                        ]]--
+                        Runtime:removeEventListener("enterFrame", event.other) --rimuovo il listener dello scroll, così non si muove più
+                        local indexToRemove = table.indexOf(table_plasticbag, plasticbag ) --trovo l'indice che ha all'interno della tabella dei sacchetti di plastica
+                        table.remove(table_plasticbag, indexToRemove) --lo rimuovo dalla tabella, utilizzando l'indice 'indexToRemove' 
+                        display:remove(event.other) --lo rimuovo dal display
+                        group_elements:remove(event.other) --lo rimuovo dal gruppo (????? serve??? NON LO SO, VEDIAMO SE DARA' PROBLEMI)
                     end
                     if(event.other.name ==  "enemy") then 
                         --mi sono scontrato col nemico
