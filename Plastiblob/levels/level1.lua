@@ -1,15 +1,22 @@
 -----------------------------------------------------------------------------------------
 --
--- level1.lua
+-- PRIMO LIVELLO DEL GIOCO: SALTARE I NEMICI E RACCOGLIERE LA PLASTICA DAL CIELO
 --
 -----------------------------------------------------------------------------------------
 
-local composer = require( "composer" )
-local scene = composer.newScene()
-local tutorial = 1
-local bg
-local punteggio
-local sprite
+-- dichiaro delle variabili che andrò a usare in varie scene del livello
+local composer = require( "composer" ) --richiedo la libreria composer
+local scene = composer.newScene() --nuova scena composer
+local tutorial = 1 --ho completato il tutorial? se è 0 devo ancora farlo!
+local bg --variabile che durante lo show conterrà le due immagini di sfondo che andranno una dopo l'altra
+local punteggio --variabile che conterrà il mio punteggio del livello
+local sprite --sprite del personaggio
+local enemies = {} --sprite dei nemici
+local table_plasticbag = {}
+local button_home --bottone per uscire dal livello e tornare alla button_home dei livelli
+local stop =  0 --variabile che servirà per capire se stoppare il gioco
+local callingEnemies
+local callingPlasticbag
 
 function scene:create( event )
 
@@ -18,10 +25,13 @@ function scene:create( event )
 	-- INSERT code here to initialize the scene
     -- e.g. add display objects to 'sceneGroup', add touch listeners, etc.
     local sceneGroup = self.view
-    background = display.newGroup()
-    elements = display.newGroup()
-    sceneGroup:insert( background )
-    sceneGroup:insert( elements )
+    --creo due nuovi gruppi che inserirò all'interno del gruppo 'padre' sceneGroup
+    group_tutorial = display.newGroup() --group_background conterrà la foto di sfondo che scrollerà
+    group_background = display.newGroup() --group_background conterrà la foto di sfondo che scrollerà
+    group_elements = display.newGroup() --group_elements conterrà tutti gli altri elementi dello schermo: sprite del personaggio, nemici e bottoni per uscire dal gioco
+    sceneGroup:insert( group_tutorial ) --inserisco il gruppo group_background dentro la scena
+    sceneGroup:insert( group_background ) --inserisco il gruppo group_background dentro la scena
+    sceneGroup:insert( group_elements ) --inserisco il gruppo group_elements dentro la scena
 end
 
 function scene:show( event )
@@ -41,7 +51,16 @@ function scene:show( event )
 		--physics.setDrawMode( "debug" )  
 		
     elseif phase == "did" then
-        if(tutorial == 1) then
+        if(tutorial == 0) then 
+            --[[ DA FARE
+            
+
+            --visualizzare il tutorial del gioco, all'interno del gruppo 'group_tutorial'
+
+
+            ]]--
+        elseif(tutorial == 1) then
+            --ELIMINARE IL GRUPPO DEL TUTORIAL 
             -- INIZIALIZZO LE VARIABILI CHE VERRANNO USATE NEL GIOCO
 
             -- VARIABILI PER LO SFONDO DI BACKGROUND {
@@ -56,26 +75,25 @@ function scene:show( event )
                     bg[1].anchorX = 0
                     bg[1].x = 0
                     bg[1].y = _y
-                    background:insert(bg[1])
+                    group_background:insert(bg[1])
                     bg[2] = display.newImageRect("immagini/livello-1/plastic-beach.png", _w, _h)
                     bg[2].anchorY = 0
                     bg[2].anchorX = 0
                     bg[2].x = _w
                     bg[2].y = _y
-                    background:insert(bg[2])
-                    
-                local enemies = {} --vettore che conterrà i nemici che inserirò dentro il gioco
+                    group_background:insert(bg[2])
 
                 ------------------------------------------------------------
                 -- VARIABILI MOLTO IMPORTANTI PER IL GIOCO: VELOCITA' DI GIOCO
                 local frame_speed = 10 --questa sarà la velocità dello scorrimento del nostro sfondo, in base a questa velocità alzeremo anche quella del gioco
-                local time_speed = 30 -- ogni quanti millisecondi verranno chiamate le funzioni di loop (esempio di sfondo background)
+                local time_speed = 30 -- ogni quanti millisecondi verranno chiamate le funzioni di loop (esempio di sfondo group_background)
                 ------------------------------------------------------------
             --}
             --VARIABILI PER GLI ELEMENTI DELLO SCHERMO{
             local groundHeight = 100
             local ground = display.newRect( 0, 0,99999, groundHeight )
-            elements:insert(ground)
+            ground.name = "ground"
+            group_elements:insert(ground)
             ground.x = display.contentCenterX
             ground.y = display.contentHeight- groundHeight/2
             physics.addBody(ground, "static",{bounce=0, friction=1 } )
@@ -111,16 +129,16 @@ function scene:show( event )
             }
             --metto assieme tutti i dettagli dello sprite, elencati in precedenza
             sprite = display.newSprite( spriteWalkingSheet, spriteData )
-            elements:insert(sprite)   
+            sprite.name = "sprite"
+            group_elements:insert(sprite)   
             local posY_sprite =  ground.y 
             sprite.x = (display.contentWidth/2)-300 ; sprite.y = posY_sprite-100
-            local frameIndex = 8
+            local frameIndex = 1
             local outlinePersonaggio = graphics.newOutline(2, spriteWalkingSheet, frameIndex)   --outline personaggio
             physics.addBody(sprite, { outline=outlinePersonaggio, density=10, bounce=0, friction=1})    --sprite diventa corpo con fisica
             sprite.gravityScale = 3.8
             sprite.isFixedRotation = true --rotazione bloccata
             sprite.isJumping = false
-            --^_^----^_^----^_^----^_^----^_^----^_^----^_^----^_^----^_^----^_^----^_^----^_^----^_^----^_^----^_^----^_^----^_^----^_^--
             
             -- PRIMO NEMICO
             local enemyWalkingSheetData = { width=200, height=200, numFrames=6, sheetContentWidth=1200, sheetContentHeight=200 }
@@ -130,6 +148,14 @@ function scene:show( event )
             }
             local enemyTimeSpawn = math.random(4000,15000);
 
+            -- SACCHETTO IN PLASTICA
+            local plasticbagSheetData = { width=130, height=130, numFrames=4, sheetContentWidth=520, sheetContentHeight=130 }
+            local plasticbagSheet = graphics.newImageSheet( "immagini/livello-1/paper.png", plasticbagSheetData )
+            local plasticbagData = {
+                { name="plastic", sheet=plasticbagSheet, start=1, count=4, time=500, loopCount=0 }
+            }
+            local plasticbagTimeSpawn = 1000
+
             --}
             
 
@@ -137,23 +163,41 @@ function scene:show( event )
             --FUNZIONI {
             
             local function moveBackground(self)
-                --questa funzione muove il background di sfondo
+                --questa funzione muove il group_background di sfondo
                 if 	self.x<-(display.contentWidth-frame_speed*2) then
                     self.x = display.contentWidth
                 else
                     self.x =self.x - frame_speed
                 end	
             end
+            
+            ------------------------------------------------
+            local function loop( event )
+                --qui dentro metteremo tutte le cose che necessitano di un loop all'interno del gioco
+                --richiamo le due funzioni per muovere lo sfondo
+                moveBackground(bg[1])
+                moveBackground(bg[2])
+                sprite:play()
+            end
+            ------------------------------------------------
+            -- FUNZIONI PER I NEMICI {
+            local function enemyScroll(self, event)
+                --fa scorrere il nemico nello schermo
+                if stop == 0 then
+                    self.x = self.x - (frame_speed*0.7)
+
+                end
+            end
             ------------------------------------------------
             local function createEnemies()
                 --crea un oggetto di un nuovo sprite nemico e lo aggiunge alla tabella enemies[]
                 --da implementare meglio, mi faccio passare che tipo di nemico devo inserire
                 local enemy = display.newSprite( enemyWalkingSheet, enemyData )
+                enemy.name = "enemy"
                 enemy:play()
-                elements:insert(enemy) 
+                group_elements:insert(enemy) 
                 enemy.x = display.actualContentWidth + 200
                 enemy.y = ground.y-150
-                print(enemy.y)
                 frameIndexNemico = 1;
                 local outlineNemico = graphics.newOutline(5, enemyWalkingSheet, frameIndexNemico)
                 physics.addBody(enemy, { outline=outlineNemico, density=5, bounce=0, friction=1})
@@ -162,19 +206,6 @@ function scene:show( event )
                 enemy.gravityScale = 5
                 table.insert(enemies, enemy)
                 return enemy
-            end
-            ------------------------------------------------
-            local function enemyScroll(self, event)
-                --fa scorrere il nemico nello schermo
-                self.x = self.x - frame_speed*0.7
-            end
-            ------------------------------------------------
-            local function loop( event )
-                --qui dentro metteremo tutte le cose che necessitano di un loop all'interno del gioco
-                --richiamo le due funzioni per muovere lo sfondo
-                moveBackground(bg[1])
-                moveBackground(bg[2])
-                sprite:play()
             end
             ------------------------------------------------
             local function enemiesLoop()
@@ -190,16 +221,68 @@ function scene:show( event )
                     end
                 end
             end
+            --}
             ------------------------------------------------
-        
+            -- FUNZIONI PER IL SACCHETTO DI PLASTICA CHE VOLA{
+                local function plasticbagScroll(self, event)
+                    --fa scorrere il nemico nello schermo
+                    if stop == 0 then
+                        self.x = self.x - (frame_speed*0.7)
+                        local spostamentoaria = math.random(-5, 5)
+                        self.y = self.y + spostamentoaria
+                    end
+                end
+                ------------------------------------------------
+                local function createPlasticbag()
+                    --crea un oggetto di un nuovo sprite nemico e lo aggiunge alla tabella table_plasticbag[]
+                    --da implementare meglio, mi faccio passare che tipo di nemico devo inserire
+                    local plasticbag = display.newSprite( plasticbagSheet, plasticbagData )
+                    plasticbag.name = "plasticbag"
+                    plasticbag:play()
+                    group_elements:insert(plasticbag) 
+                    plasticbag.x = display.actualContentWidth + 200
+                    plasticbag.y = 200
+                    local frameIndePlasticbag = 1;
+                    local outlinePlasticbag = graphics.newOutline(20, plasticbagSheet, frameIndePlasticbag)
+                    physics.addBody(plasticbag, { outline=outlinePlasticbag, density=1, bounce=0, friction=1})
+                    plasticbag.bodyType = "static"
+                    table.insert(table_plasticbag, plasticbag)
+                    return plasticbag
+                end
+                ------------------------------------------------
+                local function plasticbagLoop()
+                    plasticbag = createPlasticbag()
+                    plasticbag.enterFrame = plasticbagScroll
+                    Runtime:addEventListener("enterFrame", plasticbag)
+                    for i,thisPlasticbag in ipairs(table_plasticbag) do
+                        if thisPlasticbag.x < -200 then
+                            Runtime:removeEventListener("enterFrame",thisPlasticbag)
+                            display.remove(thisPlasticbag)
+                            table.remove(table_plasticbag,i)
+                        end
+                    end
+                end
+                --}
+                ------------------------------------------------
+            --}
+            
             --funzione che capisce se c'è collisione
             function sprite.collision( self, event )
-                if( event.phase == "began" and self.isJumping ) then		
-                    self.isJumping = false
-                    self:setSequence("walking")
-                    self:play()
-                    print("Landed @ ", system.getTimer())
-                    print("------------------------\n")
+                if( event.phase == "began" ) then		
+                    --print( self.name .. ": collision began with " .. event.other.name)
+                    if(event.other.name ==  "plasticbag") then
+                        print("Collisione con la plastica")
+                    end
+                    if(event.other.name ==  "enemy") then
+                        print("Collisione con il nemico")
+                    end
+                    if(self.isJumping) then 
+                        self.isJumping = false
+                        self:setSequence("walking")
+                        self:play()
+                       --print("Landed @ ", system.getTimer())
+                        --print("------------------------\n")
+                    end
                 end
             end
             sprite:addEventListener("collision")
@@ -220,26 +303,35 @@ function scene:show( event )
             ------------------------------------------------
             local function touchListener()
             --funzione che capirà quale evento scatenare al click sullo schermo
-            -- if
+            --[[
+
+                    DA FARE!
+
+            ]]--
             end
+            -----------------------------------------------------------------
         
             -- }
-            local deletedata = display.newImageRect( "immagini/menu/x.png", 80, 80 )
-            deletedata.anchorX =  0
-            deletedata.anchorY =  0
-            deletedata.x = display.actualContentWidth - 100
-            deletedata.y = 80
-            elements:insert(deletedata)
+            --bottone per uscire dal livello e tornare al menu del livelli
+            button_home = display.newImageRect( "immagini/menu/x.png", 80, 80 )
+            button_home.anchorX =  0
+            button_home.anchorY =  0
+            button_home.x = display.actualContentWidth - 100
+            button_home.y = 80
+            group_elements:insert(button_home)
 
-            function deletedata:touch( event )
+            function button_home:touch( event )
                 if event.phase == "ended" then
-                    composer.gotoScene( "menu-levels", "fade", 500 )
+                    stop = 1
+                    timer.performWithDelay( 500, function() composer.gotoScene( "menu-levels", "fade", 500 ) end)  --ritorno al menu dei livelli
                 end
             end
 
-            deletedata:addEventListener( "touch", touch )
+            button_home:addEventListener( "touch", touch )
+
             gameLoop = timer.performWithDelay( time_speed, loop, 0 )
             callingEnemies = timer.performWithDelay( enemyTimeSpawn, enemiesLoop, 0 )
+            callingPlasticbag = timer.performWithDelay( plasticbagTimeSpawn, plasticbagLoop, 1 )
             --PARTE FINALE: richiamo le funzioni e aggiungo gli elementi allo schermo e ai gruppi
         end
 	end
@@ -255,15 +347,36 @@ function scene:hide( event )
 		--
 		-- INSERT code here to pause the scene
 		-- e.g. stop timers, stop animation, unload sounds, etc.)
+        --QUI BISOGNA SALVARE I DATI DEL GIOCATORE COME IL PUNTEGGIO
 
-		--QUI BISOGNA SALVARE I DATI DEL GIOCATORE COME IL PUNTEGGIO
+        --CANCELLO I LOOP
 		timer.cancel( gameLoop )
-		timer.cancel( callingEnemies )
-		physics.pause()
+        timer.cancel( callingEnemies )
+        timer.cancel( callingPlasticbag )
+        physics.pause()
+
+       
+        --ELIMINO I LISTENERS
+        Runtime:removeEventListener("enterFrame",enemy)
+        Runtime:removeEventListener("enterFrame",plasticbag)
+        Runtime:removeEventListener( "touch", sprite )
+        button_home:removeEventListener( "touch", touch ) 
+        
+        --SVUOTO LE TABELLE
+        for i=1, #enemies do
+            enemies[i]:removeSelf() -- Optional Display Object Removal
+            enemies[i] = nil        -- Nil Out Table Instance
+        end
+        for i=1, #table_plasticbag do
+            table_plasticbag[i]:removeSelf() -- Optional Display Object Removal
+            table_plasticbag[i] = nil        -- Nil Out Table Instance
+        end
+
 	elseif phase == "did" then
 		-- Called when the scene is now off screen
 		--cancella tutto il contenuto all'interno di una scena senza salvare i contenuti
-		composer.removeScene( "levels.level1" )
+        
+        composer.removeScene( "levels.level1" )
 	end	
 	
 end
