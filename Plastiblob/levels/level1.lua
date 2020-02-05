@@ -279,7 +279,7 @@ function scene:show( event )
 
                         ]]--
                         Runtime:removeEventListener("enterFrame", event.other) --rimuovo il listener dello scroll, così non si muove più
-                        local indexToRemove = table.indexOf(table_plasticbag, plasticbag ) --trovo l'indice che ha all'interno della tabella dei sacchetti di plastica
+                        local indexToRemove = table.indexOf(table_plasticbag, event.other ) --trovo l'indice che ha all'interno della tabella dei sacchetti di plastica
                         table.remove(table_plasticbag, indexToRemove) --lo rimuovo dalla tabella, utilizzando l'indice 'indexToRemove' 
                         display:remove(event.other) --lo rimuovo dal display
                         group_elements:remove(event.other) --lo rimuovo dal gruppo (????? serve??? NON LO SO, VEDIAMO SE DARA' PROBLEMI)
