@@ -18,7 +18,10 @@ function scene:create( event )
 	-- INSERT code here to initialize the scene
     -- e.g. add display objects to 'sceneGroup', add touch listeners, etc.
     local sceneGroup = self.view
-    local background = self.view
+    background = display.newGroup()
+    elements = display.newGroup()
+    sceneGroup:insert( background )
+    sceneGroup:insert( elements )
 end
 
 function scene:show( event )
@@ -39,8 +42,6 @@ function scene:show( event )
     elseif phase == "did" then
         if(tutorial == 1) then
             -- INIZIALIZZO LE VARIABILI CHE VERRANNO USATE NEL GIOCO
-            local background = self.view
-            local sceneGroup = self.view
 
             -- VARIABILI PER LO SFONDO DI BACKGROUND {
                 local _w = display.actualContentWidth  -- Width of screen
@@ -73,7 +74,7 @@ function scene:show( event )
             --VARIABILI PER GLI ELEMENTI DELLO SCHERMO{
             local groundHeight = 100
             local ground = display.newRect( 0, 0,99999, groundHeight )
-            sceneGroup:insert(ground)
+            elements:insert(ground)
             ground.x = display.contentCenterX
             ground.y = display.contentHeight- groundHeight/2
             physics.addBody(ground, "static",{bounce=0, friction=1 } )
@@ -93,7 +94,7 @@ function scene:show( event )
             }
             --metto assieme tutti i dettagli dello sprite, elencati in precedenza
             sprite = display.newSprite( spriteWalkingSheet, spriteData )
-            sceneGroup:insert(sprite)   
+            elements:insert(sprite)   
             local posY_sprite =  ground.y 
             sprite.x = (display.contentWidth/2)-300 ; sprite.y = posY_sprite-100
             local outlinePersonaggio = graphics.newOutline(20, spriteWalkingSheet)
@@ -130,7 +131,7 @@ function scene:show( event )
                 --da implementare meglio, mi faccio passare che tipo di nemico devo inserire
                 local enemy = display.newSprite( enemyWalkingSheet, enemyData )
                 enemy:play()
-                sceneGroup:insert(enemy) 
+                elements:insert(enemy) 
                 enemy.x = display.actualContentWidth + 200
                 enemy.y = ground.y 
                 print(enemy.y)
@@ -205,7 +206,7 @@ function scene:show( event )
             deletedata.anchorY =  0
             deletedata.x = display.actualContentWidth - 100
             deletedata.y = 80
-            sceneGroup:insert(deletedata)
+            elements:insert(deletedata)
 
             function deletedata:touch( event )
                 if event.phase == "ended" then
@@ -217,7 +218,6 @@ function scene:show( event )
             gameLoop = timer.performWithDelay( time_speed, loop, 0 )
             callingEnemies = timer.performWithDelay( enemyTimeSpawn, enemiesLoop, 0 )
             --PARTE FINALE: richiamo le funzioni e aggiungo gli elementi allo schermo e ai gruppi
-            sceneGroup:insert(deletedata)
         end
 	end
 end
