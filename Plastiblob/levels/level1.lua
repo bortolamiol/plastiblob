@@ -89,7 +89,7 @@ function scene:show( event )
                 local enemySpeed = 2 --velocità di spostamento del nemico
                 local frame_speed = 20 --questa sarà la velocità dello scorrimento del nostro sfondo, in base a questa velocità alzeremo anche quella del gioco
                 local time_speed = 60 -- ogni quanti millisecondi verranno chiamate le funzioni di loop (esempio di sfondo group_background)
-                local spriteFrameSpeed = 700 --velocità del movimento delle gambe dello sprite [250 - 700]
+                local spriteFrameSpeed = 900 --velocità del movimento delle gambe dello sprite [250 - 700]
                 ------------------------------------------------------------
             --}
             --VARIABILI PER GLI ELEMENTI DELLO SCHERMO{
@@ -149,7 +149,7 @@ function scene:show( event )
             local enemyData = {
                 { name="walking", sheet=enemyWalkingSheet, start=1, count=6, time=500, loopCount=0 }
             }
-            local enemyTimeSpawn = math.random(4000,15000);
+            local enemyTimeSpawn = math.random(10000,15000);
 
             -- SACCHETTO IN PLASTICA
             local plasticbagSheetData = { width=130, height=130, numFrames=4, sheetContentWidth=520, sheetContentHeight=130 }
@@ -251,7 +251,7 @@ function scene:show( event )
                     plasticbag.bodyType = "static"
                     table.insert(table_plasticbag, plasticbag)
                     plasticbag.id = #table_plasticbag --l'ID di questa plastic bag è la posizione che ha all'interno del vettore table_plasticbag  
-                   -- print ( table.concat(table_plasticbag, ", ") ) 
+                    --print(table.concat(table_plasticbag, ", "))
                     return plasticbag
                 end
                 ------------------------------------------------
@@ -277,14 +277,14 @@ function scene:show( event )
                     --print( self.name .. ": collision began with " .. event.other.name)
                     if(event.other.name ==  "plasticbag") then
                         --Mi sono scontrato con il sacchetto in plastica
-                        Runtime:removeEventListener("enterFrame", event.other)
-                        display.remove(event.other)
-                        group_elements(event.other)
-                        table.remove(table_plasticbag,event.other.id)
+                        --[[Runtime:removeEventListener("enterFrame", event.other)
+                        display:remove(event.other)
+                        group_elements:remove(event.other)
+                        table.remove(table_plasticbag,event.other.id)]]--
                     end
                     if(event.other.name ==  "enemy") then 
                         --mi sono scontrato col nemico
-                        print("Collisione con il nemico")
+                       --print("Collisione con il nemico")
                     end
                     if(self.isJumping) then 
                         self.isJumping = false
