@@ -382,11 +382,11 @@ function scene:show( event )
             end
             -- }
             --bottone per uscire dal livello e tornare al menu del livelli
-            button_home = display.newImageRect( "immagini/menu/x.png", 80, 80 )
+            button_home = display.newImageRect( "immagini/menu/home.png", 80, 80 )
             button_home.anchorX =  0
             button_home.anchorY =  0
             button_home.x = display.actualContentWidth - 100
-            button_home.y = 80
+            button_home.y = 40
             group_elements:insert(button_home)
 
             function button_home:touch( event )
