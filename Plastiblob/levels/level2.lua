@@ -447,23 +447,6 @@ function scene:hide( event )
         --QUI BISOGNA SALVARE I DATI DEL GIOCATORE COME IL PUNTEGGIO
         print(gameFinished)
         if(gameFinished == 1) then
-            -- Mi connetto al database e dico che ho completato il livello 1!
-            --[[local sqlite3 = require( "sqlite3" )
-            local path = system.pathForFile( "data.db", system.DocumentsDirectory )
-            local db = sqlite3.open( path )
-            local levelsw = {}
-            for row in db:nrows( "SELECT * FROM levels" ) do --prima devo controllare che non l'utente non lo abbia già fatto
-               levelsw[#levelsw+1] =
-               {
-                   FirstName = row.FirstName,
-                   level = row.level,
-               }
-               local livellicompletati = levelsw[1].level
-            end
-            if livellicompletati == 1 then]]--
-                --local q = [[UPDATE levels SET level='2' WHERE ID=1;]] SCOMMENTARE QUESTA RIGA
-                --db:exec( q )) SCOMMENTARE QUESTA RIGA
-            --end SCOMMENTARE QUESTA RIGA
             resetScene("gamefinished") --se entro qui devo cancellare anche un timeloop che è partito con l'avvicinamento del castello di sabbia
         else
             resetScene("all")  --se entro qui sono uscito prima dal livello, devo eliminare meno timer all'interno del gioco
