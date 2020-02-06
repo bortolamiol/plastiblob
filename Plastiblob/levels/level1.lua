@@ -88,7 +88,6 @@ function scene:show( event )
                 -- VARIABILI MOLTO IMPORTANTI PER IL GIOCO: VELOCITA' DI GIOCO
                 local enemySpeed = 2 --velocità di spostamento del nemico
                 local enemySpeed_max = 8 -- massima velocità di spostamento del nemico
-
                 local frame_speed = 20 --questa sarà la velocità dello scorrimento del nostro sfondo, in base a questa velocità alzeremo anche quella del gioco
                 
                 local time_speed_min = 30 -- ogni quanti millisecondi verranno chiamate le funzioni di loop (esempio di sfondo group_background)
@@ -165,11 +164,8 @@ function scene:show( event )
                 { name="plastic", sheet=plasticbagSheet, start=1, count=4, time=500, loopCount=0 }
             }
             local plasticbagTimeSpawn = 5000
-
             --}
-            
 
-            
             --FUNZIONI {
             
             local function moveBackground(self)
@@ -293,12 +289,15 @@ function scene:show( event )
 
                        ]]--
                     end
-                    if(self.isJumping) then 
-                        self.isJumping = false
-                        self:setSequence("walking")
-                        self:play()
-                       --print("Landed @ ", system.getTimer())
-                        --print("------------------------\n")
+                    if(self.isJumping) then
+                        if(event.other.name == "ground")
+                            then 
+                            self.isJumping = false
+                            self:setSequence("walking")
+                            self:play()
+                        --print("Landed @ ", system.getTimer())
+                            --print("------------------------\n")
+                        end
                     end
                 end
             end
@@ -316,8 +315,18 @@ function scene:show( event )
                 end
             end
             Runtime:addEventListener( "touch", sprite )
-
-            ------------------------------------------------
+            -----------------------------------------------
+            local function preCollisionEvent( self, event )
+            
+            local collideObject = event.other
+            if ( collideObject.collType == "passthru" ) then
+                event.contact.isEnabled = false  --disable this specific collision
+            end
+            end
+            
+            sprite.preCollision = preCollisionEvent
+            sprite:addEventListener( "preCollision" )
+------------------------------------------------
             local function touchListener()
             --funzione che capirà quale evento scatenare al click sullo schermo
             --[[
@@ -339,8 +348,9 @@ function scene:show( event )
                 secondsPlayed = secondsPlayed + 1 --ogni secondo che passa aumento questa variabile che tiene conto di quanto tempo è passato
                 local spriteFrameSpeed_min = 850
                 local enemySpeed_min = 2
+                -- secondsplayed: secondstoplay = x : 6 <-- velocità massima
                 local x_time_speed = ((6 * secondsPlayed) / timeToPlay) --ottiene un numero da 1 a 6
-                gameLoop._delay = time_speed_min - ((time_speed_min * x_time_speed)/time_speed_max )
+                gameLoop._delay = time_speed_min - ((time_speed_min * x_time_speed)/time_speed_max ) --30 - ()
                 --print(time_speed_min)
                 spriteFrameSpeed =  spriteFrameSpeed_min - ((300 * secondsPlayed) / timeToPlay)
                 enemySpeed =  enemySpeed_min + ((8 * secondsPlayed) / timeToPlay)
