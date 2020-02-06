@@ -87,9 +87,15 @@ function scene:show( event )
                 ------------------------------------------------------------
                 -- VARIABILI MOLTO IMPORTANTI PER IL GIOCO: VELOCITA' DI GIOCO
                 local enemySpeed = 2 --velocità di spostamento del nemico
+                local enemySpeed_max = 8 -- massima velocità di spostamento del nemico
+
                 local frame_speed = 20 --questa sarà la velocità dello scorrimento del nostro sfondo, in base a questa velocità alzeremo anche quella del gioco
-                local time_speed = 30 -- ogni quanti millisecondi verranno chiamate le funzioni di loop (esempio di sfondo group_background)
-                local spriteFrameSpeed = 800 --velocità del movimento delle gambe dello sprite [250 - 700]
+                
+                local time_speed_min = 30 -- ogni quanti millisecondi verranno chiamate le funzioni di loop (esempio di sfondo group_background)
+                local time_speed_max = 6 --massimo di velocità che time_speed può raggiungere
+                
+                local spriteFrameSpeed = 800 --velocità del movimento delle gambe dello sprite [250 - 800]
+                local spriteFrameSpeed_max = 300 --velocità del movimento delle gambe dello sprite [250 - 800]
                 ------------------------------------------------------------
             --}
             --VARIABILI PER GLI ELEMENTI DELLO SCHERMO{
@@ -176,21 +182,11 @@ function scene:show( event )
             end
             
             ------------------------------------------------
-            local function loop( event )
-                --qui dentro metteremo tutte le cose che necessitano di un loop all'interno del gioco
-                --richiamo le due funzioni per muovere lo sfondo
-                print(time_speed)
-                moveBackground(bg[1])
-                moveBackground(bg[2])
-                sprite:play()
-            end
-            ------------------------------------------------
             -- FUNZIONI PER I NEMICI {
             local function enemyScroll(self, event)
                 --fa scorrere il nemico nello schermo
                 if stop == 0 then
                     self.x = self.x - (enemySpeed*2)
-
                 end
             end
             ------------------------------------------------
@@ -328,24 +324,22 @@ function scene:show( event )
 
             ]]--
             end
-            -----------------------------------------------------------------
-            
-            local function increaseGameSpeed()
+            ------------------------------------------------
+            local function loop( event )
+                --qui dentro metteremo tutte le cose che necessitano di un loop all'interno del gioco
+                --richiamo le due funzioni per muovere lo sfondo
+                moveBackground(bg[1])
+                moveBackground(bg[2])
+                sprite:play()
+            end
+            ------------------------------------------------
+            local function increaseGameSpeed(event)
                 secondsPlayed = secondsPlayed + 1 --ogni secondo che passa aumento questa variabile che tiene conto di quanto tempo è passato
-                --print("secondi: " .. tostring(secondsPlayed))
-                --spriteFrameSpeed [850 - 300]
-                --enemySpeed [2 - 8]
-                --time_speed [30 - 6]
-                -- se si vuole anche enemyTimeSpawnMin ed enemyTimeSpawnMax
-                -- secondsPlayed : 120 = x : max
-               -- print("time speed after ".. secondsPlayed .. " seconds : "..time_speed)
-                local time_speed_min = 30
-                local time_speed_max = 6
                 local spriteFrameSpeed_min = 850
                 local enemySpeed_min = 2
                 local x_time_speed = ((6 * secondsPlayed) / timeToPlay) --ottiene un numero da 1 a 6
-                time_speed = time_speed_min - ((time_speed_min * x_time_speed)/time_speed_max )
-                --print(time_speed)
+                gameLoop._delay = time_speed_min - ((time_speed_min * x_time_speed)/time_speed_max )
+                --print(time_speed_min)
                 spriteFrameSpeed =  spriteFrameSpeed_min - ((300 * secondsPlayed) / timeToPlay)
                 enemySpeed =  enemySpeed_min + ((8 * secondsPlayed) / timeToPlay)
                 
@@ -369,7 +363,7 @@ function scene:show( event )
 
             --PARTE FINALE: richiamo le funzioni e aggiungo gli elementi allo schermo e ai gruppi
             timeplayed = timer.performWithDelay( 1000, increaseGameSpeed, 0 )
-            gameLoop = timer.performWithDelay( time_speed, loop, 0 )
+            gameLoop = timer.performWithDelay( time_speed_min, loop, 0 )
             callingEnemies = timer.performWithDelay( math.random(enemyTimeSpawnMin, enemyTimeSpawnMax), enemiesLoop, 0 )
             callingPlasticbag = timer.performWithDelay( plasticbagTimeSpawn, plasticbagLoop, 0)
         end
