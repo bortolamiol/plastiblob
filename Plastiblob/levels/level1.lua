@@ -19,7 +19,7 @@ local callingEnemies
 local castle
 local callingPlasticbag
 local timeplayed  --varaiabile che misura da quanti secondi sono all'interno del gioco e farà cambiare la velocità
-local timeToPlay = 10 --variabile che conterrà quanto l'utente dovrà sopravvivere all'interno del gioco
+local timeToPlay = 100 --variabile che conterrà quanto l'utente dovrà sopravvivere all'interno del gioco
 function scene:create( event )
 
 	-- Called when the scene's view does not exist.
@@ -46,7 +46,7 @@ function scene:show( event )
 		physics.start()
 		-- Overlays collision outlines on normal display objects
         physics.setGravity( 0,20 )
-        --physics.setDrawMode( "hybrid" )
+        physics.setDrawMode( "hybrid" )
 		-- The default Corona renderer, with no collision outlines
 		--physics.setDrawMode( "normal" )
 		-- Shows collision engine outlines only
@@ -107,7 +107,7 @@ function scene:show( event )
             local ground = display.newRect( 0, 0,99999, groundHeight )
             ground:setFillColor(0,0,0,0)
             ground.name = "ground"
-            --group_elements:insert(ground)
+            group_elements:insert(ground)
             ground.x = display.contentCenterX
             ground.y = display.contentHeight- groundHeight/2
             physics.addBody(ground, "static",{bounce=0, friction=1 } )
@@ -173,11 +173,11 @@ function scene:show( event )
             
 
             --CASTELLO DI SABBIA IN CUI ENTRERO' A FINE LIVELLO
-            castle = display.newImageRect( "immagini/livello-1/sandcastle-duck.png", 300, 300 )
-            castle.anchorX =  0
-            castle.anchorY =  0
-            castle.x = display.actualContentWidth - 100
-            castle.y = 80
+            castle = display.newImageRect( "immagini/livello-1/sandcastle-duck.png", 700, 700 )
+            castle.x = display.actualContentWidth + 800
+            castle.y = ground.y - castle.height/2 - groundHeight/2
+            group_elements:insert(castle)
+            --physics.addBody(castle, "static",{bounce=0, friction=1 } )
             --}
             
 
@@ -347,9 +347,15 @@ function scene:show( event )
                 sprite:play()
             end
             ------------------------------------------------
-            local function castleScroll(self, event) --funzione per far apparire nello schermo un castello in cui il blob entrerà
+
+            ------------------------------------------------
+            local function castleScroll() --funzione per far apparire nello schermo un castello in cui il blob entrerà
                 if stop == 0 then
-                    self.x = self.x - (enemySpeed*2)
+                    --[[
+
+                        DEVO FAR AVVICINARE IL CASTELLO E AVVICINARE LA SPRITE AL CASTELLO
+
+                    ]]--
                 end
             end
             ----------------------------------------------
@@ -369,6 +375,8 @@ function scene:show( event )
                     if (castleAppared == 0 ) then
                         castleAppared = 1
                         print("ORA APPARE IL CASTELLO")
+                        Runtime:addEventListener("enterFrame", castleScroll)
+                        resetScene()
                     end
                 end
             end
@@ -397,7 +405,6 @@ function scene:show( event )
         end
 	end
 end
-
 function scene:hide( event )
 	local sceneGroup = self.view
 	
@@ -410,29 +417,7 @@ function scene:hide( event )
 		-- e.g. stop timers, stop animation, unload sounds, etc.)
         --QUI BISOGNA SALVARE I DATI DEL GIOCATORE COME IL PUNTEGGIO
 
-        --CANCELLO I LOOP
-		timer.cancel( gameLoop )
-        timer.cancel( callingEnemies )
-        timer.cancel( callingPlasticbag )
-        timer.cancel( timeplayed )
-        physics.pause()
-
-       
-        --ELIMINO I LISTENERS
-        Runtime:removeEventListener("enterFrame",enemy)
-        Runtime:removeEventListener("enterFrame",plasticbag)
-        Runtime:removeEventListener( "touch", sprite )
-        button_home:removeEventListener( "touch", touch ) 
-        
-        --SVUOTO LE TABELLE
-        for i=1, #enemies do
-            enemies[i]:removeSelf() -- Optional Display Object Removal
-            enemies[i] = nil        -- Nil Out Table Instance
-        end
-        for i=1, #table_plasticbag do
-            table_plasticbag[i]:removeSelf() -- Optional Display Object Removal
-            table_plasticbag[i] = nil        -- Nil Out Table Instance
-        end
+        resetScene()
 
 	elseif phase == "did" then
 		-- Called when the scene is now off screen
@@ -451,6 +436,30 @@ function scene:destroy( event )
 	-- e.g. remove display objects, remove touch listeners, save state, etc.
 	local sceneGroup = self.view
 	
+end
+function resetScene()
+    timer.cancel( gameLoop )
+    timer.cancel( callingEnemies )
+    timer.cancel( callingPlasticbag )
+    timer.cancel( timeplayed )
+    physics.pause()
+
+       
+    --ELIMINO I LISTENERS
+    Runtime:removeEventListener("enterFrame",enemy)
+    Runtime:removeEventListener("enterFrame",plasticbag)
+    Runtime:removeEventListener( "touch", sprite )
+    button_home:removeEventListener( "touch", touch ) 
+        
+    --SVUOTO LE TABELLE
+    for i=1, #enemies do
+        enemies[i]:removeSelf() -- Optional Display Object Removal
+        enemies[i] = nil        -- Nil Out Table Instance
+    end
+    for i=1, #table_plasticbag do
+        table_plasticbag[i]:removeSelf() -- Optional Display Object Removal
+        table_plasticbag[i] = nil        -- Nil Out Table Instance
+    end
 end
 
 ---------------------------------------------------------------------------------
