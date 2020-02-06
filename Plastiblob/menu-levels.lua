@@ -7,6 +7,14 @@
 
 local composer = require( "composer" )
 local scene = composer.newScene()
+local sqlite3 = require( "sqlite3" )	
+
+	-- Create a file path for the database file "data.db"
+	local path = system.pathForFile( "data.db", system.DocumentsDirectory )
+
+	-- Open the database for access
+	local db = sqlite3.open( path )
+	--controllo se la tabella 'levels' esiste già, sennò la devo creare
 
 -- include Corona's "widget" library
 local widget = require "widget"

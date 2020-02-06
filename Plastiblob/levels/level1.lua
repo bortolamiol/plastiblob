@@ -20,6 +20,8 @@ local castle
 local callingPlasticbag
 local timeplayed  --varaiabile che misura da quanti secondi sono all'interno del gioco e farà cambiare la velocità
 local timeToPlay = 100 --variabile che conterrà quanto l'utente dovrà sopravvivere all'interno del gioco
+local scoreCount    --variabile conteggio punteggio iniziale
+
 function scene:create( event )
 
 	-- Called when the scene's view does not exist.
@@ -50,7 +52,8 @@ function scene:show( event )
 		-- The default Corona renderer, with no collision outlines
 		--physics.setDrawMode( "normal" )
 		-- Shows collision engine outlines only
-		--physics.setDrawMode( "debug" )  
+        --physics.setDrawMode( "debug" )
+
 		
     elseif phase == "did" then
         if(tutorial == 0) then 
@@ -64,8 +67,9 @@ function scene:show( event )
         elseif(tutorial == 1) then
             --ELIMINARE IL GRUPPO DEL TUTORIAL 
             -- INIZIALIZZO LE VARIABILI CHE VERRANNO USATE NEL GIOCO
-               local secondsPlayed = 0 --quanti secondi sono passati dall'inizio del gioco
-               local castleAppared = 0 --variabile fuffa che mi servirà per controllare se il castello è già apparso sullo schermo una volta
+                local secondsPlayed = 0 --quanti secondi sono passati dall'inizio del gioco
+                local castleAppared = 0 --variabile fuffa che mi servirà per controllare se il castello è già apparso sullo schermo una volta
+                local scoreCount = 0 --variabile conteggio punteggio iniziale
 
             -- VARIABILI PER LO SFONDO DI BACKGROUND {
                 local _w = display.actualContentWidth  -- Width of screen
@@ -178,7 +182,8 @@ function scene:show( event )
             castle.y = ground.y - castle.height/2 - groundHeight/2
             group_elements:insert(castle)
             --physics.addBody(castle, "static",{bounce=0, friction=1 } )
-            --}
+            
+            
 
             --FUNZIONI {
             
@@ -283,11 +288,11 @@ function scene:show( event )
                 if( event.phase == "began" ) then		
                     --tutte le informazioni dell'elemento che ho toccato le troviamo dentro event.other
                     if(event.other.name ==  "plasticbag") then --mi sono scontrato con il sacchetto
-                        --[[
-
-                            INSERIRE QUI IL DARE PUNTEGGIO PER AVER RACCOLTO LA PLASTICA
-
-                        ]]--
+                        scoreCount = scoreCount+100;
+                        print(scoreCount)
+                        --TESTO DELLO SCORE
+                        local scoreText = display.newText( scoreCount, 100, 200, native.systemFont, 16 )
+                        scoreText:setFillColor( 1, 0, 0 )
                         Runtime:removeEventListener("enterFrame", event.other) --rimuovo il listener dello scroll, così non si muove più
                         local indexToRemove = table.indexOf(table_plasticbag, event.other ) --trovo l'indice che ha all'interno della tabella dei sacchetti di plastica
                         table.remove(table_plasticbag, indexToRemove) --lo rimuovo dalla tabella, utilizzando l'indice 'indexToRemove' 
