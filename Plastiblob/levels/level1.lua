@@ -18,7 +18,7 @@ local stop =  0 --variabile che servirà per capire se stoppare il gioco
 local callingEnemies
 local callingPlasticbag
 local timeplayed  --varaiabile che misura da quanti secondi sono all'interno del gioco e farà cambiare la velocità
-local timeToPlay = 120 --variabile che conterrà quanto l'utente dovrà sopravvivere all'interno del gioco
+local timeToPlay = 100 --variabile che conterrà quanto l'utente dovrà sopravvivere all'interno del gioco
 function scene:create( event )
 
 	-- Called when the scene's view does not exist.
@@ -86,8 +86,9 @@ function scene:show( event )
 
                 ------------------------------------------------------------
                 -- VARIABILI MOLTO IMPORTANTI PER IL GIOCO: VELOCITA' DI GIOCO
-                local enemySpeed = 2 --velocità di spostamento del nemico
-                local enemySpeed_max = 8 -- massima velocità di spostamento del nemico
+                local enemySpeed_max = 14 -- massima velocità di spostamento del nemico
+                local enemySpeed_min = 2 -- minima velocità di spostamento del nemico
+                local enemySpeed = enemySpeed_min --velocità di spostamento del nemico
 
                 local frame_speed = 20 --questa sarà la velocità dello scorrimento del nostro sfondo, in base a questa velocità alzeremo anche quella del gioco
                 
@@ -95,7 +96,7 @@ function scene:show( event )
                 local time_speed_max = 6 --massimo di velocità che time_speed può raggiungere
                 
                 local spriteFrameSpeed = 800 --velocità del movimento delle gambe dello sprite [250 - 800]
-                local spriteFrameSpeed_max = 300 --velocità del movimento delle gambe dello sprite [250 - 800]
+                local spriteFrameSpeed_max = 200 --velocità del movimento delle gambe dello sprite [250 - 800]
                 ------------------------------------------------------------
             --}
             --VARIABILI PER GLI ELEMENTI DELLO SCHERMO{
@@ -337,14 +338,15 @@ function scene:show( event )
             ------------------------------------------------
             local function increaseGameSpeed(event)
                 secondsPlayed = secondsPlayed + 1 --ogni secondo che passa aumento questa variabile che tiene conto di quanto tempo è passato
-                print(secondsPlayed)
-                local spriteFrameSpeed_min = 850
-                local enemySpeed_min = 2
-                local x_time_speed = ((6 * secondsPlayed) / timeToPlay) --ottiene un numero da 1 a 6
-                gameLoop._delay = time_speed_min - ((time_speed_min * x_time_speed)/time_speed_max )
-                spriteFrameSpeed =  spriteFrameSpeed_min - ((300 * secondsPlayed) / timeToPlay)
-                enemySpeed =  enemySpeed_min + ((8 * secondsPlayed) / timeToPlay)
-                
+                if(gameLoop._delay >= time_speed_max) then --minimo di millisecondi a cui può spingersi la funzione loop
+                    --time speed con cui viene richiamata la funzione loop
+                    local x_time_speed = ((time_speed_max * secondsPlayed) / timeToPlay) --ottiene un numero da 1 a 6
+                    gameLoop._delay = time_speed_min - ((time_speed_min * x_time_speed)/time_speed_max ) --il time delay è frutto di un'altra proporzione da 6 a 30
+
+                    --cambio della velocità del nostro nemico [da 2 a 12] --> secondi passati : secondi totali = x : 12 (ritornerà un numero da 1 a 12)
+                    local x_enemySpeed = ((enemySpeed_max * secondsPlayed)/timeToPlay)
+                    enemySpeed = enemySpeed_min + x_enemySpeed --la velocità è data dalla velocità minima (2) + il risultato della proporzione
+                    end
             end
             -- }
             --bottone per uscire dal livello e tornare al menu del livelli
