@@ -126,8 +126,8 @@ function scene:show( event )
             { 
                 width=200, 
                 height=200, 
-                numFrames=7, 
-                sheetContentWidth=1400, 
+                numFrames=8, 
+                sheetContentWidth=1600, 
                 sheetContentHeight=200 
             }
 
@@ -135,7 +135,7 @@ function scene:show( event )
             -- In your sequences, add the parameter 'sheet=', referencing which image sheet the sequence should use
             local spriteData = {
                 { name="walking", sheet=spriteWalkingSheet, start=1, count=8, time=spriteFrameSpeed, loopCount=0 },
-                { name="jumping", sheet=spriteJumpingSheet, start=1, count=7, time=500, loopCount=0 }
+                { name="jumping", sheet=spriteJumpingSheet, start=1, count=8, time=600, loopCount=1 }
             }
             --metto assieme tutti i dettagli dello sprite, elencati in precedenza
             sprite = display.newSprite( spriteWalkingSheet, spriteData )
@@ -338,6 +338,7 @@ function scene:show( event )
             ------------------------------------------------
             local function increaseGameSpeed(event)
                 secondsPlayed = secondsPlayed + 1 --ogni secondo che passa aumento questa variabile che tiene conto di quanto tempo è passato
+                print(secondsPlayed)
                 if(gameLoop._delay >= time_speed_max) then --minimo di millisecondi a cui può spingersi la funzione loop
                     --time speed con cui viene richiamata la funzione loop
                     local x_time_speed = ((time_speed_max * secondsPlayed) / timeToPlay) --ottiene un numero da 1 a 6
