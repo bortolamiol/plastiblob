@@ -337,11 +337,11 @@ function scene:show( event )
             ------------------------------------------------
             local function increaseGameSpeed(event)
                 secondsPlayed = secondsPlayed + 1 --ogni secondo che passa aumento questa variabile che tiene conto di quanto tempo è passato
+                print(secondsPlayed)
                 local spriteFrameSpeed_min = 850
                 local enemySpeed_min = 2
                 local x_time_speed = ((6 * secondsPlayed) / timeToPlay) --ottiene un numero da 1 a 6
                 gameLoop._delay = time_speed_min - ((time_speed_min * x_time_speed)/time_speed_max )
-                --print(time_speed_min)
                 spriteFrameSpeed =  spriteFrameSpeed_min - ((300 * secondsPlayed) / timeToPlay)
                 enemySpeed =  enemySpeed_min + ((8 * secondsPlayed) / timeToPlay)
                 
