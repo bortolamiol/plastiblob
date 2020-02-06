@@ -17,7 +17,8 @@ local button_home --bottone per uscire dal livello e tornare alla button_home de
 local stop =  0 --variabile che servirà per capire se stoppare il gioco
 local callingEnemies
 local callingPlasticbag
-
+local timeplayed  --varaiabile che misura da quanti secondi sono all'interno del gioco e farà cambiare la velocità
+local timeToPlay = 120 --variabile che conterrà quanto l'utente dovrà sopravvivere all'interno del gioco
 function scene:create( event )
 
 	-- Called when the scene's view does not exist.
@@ -62,7 +63,7 @@ function scene:show( event )
         elseif(tutorial == 1) then
             --ELIMINARE IL GRUPPO DEL TUTORIAL 
             -- INIZIALIZZO LE VARIABILI CHE VERRANNO USATE NEL GIOCO
-
+               local secondsPlayed = 0
             -- VARIABILI PER LO SFONDO DI BACKGROUND {
                 local _w = display.actualContentWidth  -- Width of screen
                 local _h = display.actualContentHeight  -- Height of screen
@@ -85,8 +86,16 @@ function scene:show( event )
 
                 ------------------------------------------------------------
                 -- VARIABILI MOLTO IMPORTANTI PER IL GIOCO: VELOCITA' DI GIOCO
-                local frame_speed = 10 --questa sarà la velocità dello scorrimento del nostro sfondo, in base a questa velocità alzeremo anche quella del gioco
-                local time_speed = 30 -- ogni quanti millisecondi verranno chiamate le funzioni di loop (esempio di sfondo group_background)
+                local enemySpeed = 2 --velocità di spostamento del nemico
+                local enemySpeed_max = 8 -- massima velocità di spostamento del nemico
+
+                local frame_speed = 20 --questa sarà la velocità dello scorrimento del nostro sfondo, in base a questa velocità alzeremo anche quella del gioco
+                
+                local time_speed_min = 30 -- ogni quanti millisecondi verranno chiamate le funzioni di loop (esempio di sfondo group_background)
+                local time_speed_max = 6 --massimo di velocità che time_speed può raggiungere
+                
+                local spriteFrameSpeed = 800 --velocità del movimento delle gambe dello sprite [250 - 800]
+                local spriteFrameSpeed_max = 300 --velocità del movimento delle gambe dello sprite [250 - 800]
                 ------------------------------------------------------------
             --}
             --VARIABILI PER GLI ELEMENTI DELLO SCHERMO{
@@ -124,7 +133,7 @@ function scene:show( event )
             local spriteJumpingSheet = graphics.newImageSheet( "immagini/livello-1/spritejump.png", spriteJumpingSheetData )
             -- In your sequences, add the parameter 'sheet=', referencing which image sheet the sequence should use
             local spriteData = {
-                { name="walking", sheet=spriteWalkingSheet, start=1, count=8, time=500, loopCount=0 },
+                { name="walking", sheet=spriteWalkingSheet, start=1, count=8, time=spriteFrameSpeed, loopCount=0 },
                 { name="jumping", sheet=spriteJumpingSheet, start=1, count=7, time=500, loopCount=0 }
             }
             --metto assieme tutti i dettagli dello sprite, elencati in precedenza
@@ -146,7 +155,8 @@ function scene:show( event )
             local enemyData = {
                 { name="walking", sheet=enemyWalkingSheet, start=1, count=6, time=500, loopCount=0 }
             }
-            local enemyTimeSpawn = math.random(4000,15000);
+            local enemyTimeSpawnMin = 5000
+            local enemyTimeSpawnMax  = 9000
 
             -- SACCHETTO IN PLASTICA
             local plasticbagSheetData = { width=130, height=130, numFrames=4, sheetContentWidth=520, sheetContentHeight=130 }
@@ -154,7 +164,7 @@ function scene:show( event )
             local plasticbagData = {
                 { name="plastic", sheet=plasticbagSheet, start=1, count=4, time=500, loopCount=0 }
             }
-            local plasticbagTimeSpawn = 1000
+            local plasticbagTimeSpawn = 5000
 
             --}
             
@@ -172,20 +182,11 @@ function scene:show( event )
             end
             
             ------------------------------------------------
-            local function loop( event )
-                --qui dentro metteremo tutte le cose che necessitano di un loop all'interno del gioco
-                --richiamo le due funzioni per muovere lo sfondo
-                moveBackground(bg[1])
-                moveBackground(bg[2])
-                sprite:play()
-            end
-            ------------------------------------------------
             -- FUNZIONI PER I NEMICI {
             local function enemyScroll(self, event)
                 --fa scorrere il nemico nello schermo
                 if stop == 0 then
-                    self.x = self.x - (frame_speed*0.7)
-
+                    self.x = self.x - (enemySpeed*2)
                 end
             end
             ------------------------------------------------
@@ -216,7 +217,6 @@ function scene:show( event )
                     if thisEnemy.x < -200 then
                         Runtime:removeEventListener("enterFrame",thisEnemy)
                         display.remove(thisEnemy)
-                        print("cancellato")
                         table.remove(enemies,i)
                     end
                 end
@@ -227,7 +227,7 @@ function scene:show( event )
                 local function plasticbagScroll(self, event)
                     --fa scorrere il nemico nello schermo
                     if stop == 0 then
-                        self.x = self.x - (frame_speed*0.7)
+                        self.x = self.x - (enemySpeed*2)
                         local spostamentoaria = math.random(-5, 5)
                         self.y = self.y + spostamentoaria
                     end
@@ -240,7 +240,7 @@ function scene:show( event )
                     plasticbag.name = "plasticbag"
                     plasticbag:play()
                     group_elements:insert(plasticbag) 
-                    plasticbag.x = display.actualContentWidth + 200
+                    plasticbag.x = display.actualContentWidth
                     plasticbag.y = 200
                     local frameIndePlasticbag = 1;
                     local outlinePlasticbag = graphics.newOutline(20, plasticbagSheet, frameIndePlasticbag)
@@ -253,14 +253,14 @@ function scene:show( event )
                 end
                 ------------------------------------------------
                 local function plasticbagLoop()
-                    plasticbag = createPlasticbag()
-                    plasticbag.enterFrame = plasticbagScroll
-                    Runtime:addEventListener("enterFrame", plasticbag)
-                    for i,thisPlasticbag in ipairs(table_plasticbag) do
-                        if thisPlasticbag.x < -200 then
-                            Runtime:removeEventListener("enterFrame",thisPlasticbag)
-                            display.remove(thisPlasticbag)
-                            table.remove(table_plasticbag,i)
+                    plasticbag = createPlasticbag() --creo un'istanza di un oggetto sprite plastic bag
+                    plasticbag.enterFrame = plasticbagScroll --lo faccio scrollare, grazie alla funzione plasticbagScroll
+                    Runtime:addEventListener("enterFrame", plasticbag) --assegno all'evento enterframe lo scroll
+                    for i,thisPlasticbag in ipairs(table_plasticbag) do  --ipairs ritorna: an iteration Function, a Table, and 0. (?? trovata online)
+                        if thisPlasticbag.x < -200 then --se c'è un sacchetto di plastica che ha superato il limite di -200, lo togliamo!
+                            Runtime:removeEventListener("enterFrame",thisPlasticbag) --rimuovo l'ascoltatore che lo fa scrollare
+                            display.remove(thisPlasticbag) --rimuove QUEL sacchetto di plastica dal display display
+                            table.remove(table_plasticbag,i) --lo rimuove anche dalla tabella dei sacchetti di plastica
                         end
                     end
                 end
@@ -268,18 +268,30 @@ function scene:show( event )
                 ------------------------------------------------
             --}
             
-            --funzione che capisce se c'è collisione
+            --funzione che capisce se c'è collisione con un elemento
             function sprite.collision( self, event )
                 if( event.phase == "began" ) then		
-                    --print( self.name .. ": collision began with " .. event.other.name)
-                    
-                    if(event.other.name ==  "plasticbag") then
-                        print("Collisione con la plastica")
-                        Runtime:removeEventListener("enterFrame",thisPlasticbag)
-                        display.remove(thisPlasticbag)
+                    --tutte le informazioni dell'elemento che ho toccato le troviamo dentro event.other
+                    if(event.other.name ==  "plasticbag") then --mi sono scontrato con il sacchetto
+                        --[[
+
+                            INSERIRE QUI IL DARE PUNTEGGIO PER AVER RACCOLTO LA PLASTICA
+
+                        ]]--
+                        Runtime:removeEventListener("enterFrame", event.other) --rimuovo il listener dello scroll, così non si muove più
+                        local indexToRemove = table.indexOf(table_plasticbag, event.other ) --trovo l'indice che ha all'interno della tabella dei sacchetti di plastica
+                        table.remove(table_plasticbag, indexToRemove) --lo rimuovo dalla tabella, utilizzando l'indice 'indexToRemove' 
+                        display:remove(event.other) --lo rimuovo dal display
+                        group_elements:remove(event.other) --lo rimuovo dal gruppo (????? serve??? NON LO SO, VEDIAMO SE DARA' PROBLEMI)
                     end
-                    if(event.other.name ==  "enemy") then
-                        print("Collisione con il nemico")
+                    if(event.other.name ==  "enemy") then 
+                        --mi sono scontrato col nemico
+                       --print("Collisione con il nemico")
+                       --[[
+
+                            INSERIRE QUI GAME OVER
+
+                       ]]--
                     end
                     if(self.isJumping) then 
                         self.isJumping = false
@@ -314,8 +326,26 @@ function scene:show( event )
 
             ]]--
             end
-            -----------------------------------------------------------------
-        
+            ------------------------------------------------
+            local function loop( event )
+                --qui dentro metteremo tutte le cose che necessitano di un loop all'interno del gioco
+                --richiamo le due funzioni per muovere lo sfondo
+                moveBackground(bg[1])
+                moveBackground(bg[2])
+                sprite:play()
+            end
+            ------------------------------------------------
+            local function increaseGameSpeed(event)
+                secondsPlayed = secondsPlayed + 1 --ogni secondo che passa aumento questa variabile che tiene conto di quanto tempo è passato
+                local spriteFrameSpeed_min = 850
+                local enemySpeed_min = 2
+                local x_time_speed = ((6 * secondsPlayed) / timeToPlay) --ottiene un numero da 1 a 6
+                gameLoop._delay = time_speed_min - ((time_speed_min * x_time_speed)/time_speed_max )
+                --print(time_speed_min)
+                spriteFrameSpeed =  spriteFrameSpeed_min - ((300 * secondsPlayed) / timeToPlay)
+                enemySpeed =  enemySpeed_min + ((8 * secondsPlayed) / timeToPlay)
+                
+            end
             -- }
             --bottone per uscire dal livello e tornare al menu del livelli
             button_home = display.newImageRect( "immagini/menu/x.png", 80, 80 )
@@ -331,13 +361,13 @@ function scene:show( event )
                     timer.performWithDelay( 500, function() composer.gotoScene( "menu-levels", "fade", 500 ) end)  --ritorno al menu dei livelli
                 end
             end
-
             button_home:addEventListener( "touch", touch )
 
-            gameLoop = timer.performWithDelay( time_speed, loop, 0 )
-            callingEnemies = timer.performWithDelay( enemyTimeSpawn, enemiesLoop, 0 )
-            callingPlasticbag = timer.performWithDelay( plasticbagTimeSpawn, plasticbagLoop, 1 )
             --PARTE FINALE: richiamo le funzioni e aggiungo gli elementi allo schermo e ai gruppi
+            timeplayed = timer.performWithDelay( 1000, increaseGameSpeed, 0 )
+            gameLoop = timer.performWithDelay( time_speed_min, loop, 0 )
+            callingEnemies = timer.performWithDelay( math.random(enemyTimeSpawnMin, enemyTimeSpawnMax), enemiesLoop, 0 )
+            callingPlasticbag = timer.performWithDelay( plasticbagTimeSpawn, plasticbagLoop, 0)
         end
 	end
 end
@@ -358,6 +388,7 @@ function scene:hide( event )
 		timer.cancel( gameLoop )
         timer.cancel( callingEnemies )
         timer.cancel( callingPlasticbag )
+        timer.cancel( timeplayed )
         physics.pause()
 
        
