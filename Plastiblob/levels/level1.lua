@@ -18,7 +18,7 @@ local stop =  0 --variabile che servirà per capire se stoppare il gioco
 local callingEnemies
 local callingPlasticbag
 local timeplayed  --varaiabile che misura da quanti secondi sono all'interno del gioco e farà cambiare la velocità
-local timeToPlay = 120 --variabile che conterrà quanto l'utente dovrà sopravvivere all'interno del gioco
+local timeToPlay = 100 --variabile che conterrà quanto l'utente dovrà sopravvivere all'interno del gioco
 function scene:create( event )
 
 	-- Called when the scene's view does not exist.
@@ -45,7 +45,7 @@ function scene:show( event )
 		physics.start()
 		-- Overlays collision outlines on normal display objects
         physics.setGravity( 0,20 )
-        physics.setDrawMode( "hybrid" )
+       -- physics.setDrawMode( "hybrid" )
 		-- The default Corona renderer, with no collision outlines
 		--physics.setDrawMode( "normal" )
 		-- Shows collision engine outlines only
@@ -86,15 +86,17 @@ function scene:show( event )
 
                 ------------------------------------------------------------
                 -- VARIABILI MOLTO IMPORTANTI PER IL GIOCO: VELOCITA' DI GIOCO
-                local enemySpeed = 2 --velocità di spostamento del nemico
-                local enemySpeed_max = 8 -- massima velocità di spostamento del nemico
+                local enemySpeed_max = 14 -- massima velocità di spostamento del nemico
+                local enemySpeed_min = 2 -- minima velocità di spostamento del nemico
+                local enemySpeed = enemySpeed_min --velocità di spostamento del nemico
+
                 local frame_speed = 20 --questa sarà la velocità dello scorrimento del nostro sfondo, in base a questa velocità alzeremo anche quella del gioco
                 
                 local time_speed_min = 30 -- ogni quanti millisecondi verranno chiamate le funzioni di loop (esempio di sfondo group_background)
                 local time_speed_max = 6 --massimo di velocità che time_speed può raggiungere
                 
                 local spriteFrameSpeed = 800 --velocità del movimento delle gambe dello sprite [250 - 800]
-                local spriteFrameSpeed_max = 300 --velocità del movimento delle gambe dello sprite [250 - 800]
+                local spriteFrameSpeed_max = 200 --velocità del movimento delle gambe dello sprite [250 - 800]
                 ------------------------------------------------------------
             --}
             --VARIABILI PER GLI ELEMENTI DELLO SCHERMO{
@@ -124,8 +126,8 @@ function scene:show( event )
             { 
                 width=200, 
                 height=200, 
-                numFrames=7, 
-                sheetContentWidth=1400, 
+                numFrames=8, 
+                sheetContentWidth=1600, 
                 sheetContentHeight=200 
             }
 
@@ -133,7 +135,7 @@ function scene:show( event )
             -- In your sequences, add the parameter 'sheet=', referencing which image sheet the sequence should use
             local spriteData = {
                 { name="walking", sheet=spriteWalkingSheet, start=1, count=8, time=spriteFrameSpeed, loopCount=0 },
-                { name="jumping", sheet=spriteJumpingSheet, start=1, count=7, time=500, loopCount=0 }
+                { name="jumping", sheet=spriteJumpingSheet, start=1, count=8, time=1000, loopCount=0 }
             }
             --metto assieme tutti i dettagli dello sprite, elencati in precedenza
             sprite = display.newSprite( spriteWalkingSheet, spriteData )
@@ -346,15 +348,16 @@ function scene:show( event )
             ------------------------------------------------
             local function increaseGameSpeed(event)
                 secondsPlayed = secondsPlayed + 1 --ogni secondo che passa aumento questa variabile che tiene conto di quanto tempo è passato
-                local spriteFrameSpeed_min = 850
-                local enemySpeed_min = 2
-                -- secondsplayed: secondstoplay = x : 6 <-- velocità massima
-                local x_time_speed = ((6 * secondsPlayed) / timeToPlay) --ottiene un numero da 1 a 6
-                gameLoop._delay = time_speed_min - ((time_speed_min * x_time_speed)/time_speed_max ) --30 - ()
-                --print(time_speed_min)
-                spriteFrameSpeed =  spriteFrameSpeed_min - ((300 * secondsPlayed) / timeToPlay)
-                enemySpeed =  enemySpeed_min + ((8 * secondsPlayed) / timeToPlay)
-                
+                print(secondsPlayed)
+                if(gameLoop._delay >= time_speed_max) then --minimo di millisecondi a cui può spingersi la funzione loop
+                    --time speed con cui viene richiamata la funzione loop
+                    local x_time_speed = ((time_speed_max * secondsPlayed) / timeToPlay) --ottiene un numero da 1 a 6
+                    gameLoop._delay = time_speed_min - ((time_speed_min * x_time_speed)/time_speed_max ) --il time delay è frutto di un'altra proporzione da 6 a 30
+
+                    --cambio della velocità del nostro nemico [da 2 a 12] --> secondi passati : secondi totali = x : 12 (ritornerà un numero da 1 a 12)
+                    local x_enemySpeed = ((enemySpeed_max * secondsPlayed)/timeToPlay)
+                    enemySpeed = enemySpeed_min + x_enemySpeed --la velocità è data dalla velocità minima (2) + il risultato della proporzione
+                    end
             end
             -- }
             --bottone per uscire dal livello e tornare al menu del livelli
