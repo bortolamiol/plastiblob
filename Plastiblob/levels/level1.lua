@@ -88,8 +88,8 @@ function scene:show( event )
                 -- VARIABILI MOLTO IMPORTANTI PER IL GIOCO: VELOCITA' DI GIOCO
                 local enemySpeed = 2 --velocità di spostamento del nemico
                 local frame_speed = 20 --questa sarà la velocità dello scorrimento del nostro sfondo, in base a questa velocità alzeremo anche quella del gioco
-                local time_speed = 60 -- ogni quanti millisecondi verranno chiamate le funzioni di loop (esempio di sfondo group_background)
-                local spriteFrameSpeed = 900 --velocità del movimento delle gambe dello sprite [250 - 700]
+                local time_speed = 30 -- ogni quanti millisecondi verranno chiamate le funzioni di loop (esempio di sfondo group_background)
+                local spriteFrameSpeed = 800 --velocità del movimento delle gambe dello sprite [250 - 700]
                 ------------------------------------------------------------
             --}
             --VARIABILI PER GLI ELEMENTI DELLO SCHERMO{
@@ -149,7 +149,8 @@ function scene:show( event )
             local enemyData = {
                 { name="walking", sheet=enemyWalkingSheet, start=1, count=6, time=500, loopCount=0 }
             }
-            local enemyTimeSpawn = math.random(10000,15000);
+            local enemyTimeSpawnMin = 5000
+            local enemyTimeSpawnMax  = 9000
 
             -- SACCHETTO IN PLASTICA
             local plasticbagSheetData = { width=130, height=130, numFrames=4, sheetContentWidth=520, sheetContentHeight=130 }
@@ -178,6 +179,7 @@ function scene:show( event )
             local function loop( event )
                 --qui dentro metteremo tutte le cose che necessitano di un loop all'interno del gioco
                 --richiamo le due funzioni per muovere lo sfondo
+                print(time_speed)
                 moveBackground(bg[1])
                 moveBackground(bg[2])
                 sprite:play()
@@ -287,6 +289,11 @@ function scene:show( event )
                     if(event.other.name ==  "enemy") then 
                         --mi sono scontrato col nemico
                        --print("Collisione con il nemico")
+                       --[[
+
+                            INSERIRE QUI GAME OVER
+
+                       ]]--
                     end
                     if(self.isJumping) then 
                         self.isJumping = false
@@ -324,9 +331,24 @@ function scene:show( event )
             -----------------------------------------------------------------
             
             local function increaseGameSpeed()
-               secondsPlayed = secondsPlayed + 1 --ogni secondo che passa aumento questa variabile che tiene conto di quanto tempo è passato
-               --[[]]--
-               --print("secondi: " .. tostring(secondsPlayed))
+                secondsPlayed = secondsPlayed + 1 --ogni secondo che passa aumento questa variabile che tiene conto di quanto tempo è passato
+                --print("secondi: " .. tostring(secondsPlayed))
+                --spriteFrameSpeed [850 - 300]
+                --enemySpeed [2 - 8]
+                --time_speed [30 - 6]
+                -- se si vuole anche enemyTimeSpawnMin ed enemyTimeSpawnMax
+                -- secondsPlayed : 120 = x : max
+               -- print("time speed after ".. secondsPlayed .. " seconds : "..time_speed)
+                local time_speed_min = 30
+                local time_speed_max = 6
+                local spriteFrameSpeed_min = 850
+                local enemySpeed_min = 2
+                local x_time_speed = ((6 * secondsPlayed) / timeToPlay) --ottiene un numero da 1 a 6
+                time_speed = time_speed_min - ((time_speed_min * x_time_speed)/time_speed_max )
+                --print(time_speed)
+                spriteFrameSpeed =  spriteFrameSpeed_min - ((300 * secondsPlayed) / timeToPlay)
+                enemySpeed =  enemySpeed_min + ((8 * secondsPlayed) / timeToPlay)
+                
             end
             -- }
             --bottone per uscire dal livello e tornare al menu del livelli
@@ -348,7 +370,7 @@ function scene:show( event )
             --PARTE FINALE: richiamo le funzioni e aggiungo gli elementi allo schermo e ai gruppi
             timeplayed = timer.performWithDelay( 1000, increaseGameSpeed, 0 )
             gameLoop = timer.performWithDelay( time_speed, loop, 0 )
-            callingEnemies = timer.performWithDelay( enemyTimeSpawn, enemiesLoop, 0 )
+            callingEnemies = timer.performWithDelay( math.random(enemyTimeSpawnMin, enemyTimeSpawnMax), enemiesLoop, 0 )
             callingPlasticbag = timer.performWithDelay( plasticbagTimeSpawn, plasticbagLoop, 0)
         end
 	end
