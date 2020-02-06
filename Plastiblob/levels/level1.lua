@@ -245,6 +245,8 @@ function scene:show( event )
                     local frameIndePlasticbag = 1;
                     local outlinePlasticbag = graphics.newOutline(20, plasticbagSheet, frameIndePlasticbag)
                     physics.addBody(plasticbag, { outline=outlinePlasticbag, density=1, bounce=0, friction=1})
+                    plasticbag.isBullet = true
+                    plasticbag.isSensor = true
                     plasticbag.bodyType = "static"
                     table.insert(table_plasticbag, plasticbag)
                     return plasticbag
