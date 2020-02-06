@@ -245,6 +245,8 @@ function scene:show( event )
                     local frameIndePlasticbag = 1;
                     local outlinePlasticbag = graphics.newOutline(20, plasticbagSheet, frameIndePlasticbag)
                     physics.addBody(plasticbag, { outline=outlinePlasticbag, density=1, bounce=0, friction=1})
+                    plasticbag.isBullet = true
+                    plasticbag.isSensor = true
                     plasticbag.bodyType = "static"
                     table.insert(table_plasticbag, plasticbag)
                     return plasticbag
@@ -270,8 +272,11 @@ function scene:show( event )
             function sprite.collision( self, event )
                 if( event.phase == "began" ) then		
                     --print( self.name .. ": collision began with " .. event.other.name)
+                    
                     if(event.other.name ==  "plasticbag") then
                         print("Collisione con la plastica")
+                        Runtime:removeEventListener("enterFrame",thisPlasticbag)
+                        display.remove(thisPlasticbag)
                     end
                     if(event.other.name ==  "enemy") then
                         print("Collisione con il nemico")
