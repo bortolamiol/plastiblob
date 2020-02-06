@@ -16,6 +16,7 @@ local table_plasticbag = {}
 local button_home --bottone per uscire dal livello e tornare alla button_home dei livelli
 local stop =  0 --variabile che servirà per capire se stoppare il gioco
 local callingEnemies
+local castle
 local callingPlasticbag
 local timeplayed  --varaiabile che misura da quanti secondi sono all'interno del gioco e farà cambiare la velocità
 local timeToPlay = 100 --variabile che conterrà quanto l'utente dovrà sopravvivere all'interno del gioco
@@ -63,7 +64,9 @@ function scene:show( event )
         elseif(tutorial == 1) then
             --ELIMINARE IL GRUPPO DEL TUTORIAL 
             -- INIZIALIZZO LE VARIABILI CHE VERRANNO USATE NEL GIOCO
-               local secondsPlayed = 0
+               local secondsPlayed = 0 --quanti secondi sono passati dall'inizio del gioco
+               local castleAppared = 0 --variabile fuffa che mi servirà per controllare se il castello è già apparso sullo schermo una volta
+
             -- VARIABILI PER LO SFONDO DI BACKGROUND {
                 local _w = display.actualContentWidth  -- Width of screen
                 local _h = display.actualContentHeight  -- Height of screen
@@ -86,7 +89,7 @@ function scene:show( event )
 
                 ------------------------------------------------------------
                 -- VARIABILI MOLTO IMPORTANTI PER IL GIOCO: VELOCITA' DI GIOCO
-                local enemySpeed_max = 14 -- massima velocità di spostamento del nemico
+                local enemySpeed_max = 8 -- massima velocità di spostamento del nemico
                 local enemySpeed_min = 2 -- minima velocità di spostamento del nemico
                 local enemySpeed = enemySpeed_min --velocità di spostamento del nemico
 
@@ -102,6 +105,7 @@ function scene:show( event )
             --VARIABILI PER GLI ELEMENTI DELLO SCHERMO{
             local groundHeight = 100
             local ground = display.newRect( 0, 0,99999, groundHeight )
+            ground:setFillColor(0,0,0,0)
             ground.name = "ground"
             group_elements:insert(ground)
             ground.x = display.contentCenterX
@@ -166,6 +170,14 @@ function scene:show( event )
                 { name="plastic", sheet=plasticbagSheet, start=1, count=4, time=500, loopCount=0 }
             }
             local plasticbagTimeSpawn = 5000
+            
+
+            --CASTELLO DI SABBIA IN CUI ENTRERO' A FINE LIVELLO
+            castle = display.newImageRect( "immagini/livello-1/sandcastle-duck.png", 700, 700 )
+            castle.x = display.actualContentWidth + 800
+            castle.y = ground.y - castle.height/2 - groundHeight/2
+            group_elements:insert(castle)
+            --physics.addBody(castle, "static",{bounce=0, friction=1 } )
             --}
 
             --FUNZIONI {
@@ -346,6 +358,18 @@ function scene:show( event )
                 sprite:play()
             end
             ------------------------------------------------
+
+            ------------------------------------------------
+            local function castleScroll() --funzione per far apparire nello schermo un castello in cui il blob entrerà
+                if stop == 0 then
+                    --[[
+
+                        DEVO FAR AVVICINARE IL CASTELLO E AVVICINARE LA SPRITE AL CASTELLO
+
+                    ]]--
+                end
+            end
+            ----------------------------------------------
             local function increaseGameSpeed(event)
                 secondsPlayed = secondsPlayed + 1 --ogni secondo che passa aumento questa variabile che tiene conto di quanto tempo è passato
                 print(secondsPlayed)
@@ -357,15 +381,23 @@ function scene:show( event )
                     --cambio della velocità del nostro nemico [da 2 a 12] --> secondi passati : secondi totali = x : 12 (ritornerà un numero da 1 a 12)
                     local x_enemySpeed = ((enemySpeed_max * secondsPlayed)/timeToPlay)
                     enemySpeed = enemySpeed_min + x_enemySpeed --la velocità è data dalla velocità minima (2) + il risultato della proporzione
+                end
+                if(secondsPlayed >= timeToPlay) then
+                    if (castleAppared == 0 ) then
+                        castleAppared = 1
+                        print("ORA APPARE IL CASTELLO")
+                        Runtime:addEventListener("enterFrame", castleScroll)
+                        resetScene()
                     end
+                end
             end
             -- }
             --bottone per uscire dal livello e tornare al menu del livelli
-            button_home = display.newImageRect( "immagini/menu/x.png", 80, 80 )
+            button_home = display.newImageRect( "immagini/menu/home.png", 80, 80 )
             button_home.anchorX =  0
             button_home.anchorY =  0
             button_home.x = display.actualContentWidth - 100
-            button_home.y = 80
+            button_home.y = 40
             group_elements:insert(button_home)
 
             function button_home:touch( event )
@@ -384,7 +416,6 @@ function scene:show( event )
         end
 	end
 end
-
 function scene:hide( event )
 	local sceneGroup = self.view
 	
@@ -397,29 +428,7 @@ function scene:hide( event )
 		-- e.g. stop timers, stop animation, unload sounds, etc.)
         --QUI BISOGNA SALVARE I DATI DEL GIOCATORE COME IL PUNTEGGIO
 
-        --CANCELLO I LOOP
-		timer.cancel( gameLoop )
-        timer.cancel( callingEnemies )
-        timer.cancel( callingPlasticbag )
-        timer.cancel( timeplayed )
-        physics.pause()
-
-       
-        --ELIMINO I LISTENERS
-        Runtime:removeEventListener("enterFrame",enemy)
-        Runtime:removeEventListener("enterFrame",plasticbag)
-        Runtime:removeEventListener( "touch", sprite )
-        button_home:removeEventListener( "touch", touch ) 
-        
-        --SVUOTO LE TABELLE
-        for i=1, #enemies do
-            enemies[i]:removeSelf() -- Optional Display Object Removal
-            enemies[i] = nil        -- Nil Out Table Instance
-        end
-        for i=1, #table_plasticbag do
-            table_plasticbag[i]:removeSelf() -- Optional Display Object Removal
-            table_plasticbag[i] = nil        -- Nil Out Table Instance
-        end
+        resetScene()
 
 	elseif phase == "did" then
 		-- Called when the scene is now off screen
@@ -438,6 +447,30 @@ function scene:destroy( event )
 	-- e.g. remove display objects, remove touch listeners, save state, etc.
 	local sceneGroup = self.view
 	
+end
+function resetScene()
+    timer.cancel( gameLoop )
+    timer.cancel( callingEnemies )
+    timer.cancel( callingPlasticbag )
+    timer.cancel( timeplayed )
+    physics.pause()
+
+       
+    --ELIMINO I LISTENERS
+    Runtime:removeEventListener("enterFrame",enemy)
+    Runtime:removeEventListener("enterFrame",plasticbag)
+    Runtime:removeEventListener( "touch", sprite )
+    button_home:removeEventListener( "touch", touch ) 
+        
+    --SVUOTO LE TABELLE
+    for i=1, #enemies do
+        enemies[i]:removeSelf() -- Optional Display Object Removal
+        enemies[i] = nil        -- Nil Out Table Instance
+    end
+    for i=1, #table_plasticbag do
+        table_plasticbag[i]:removeSelf() -- Optional Display Object Removal
+        table_plasticbag[i] = nil        -- Nil Out Table Instance
+    end
 end
 
 ---------------------------------------------------------------------------------
