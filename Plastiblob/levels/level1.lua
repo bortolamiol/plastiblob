@@ -73,7 +73,7 @@ function scene:show( event )
             -- INIZIALIZZO LE VARIABILI CHE VERRANNO USATE NEL GIOCO
                 local secondsPlayed = 0 --quanti secondi sono passati dall'inizio del gioco
                 local castleAppared = 0 --variabile fuffa che mi servirà per controllare se il castello è già apparso sullo schermo una volta
-                local scoreCount = 0 --variabile conteggio punteggio iniziale
+                scoreCount = 0 --variabile conteggio punteggio iniziale
                 --TESTO DELLO SCORE
                 local scoreText = display.newText( scoreCount.."/5", display.contentCenterX, display.contentCenterY-300, native.systemFont, 28 )
                 scoreText:setFillColor( 1, 1, 0 )
@@ -495,6 +495,13 @@ function resetScene( tipo)
         timer.cancel( callingPlasticbag )
         timer.cancel( timeplayed )
         physics.pause()
+
+        --INVIO LO SCORE AL DATABASE
+        local sqlite3 = require( "sqlite3" )	
+            -- Create a file path for the database file "data.db"
+        local path = system.pathForFile( "data.db", system.DocumentsDirectory )
+            -- Open the database for access
+        local db = sqlite3.open( path )
         
         --ELIMINO I LISTENERS
         Runtime:removeEventListener("enterFrame",enemy)
