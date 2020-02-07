@@ -1,10 +1,11 @@
 -----------------------------------------------------------------------------------------
 --
--- PRIMO LIVELLO DEL GIOCO: SALTARE I NEMICI E RACCOGLIERE LA PLASTICA DAL CIELO
+-- SECONDO LIVELLO DEL GIOCO: SALTARE I NEMICI E RACCOGLIERE LA PLASTICA DAL CIELO
 --
 -----------------------------------------------------------------------------------------
 
 -- dichiaro delle variabili che andrò a usare in varie scene del livello
+local localLevel = 1 --VARIABILE CHE CONTIENE IL NUMERO DI LIVELLO A CUI APPARTIENE IL FILE LUA: IN QUESTO CASO SIAMO AL LIVELLO 2
 local composer = require( "composer" ) --richiedo la libreria composer
 local scene = composer.newScene() --nuova scena composer
 local tutorial = 1 --ho completato il tutorial? se è 0 devo ancora farlo!
@@ -52,12 +53,11 @@ function scene:show( event )
 		physics.start()
 		-- Overlays collision outlines on normal display objects
         physics.setGravity( 0,20 )
-       -- physics.setDrawMode( "hybrid" )
+        physics.setDrawMode( "hybrid" )
 		-- The default Corona renderer, with no collision outlines
 		--physics.setDrawMode( "normal" )
 		-- Shows collision engine outlines only
         --physics.setDrawMode( "debug" )
-
 		
     elseif phase == "did" then
         if(tutorial == 0) then 
@@ -69,12 +69,17 @@ function scene:show( event )
 
             ]]--
         elseif(tutorial == 1) then
+            --VARIABILE CHE CONTIENE TUTTE LE INFORMAZIONI DEL LIVELLO
+            local options = {
+                effect = "fade",
+                time = 1000,
+                params = { level="level1"}
+            }
             --ELIMINARE IL GRUPPO DEL TUTORIAL 
             -- INIZIALIZZO LE VARIABILI CHE VERRANNO USATE NEL GIOCO
                 local secondsPlayed = 0 --quanti secondi sono passati dall'inizio del gioco
                 local castleAppared = 0 --variabile fuffa che mi servirà per controllare se il castello è già apparso sullo schermo una volta
-                local scoreCount = 0 --variabile conteggio punteggio iniziale
-                gameFinished = 0
+                scoreCount = 0 --variabile conteggio punteggio iniziale
             -- VARIABILI PER LO SFONDO DI BACKGROUND {
                 local _w = display.actualContentWidth  -- Width of screen
                 local _h = display.actualContentHeight  -- Height of screen
@@ -108,6 +113,8 @@ function scene:show( event )
                 
                 local spriteFrameSpeed = 800 --velocità del movimento delle gambe dello sprite [250 - 800]
                 local spriteFrameSpeed_max = 200 --velocità del movimento delle gambe dello sprite [250 - 800]
+                
+                local plasticToCatch = 10 
                 ------------------------------------------------------------
             --}
             --VARIABILI PER GLI ELEMENTI DELLO SCHERMO{
@@ -119,7 +126,14 @@ function scene:show( event )
             ground.x = display.contentCenterX
             ground.y = display.contentHeight- groundHeight/2
             physics.addBody(ground, "static",{bounce=0, friction=1 } )
-            --}
+            --
+        
+            --TESTO DELLO SCORE
+            local scoreText = display.newText( scoreCount.."/"..plasticToCatch, display.contentCenterX, display.contentCenterY-300, native.systemFont, 28 )
+            scoreText:setFillColor( 1, 1, 0 )
+            group_elements:insert(scoreText)
+            gameFinished = 0
+        --}
             --VARIABILI PER GLI SPRITE { 
 
             --PERSONAGGIO DEL GIOCO
@@ -156,17 +170,18 @@ function scene:show( event )
             local posY_sprite =  ground.y 
             sprite.x = (display.contentWidth/2)-300 ; sprite.y = posY_sprite-100
             local frameIndex = 1
-            local outlinePersonaggio = graphics.newOutline(2, spriteWalkingSheet, frameIndex)   --outline personaggio
-            physics.addBody(sprite, { outline=outlinePersonaggio, density=10, bounce=0, friction=1})    --sprite diventa corpo con fisica
+            local outlineSpriteWalking = graphics.newOutline(2, spriteWalkingSheet, frameIndex)   --outline personaggio
+            local outlineSpriteJumping = graphics.newOutline(2, spriteJumpingSheet, frameIndex)   --outline personaggio
+            physics.addBody(sprite, { outline=outlineSpriteWalking, density=10, bounce=0, friction=1})    --sprite diventa corpo con fisica
             sprite.gravityScale = 3.8
             sprite.isFixedRotation = true --rotazione bloccata
             sprite.isJumping = false
             
             -- PRIMO NEMICO
-            local enemyWalkingSheetData = { width=200, height=200, numFrames=6, sheetContentWidth=1200, sheetContentHeight=200 }
+            local enemyWalkingSheetData = { width=200, height=200, numFrames=8, sheetContentWidth=1600, sheetContentHeight=200 }
             local enemyWalkingSheet = graphics.newImageSheet( "immagini/livello-1/zombiewalking.png", enemyWalkingSheetData )
             local enemyData = {
-                { name="walking", sheet=enemyWalkingSheet, start=1, count=6, time=500, loopCount=0 }
+                { name="walking", sheet=enemyWalkingSheet, start=1, count=8, time=800, loopCount=0 }
             }
             local enemyTimeSpawnMin = 5000
             local enemyTimeSpawnMax  = 9000
@@ -242,7 +257,7 @@ function scene:show( event )
             ------------------------------------------------
             -- FUNZIONI PER IL SACCHETTO DI PLASTICA CHE VOLA{
                 local function plasticbagScroll(self, event)
-                    --fa scorrere il nemico nello schermo
+                    --fa scorrere il sacchetto nello schermo
                     if stop == 0 then
                         self.x = self.x - (enemySpeed*2)
                         local spostamentoaria = math.random(-5, 5)
@@ -251,7 +266,7 @@ function scene:show( event )
                 end
                 ------------------------------------------------
                 local function createPlasticbag()
-                    --crea un oggetto di un nuovo sprite nemico e lo aggiunge alla tabella table_plasticbag[]
+                    --crea un oggetto di un nuovo sprite del sacchetto e lo aggiunge alla tabella table_plasticbag[]
                     --da implementare meglio, mi faccio passare che tipo di nemico devo inserire
                     local plasticbag = display.newSprite( plasticbagSheet, plasticbagData )
                     plasticbag.name = "plasticbag"
@@ -290,11 +305,8 @@ function scene:show( event )
                 if( event.phase == "began" ) then		
                     --tutte le informazioni dell'elemento che ho toccato le troviamo dentro event.other
                     if(event.other.name ==  "plasticbag") then --mi sono scontrato con il sacchetto
-                        scoreCount = scoreCount+100;
-                        print(scoreCount)
-                        --TESTO DELLO SCORE
-                        local scoreText = display.newText( scoreCount, 100, 200, native.systemFont, 16 )
-                        scoreText:setFillColor( 1, 0, 0 )
+                        scoreCount = scoreCount+1;
+                        scoreText.text = scoreCount.."/"..plasticToCatch
                         Runtime:removeEventListener("enterFrame", event.other) --rimuovo il listener dello scroll, così non si muove più
                         local indexToRemove = table.indexOf(table_plasticbag, event.other ) --trovo l'indice che ha all'interno della tabella dei sacchetti di plastica
                         table.remove(table_plasticbag, indexToRemove) --lo rimuovo dalla tabella, utilizzando l'indice 'indexToRemove' 
@@ -302,13 +314,9 @@ function scene:show( event )
                         group_elements:remove(event.other) --lo rimuovo dal gruppo (????? serve??? NON LO SO, VEDIAMO SE DARA' PROBLEMI)
                     end
                     if(event.other.name ==  "enemy") then 
-                        --mi sono scontrato col nemico
-                       --print("Collisione con il nemico")
-                       --[[
-
-                            INSERIRE QUI GAME OVER
-
-                       ]]--
+                        print("mi sono scontrato col nemico")
+                        resetScene("all")
+                        composer.gotoScene( "levels.gameover", options )
                     end
                     if(self.isJumping) then
                         if(event.other.name == "ground")
@@ -316,8 +324,6 @@ function scene:show( event )
                             self.isJumping = false
                             self:setSequence("walking")
                             self:play()
-                        --print("Landed @ ", system.getTimer())
-                            --print("------------------------\n")
                         end
                     end
                 end
@@ -332,7 +338,7 @@ function scene:show( event )
                     self.isJumping = true
                     self:setSequence("jumping")
                     self:play()
-                    print("Jumped @ ", system.getTimer())
+                    --print("Jumped @ ", system.getTimer())
                 end
             end
             Runtime:addEventListener( "touch", sprite )
@@ -347,7 +353,7 @@ function scene:show( event )
             
             sprite.preCollision = preCollisionEvent
             sprite:addEventListener( "preCollision" )
-------------------------------------------------
+            ------------------------------------------------
             local function touchListener()
             --funzione che capirà quale evento scatenare al click sullo schermo
             --[[
@@ -373,24 +379,26 @@ function scene:show( event )
                     castle.x = castle.x - 20 --sposto il castello di 20 pixel
                 else
                     Runtime:removeEventListener("enterFrame", castleScroll) -- rimuovo l'evento event scroll 
+                    gameFinished = 1 --imposto la variabile a 1, grazie a questo eliminerò anche le funzioni che ho creato qui  sopra
                     timer.cancel( gameLoop ) --non mando più avanti lo sfondo di background
                     Runtime:addEventListener("enterFrame", spriteScrollToCastle) --faccio parire la funzione che manderà avanti di un po' lo scroll
                 end
             end
             function spriteScrollToCastle() --avvicina lo sprite al castello
-                local CastlePosition = ( display.actualContentWidth - (display.actualContentWidth / 4)) --piglio la posizione del castello
+                local CastlePosition = castle.x - 20 --piglio la posizione del castello
                 if(sprite.x <= CastlePosition) then --se la posizione dello sprite è dietro a quella del castello, vado ancora avanti
                     sprite.x = sprite. x + 3 --lo sposto in avanti di 3
-                    newTimerOut = timer.performWithDelay( 3000, goToTheNewScene, 1) --inizio a mandare l'utente alla nuova scena, usando un fade
+                else
+                    goToTheNewScene()
                 end
             end
             function goToTheNewScene()
-                composer.gotoScene( "menu-levels", "fade", 1000 ) --vado alla nuova scena
+                composer.gotoScene( "menu-levels", "fade", 500 ) --vado alla nuova scena
             end
             ----------------------------------------------
             local function increaseGameSpeed(event)
                 secondsPlayed = secondsPlayed + 1 --ogni secondo che passa aumento questa variabile che tiene conto di quanto tempo è passato
-                print(secondsPlayed)
+                print("seconds played: " ..secondsPlayed)
                 if(gameLoop._delay >= time_speed_max) then --minimo di millisecondi a cui può spingersi la funzione loop
                     --time speed con cui viene richiamata la funzione loop
                     local x_time_speed = ((time_speed_max * secondsPlayed) / timeToPlay) --ottiene un numero da 1 a 6
@@ -400,15 +408,19 @@ function scene:show( event )
                     enemySpeed = enemySpeed_min + x_enemySpeed --la velocità è data dalla velocità minima (2) + il risultato della proporzione
                 end
                 if(secondsPlayed >= timeToPlay) then --se è ora di far finire il gioco, vado al passo successivo
-                    gameFinished = 1 --imposto la variabile a 1, grazie a questo eliminerò anche le funzioni che ho creato qui  sopra
-                    if (castleAppared == 0 ) then --se non ho già fatto apparire il castello, lo faccio apparire
-                        castleAppared = 1 --non lo faccio più riapparire
-                        timer.cancel( callingEnemies ) --non chiamo più nemici
-                        timer.cancel( callingPlasticbag ) --non chiamo più sacchetti di plastica
-                        Runtime:addEventListener("enterFrame", castleScroll) --chiamo la funzione castleScroll per spostare il castello
+                    if(scoreCount >= 1) then
+                        if (castleAppared == 0 ) then --se non ho già fatto apparire il castello, lo faccio apparire
+                            castleAppared = 1 --non lo faccio più riapparire
+                            timer.cancel( callingEnemies ) --non chiamo più nemici
+                            timer.cancel( callingPlasticbag ) --non chiamo più sacchetti di plastica
+                            sprite:removeEventListener("collision")
+                            Runtime:addEventListener("enterFrame", castleScroll) --chiamo la funzione castleScroll per spostare il castello
+                        end
                     end
                 end
             end
+           
+
             -- }
             --bottone per uscire dal livello e tornare al menu del livelli
             button_home = display.newImageRect( "immagini/menu/home.png", 100, 100 )
@@ -445,11 +457,12 @@ function scene:hide( event )
 		-- INSERT code here to pause the scene
 		-- e.g. stop timers, stop animation, unload sounds, etc.)
         --QUI BISOGNA SALVARE I DATI DEL GIOCATORE COME IL PUNTEGGIO
-        print(gameFinished)
+        print("game finished : " .. gameFinished)
         if(gameFinished == 1) then
+            updateHighScore(scoreCount) --mando il punteggio appena raggiunto alla funzione che permetterà di aggiornarlo
             resetScene("gamefinished") --se entro qui devo cancellare anche un timeloop che è partito con l'avvicinamento del castello di sabbia
         else
-            resetScene("all")  --se entro qui sono uscito prima dal livello, devo eliminare meno timer all'interno del gioco
+            resetScene("gameOver")  --se entro qui sono uscito prima dal livello, devo eliminare meno timer all'interno del gioco
         end
 
 	elseif phase == "did" then
@@ -469,15 +482,62 @@ function scene:destroy( event )
 	local sceneGroup = self.view
 	
 end
+----------------------------------------------
+--FUNZIONE PER AGGIORNARE L'HIGHSCORE
+function updateHighScore(scoreCount) --funzione che serve per aggiornare l'high score dell'utente
+    local sqlite3 = require( "sqlite3" )	
+    local path = system.pathForFile( "data.db", system.DocumentsDirectory )
+    local db = sqlite3.open( path )
+    local levels = {} --creo una  tabella per memorizzare i dati che mi servrà per scegliere se il punteggio è un record o no
+    for row in db:nrows( "SELECT * FROM levels" ) do
+        levels[#levels+1] =
+        {
+            FirstName = row.FirstName,
+            level = row.level,
+            scoreLevel1 = row.scoreLevel1
+        }
+        local oldScore= levels[1].scoreLevel1 --salvo il punteggio che è già presente all'interno del database
+        local levelReached = levels[1].level --mi scrivo il livello a cui è arrivato l'utente all'interno del gioco, se è l'1 allora aggiorneremo a 2 e gli permetteremo di fare un nuovo livello
+        print("livello appena completato: ".. levelReached.." - vecchio punteggio:"..oldScore)
+        if (tonumber(oldScore)<scoreCount) then --se il nuovo è punteggio è maggiore di quello già presente nel db entro nell'if
+            if(tonumber(levelReached) == tonumber(localLevel)) then --se sono al livello 1, devo aumentare il livello
+                print("devo aumentare di livello e inoltre aumento il punteggio")
+                local query =("UPDATE levels SET level ='" .. (levelReached+1) .. "' ,scoreLevel1 = '" ..scoreCount .. "' WHERE ID = 1")
+                print("query: ".. query)
+                local pushQuery = db:exec (query)  
+                if(pushQuery == 0) then --se ritorna 0 allora ho modificato correttamente il db
+                    print(" Punteggio e livello correttamente modificati!")
+                else
+                    print("ho provato a fare l'update della tabella ma non ci sono riuscito. codice errore: "..pushQuery) --errore
+                end
+            else
+                --devo solamente aumentare il punteggio"
+                local query =("UPDATE levels SET scoreLevel1 = '" ..scoreCount .. "' WHERE ID = 1")
+                local pushQuery = db:exec (query)  
+                if(pushQuery == 0) then
+                    print(" Punteggio correttamente modificato!")
+                else
+                    print("ho provato a fare l'update della tabella ma non ci sono riuscito. codice errore: "..pushQuery)
+                end
+            end
+         end
+    end
+    if ( db and db:isopen() ) then --chiuso la connessione al database
+        db:close()
+    end
+end
+----------------------------------------------
+
 function resetScene( tipo) 
-    if tipo == "all" then
+    if tipo == "gameOver" then
         timer.cancel( gameLoop )
         timer.cancel( callingEnemies )
         timer.cancel( callingPlasticbag )
         timer.cancel( timeplayed )
         physics.pause()
-        
+
         --ELIMINO I LISTENERS
+        sprite:removeEventListener("collision")
         Runtime:removeEventListener("enterFrame",enemy)
         Runtime:removeEventListener("enterFrame",plasticbag)
         Runtime:removeEventListener( "touch", sprite )
@@ -504,10 +564,9 @@ function resetScene( tipo)
 
         timer.cancel( gameLoop )
         timer.cancel( callingEnemies )
-        print(sex)
         timer.cancel( callingPlasticbag )
         timer.cancel( timeplayed )
-        timer.cancel( newTimerOut )
+        --timer.cancel( newTimerOut )
         physics.pause()
 
         --SVUOTO LE TABELLE
