@@ -80,11 +80,6 @@ function scene:show( event )
                 local secondsPlayed = 0 --quanti secondi sono passati dall'inizio del gioco
                 local castleAppared = 0 --variabile fuffa che mi servirà per controllare se il castello è già apparso sullo schermo una volta
                 scoreCount = 0 --variabile conteggio punteggio iniziale
-                --TESTO DELLO SCORE
-                local scoreText = display.newText( scoreCount.."/5", display.contentCenterX, display.contentCenterY-300, native.systemFont, 28 )
-                scoreText:setFillColor( 1, 1, 0 )
-                group_elements:insert(scoreText)
-                gameFinished = 0
             -- VARIABILI PER LO SFONDO DI BACKGROUND {
                 local _w = display.actualContentWidth  -- Width of screen
                 local _h = display.actualContentHeight  -- Height of screen
@@ -118,6 +113,8 @@ function scene:show( event )
                 
                 local spriteFrameSpeed = 800 --velocità del movimento delle gambe dello sprite [250 - 800]
                 local spriteFrameSpeed_max = 200 --velocità del movimento delle gambe dello sprite [250 - 800]
+                
+                local plasticToCatch = 10 
                 ------------------------------------------------------------
             --}
             --VARIABILI PER GLI ELEMENTI DELLO SCHERMO{
@@ -129,7 +126,14 @@ function scene:show( event )
             ground.x = display.contentCenterX
             ground.y = display.contentHeight- groundHeight/2
             physics.addBody(ground, "static",{bounce=0, friction=1 } )
-            --}
+            --
+        
+            --TESTO DELLO SCORE
+            local scoreText = display.newText( scoreCount.."/"..plasticToCatch, display.contentCenterX, display.contentCenterY-300, native.systemFont, 28 )
+            scoreText:setFillColor( 1, 1, 0 )
+            group_elements:insert(scoreText)
+            gameFinished = 0
+        --}
             --VARIABILI PER GLI SPRITE { 
 
             --PERSONAGGIO DEL GIOCO
@@ -301,7 +305,7 @@ function scene:show( event )
                     --tutte le informazioni dell'elemento che ho toccato le troviamo dentro event.other
                     if(event.other.name ==  "plasticbag") then --mi sono scontrato con il sacchetto
                         scoreCount = scoreCount+1;
-                        scoreText.text = scoreCount.."/5"
+                        scoreText.text = scoreCount.."/"..plasticToCatch
                         Runtime:removeEventListener("enterFrame", event.other) --rimuovo il listener dello scroll, così non si muove più
                         local indexToRemove = table.indexOf(table_plasticbag, event.other ) --trovo l'indice che ha all'interno della tabella dei sacchetti di plastica
                         table.remove(table_plasticbag, indexToRemove) --lo rimuovo dalla tabella, utilizzando l'indice 'indexToRemove' 
@@ -373,6 +377,7 @@ function scene:show( event )
                     castle.x = castle.x - 20 --sposto il castello di 20 pixel
                 else
                     Runtime:removeEventListener("enterFrame", castleScroll) -- rimuovo l'evento event scroll 
+                    gameFinished = 1 --imposto la variabile a 1, grazie a questo eliminerò anche le funzioni che ho creato qui  sopra
                     timer.cancel( gameLoop ) --non mando più avanti lo sfondo di background
                     Runtime:addEventListener("enterFrame", spriteScrollToCastle) --faccio parire la funzione che manderà avanti di un po' lo scroll
                 end
@@ -400,7 +405,6 @@ function scene:show( event )
                     enemySpeed = enemySpeed_min + x_enemySpeed --la velocità è data dalla velocità minima (2) + il risultato della proporzione
                 end
                 if(secondsPlayed >= timeToPlay) then --se è ora di far finire il gioco, vado al passo successivo
-                    gameFinished = 1 --imposto la variabile a 1, grazie a questo eliminerò anche le funzioni che ho creato qui  sopra
                     if (castleAppared == 0 ) then --se non ho già fatto apparire il castello, lo faccio apparire
                         castleAppared = 1 --non lo faccio più riapparire
                         timer.cancel( callingEnemies ) --non chiamo più nemici
@@ -503,9 +507,8 @@ function resetScene( tipo)
         
         --Faccio update del db scoreLevel1
         local scoreToDb = [[UPDATE levels SET scoreLevel1="]] ..scoreCount .. [[" WHERE UserID=1;]]
-        db:exec( scoreToDb )
-        --print(row.scoreLevel1)
-        
+        local resultOfQuery = db:exec( scoreToDb )
+        print("risultato della")
         --ELIMINO I LISTENERS
         Runtime:removeEventListener("enterFrame",enemy)
         Runtime:removeEventListener("enterFrame",plasticbag)
