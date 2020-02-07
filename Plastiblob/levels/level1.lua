@@ -19,7 +19,7 @@ local callingEnemies
 local castle
 local callingPlasticbag
 local timeplayed  --varaiabile che misura da quanti secondi sono all'interno del gioco e farà cambiare la velocità
-local timeToPlay = 20 --variabile che conterrà quanto l'utente dovrà sopravvivere all'interno del gioco
+local timeToPlay = 10 --variabile che conterrà quanto l'utente dovrà sopravvivere all'interno del gioco
 local scoreCount    --variabile conteggio punteggio iniziale
 local gameFinished
 local newTimerOut
@@ -177,10 +177,10 @@ function scene:show( event )
             sprite.isJumping = false
             
             -- PRIMO NEMICO
-            local enemyWalkingSheetData = { width=200, height=200, numFrames=6, sheetContentWidth=1200, sheetContentHeight=200 }
+            local enemyWalkingSheetData = { width=200, height=200, numFrames=8, sheetContentWidth=1600, sheetContentHeight=200 }
             local enemyWalkingSheet = graphics.newImageSheet( "immagini/livello-1/zombiewalking.png", enemyWalkingSheetData )
             local enemyData = {
-                { name="walking", sheet=enemyWalkingSheet, start=1, count=6, time=500, loopCount=0 }
+                { name="walking", sheet=enemyWalkingSheet, start=1, count=8, time=800, loopCount=0 }
             }
             local enemyTimeSpawnMin = 5000
             local enemyTimeSpawnMax  = 9000
@@ -313,6 +313,7 @@ function scene:show( event )
                         group_elements:remove(event.other) --lo rimuovo dal gruppo (????? serve??? NON LO SO, VEDIAMO SE DARA' PROBLEMI)
                     end
                     if(event.other.name ==  "enemy") then 
+                        print("mi sono scontrato col nemico")
                         resetScene("all")
                         composer.gotoScene( "levels.gameover", options )
                     end
@@ -386,11 +387,12 @@ function scene:show( event )
                 local CastlePosition = ( display.actualContentWidth - (display.actualContentWidth / 4)) --piglio la posizione del castello
                 if(sprite.x <= CastlePosition) then --se la posizione dello sprite è dietro a quella del castello, vado ancora avanti
                     sprite.x = sprite. x + 3 --lo sposto in avanti di 3
-                    newTimerOut = timer.performWithDelay( 3000, goToTheNewScene, 1) --inizio a mandare l'utente alla nuova scena, usando un fade
+                else
+                    goToTheNewScene()
                 end
             end
             function goToTheNewScene()
-                composer.gotoScene( "menu-levels", "fade", 1000 ) --vado alla nuova scena
+                composer.gotoScene( "menu-levels", "fade", 500 ) --vado alla nuova scena
             end
             ----------------------------------------------
             local function increaseGameSpeed(event)
@@ -405,11 +407,13 @@ function scene:show( event )
                     enemySpeed = enemySpeed_min + x_enemySpeed --la velocità è data dalla velocità minima (2) + il risultato della proporzione
                 end
                 if(secondsPlayed >= timeToPlay) then --se è ora di far finire il gioco, vado al passo successivo
-                    if (castleAppared == 0 ) then --se non ho già fatto apparire il castello, lo faccio apparire
-                        castleAppared = 1 --non lo faccio più riapparire
-                        timer.cancel( callingEnemies ) --non chiamo più nemici
-                        timer.cancel( callingPlasticbag ) --non chiamo più sacchetti di plastica
-                        Runtime:addEventListener("enterFrame", castleScroll) --chiamo la funzione castleScroll per spostare il castello
+                    if(scoreCount >= 1) then
+                        if (castleAppared == 0 ) then --se non ho già fatto apparire il castello, lo faccio apparire
+                            castleAppared = 1 --non lo faccio più riapparire
+                            timer.cancel( callingEnemies ) --non chiamo più nemici
+                            timer.cancel( callingPlasticbag ) --non chiamo più sacchetti di plastica
+                            Runtime:addEventListener("enterFrame", castleScroll) --chiamo la funzione castleScroll per spostare il castello
+                        end
                     end
                 end
             end
@@ -524,6 +528,7 @@ function resetScene( tipo)
         --print("risultato della")
 
         --ELIMINO I LISTENERS
+        sprite:removeEventListener("collision")
         Runtime:removeEventListener("enterFrame",enemy)
         Runtime:removeEventListener("enterFrame",plasticbag)
         Runtime:removeEventListener( "touch", sprite )
@@ -541,6 +546,7 @@ function resetScene( tipo)
     elseif tipo == "gamefinished" then
         updateHighScore(scoreCount);
         --ELIMINO I LISTENERS
+        sprite:removeEventListener("collision")
         Runtime:removeEventListener("enterFrame", spriteScrollToCastle)
         Runtime:removeEventListener("enterFrame", castleScroll)
         Runtime:removeEventListener("enterFrame",enemy)
@@ -552,7 +558,7 @@ function resetScene( tipo)
         timer.cancel( callingEnemies )
         timer.cancel( callingPlasticbag )
         timer.cancel( timeplayed )
-        timer.cancel( newTimerOut )
+        --timer.cancel( newTimerOut )
         physics.pause()
 
         --SVUOTO LE TABELLE
