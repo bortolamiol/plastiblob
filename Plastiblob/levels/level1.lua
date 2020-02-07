@@ -474,7 +474,7 @@ function scene:hide( event )
             --end SCOMMENTARE QUESTA RIGA
             resetScene("gamefinished") --se entro qui devo cancellare anche un timeloop che è partito con l'avvicinamento del castello di sabbia
         else
-            resetScene("all")  --se entro qui sono uscito prima dal livello, devo eliminare meno timer all'interno del gioco
+            resetScene("gameOver")  --se entro qui sono uscito prima dal livello, devo eliminare meno timer all'interno del gioco
         end
 
 	elseif phase == "did" then
@@ -495,7 +495,7 @@ function scene:destroy( event )
 	
 end
 function resetScene( tipo) 
-    if tipo == "all" then
+    if tipo == "gameOver" then
         timer.cancel( gameLoop )
         timer.cancel( callingEnemies )
         timer.cancel( callingPlasticbag )
@@ -508,7 +508,7 @@ function resetScene( tipo)
         local path = system.pathForFile( "data.db", system.DocumentsDirectory )
             -- Open the database for access
         local db = sqlite3.open( path )
-        
+        print(db)
         --Faccio update del db scoreLevel1
         local scoreToDb = [[UPDATE levels SET scoreLevel1="]] ..scoreCount .. [[" WHERE UserID=1;]]
         local resultOfQuery = db:exec( scoreToDb )
