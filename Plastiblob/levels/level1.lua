@@ -503,6 +503,11 @@ function resetScene( tipo)
             -- Open the database for access
         local db = sqlite3.open( path )
         
+        --Faccio update del db scoreLevel1
+        local scoreToDb = [[UPDATE levels SET scoreLevel1="]] ..scoreCount .. [[" WHERE UserID=1;]]
+        db:exec( scoreToDb )
+        --print(row.scoreLevel1)
+        
         --ELIMINO I LISTENERS
         Runtime:removeEventListener("enterFrame",enemy)
         Runtime:removeEventListener("enterFrame",plasticbag)
