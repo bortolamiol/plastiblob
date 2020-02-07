@@ -53,7 +53,7 @@ function scene:show( event )
 				{
 					FirstName = row.FirstName,
 					level = row.level,
-					score1 = row.scoreLevel1,
+					scoreLevel1 = row.scoreLevel1,
 					print( "ID del giocatore:".. row.ID .. " - Livello: " ..row.level .. "- Punteggio: " ..row.scoreLevel1)
 				}
 				livellicompletati = levels[1].level		
