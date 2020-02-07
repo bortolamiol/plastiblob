@@ -19,7 +19,7 @@ local callingEnemies
 local castle
 local callingPlasticbag
 local timeplayed  --varaiabile che misura da quanti secondi sono all'interno del gioco e farà cambiare la velocità
-local timeToPlay = 100 --variabile che conterrà quanto l'utente dovrà sopravvivere all'interno del gioco
+local timeToPlay = 20 --variabile che conterrà quanto l'utente dovrà sopravvivere all'interno del gioco
 local scoreCount    --variabile conteggio punteggio iniziale
 local gameFinished
 local newTimerOut
@@ -530,7 +530,6 @@ function resetScene( tipo)
 
         timer.cancel( gameLoop )
         timer.cancel( callingEnemies )
-        print(sex)
         timer.cancel( callingPlasticbag )
         timer.cancel( timeplayed )
         timer.cancel( newTimerOut )
