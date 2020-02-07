@@ -5,6 +5,7 @@
 -----------------------------------------------------------------------------------------
 
 -- dichiaro delle variabili che andrò a usare in varie scene del livello
+local localLevel = 1 --VARIABILE CHE CONTIENE IL NUMERO DI LIVELLO A CUI APPARTIENE IL FILE LUA: IN QUESTO CASO SIAMO AL LIVELLO 1
 local composer = require( "composer" ) --richiedo la libreria composer
 local scene = composer.newScene() --nuova scena composer
 local tutorial = 1 --ho completato il tutorial? se è 0 devo ancora farlo!
@@ -24,7 +25,6 @@ local scoreCount    --variabile conteggio punteggio iniziale
 local gameFinished
 local newTimerOut
 local nextScene = "menu-levels"
-print("fuori")
 function scene:create( event )
 
 	-- Called when the scene's view does not exist.
@@ -58,7 +58,6 @@ function scene:show( event )
 		--physics.setDrawMode( "normal" )
 		-- Shows collision engine outlines only
         --physics.setDrawMode( "debug" )
-        print("create")
 		
     elseif phase == "did" then
         if(tutorial == 0) then 
@@ -460,23 +459,7 @@ function scene:hide( event )
         --QUI BISOGNA SALVARE I DATI DEL GIOCATORE COME IL PUNTEGGIO
         print("game finished : " .. gameFinished)
         if(gameFinished == 1) then
-            -- Mi connetto al database e dico che ho completato il livello 1!
-            --[[local sqlite3 = require( "sqlite3" )
-            local path = system.pathForFile( "data.db", system.DocumentsDirectory )
-            local db = sqlite3.open( path )
-            local levelsw = {}
-            for row in db:nrows( "SELECT * FROM levels" ) do --prima devo controllare che non l'utente non lo abbia già fatto
-               levelsw[#levelsw+1] =
-               {
-                   FirstName = row.FirstName,
-                   level = row.level,
-               }
-               local livellicompletati = levelsw[1].level
-            end
-            if livellicompletati == 1 then]]--
-                --local q = [[UPDATE levels SET level='2' WHERE ID=1;]] SCOMMENTARE QUESTA RIGA
-                --db:exec( q )) SCOMMENTARE QUESTA RIGA
-            --end SCOMMENTARE QUESTA RIGA
+            updateHighScore(scoreCount) --mando il punteggio appena raggiunto alla funzione che permetterà di aggiornarlo
             resetScene("gamefinished") --se entro qui devo cancellare anche un timeloop che è partito con l'avvicinamento del castello di sabbia
         else
             resetScene("gameOver")  --se entro qui sono uscito prima dal livello, devo eliminare meno timer all'interno del gioco
@@ -501,19 +484,47 @@ function scene:destroy( event )
 end
 ----------------------------------------------
 --FUNZIONE PER AGGIORNARE L'HIGHSCORE
-function updateHighScore(scoreCount)
-    --INVIO LO SCORE AL DATABASE
+function updateHighScore(scoreCount) --funzione che serve per aggiornare l'high score dell'utente
     local sqlite3 = require( "sqlite3" )	
-    -- Create a file path for the database file "data.db"
     local path = system.pathForFile( "data.db", system.DocumentsDirectory )
-        -- Open the database for access
     local db = sqlite3.open( path )
-        local scoreToDb =("UPDATE levels SET scoreLevel1 = '" ..scoreCount .. "' WHERE ID = 1")
-        local pushQuery = db:exec (scoreToDb)  
-        print(pushQuery)
-        if ( db and db:isopen() ) then
-            db:close()
-        end
+    local levels = {} --creo una  tabella per memorizzare i dati che mi servrà per scegliere se il punteggio è un record o no
+    for row in db:nrows( "SELECT * FROM levels" ) do
+        levels[#levels+1] =
+        {
+            FirstName = row.FirstName,
+            level = row.level,
+            scoreLevel1 = row.scoreLevel1
+        }
+        local oldScore= levels[1].scoreLevel1 --salvo il punteggio che è già presente all'interno del database
+        local levelReached = levels[1].level --mi scrivo il livello a cui è arrivato l'utente all'interno del gioco, se è l'1 allora aggiorneremo a 2 e gli permetteremo di fare un nuovo livello
+        print("livello appena completato: ".. levelReached.." - vecchio punteggio:"..oldScore)
+        if (tonumber(oldScore)<scoreCount) then --se il nuovo è punteggio è maggiore di quello già presente nel db entro nell'if
+            if(tonumber(levelReached) == tonumber(localLevel)) then --se sono al livello 1, devo aumentare il livello
+                print("devo aumentare di livello e inoltre aumento il punteggio")
+                local query =("UPDATE levels SET level ='" .. (levelReached+1) .. "' ,scoreLevel1 = '" ..scoreCount .. "' WHERE ID = 1")
+                print("query: ".. query)
+                local pushQuery = db:exec (query)  
+                if(pushQuery == 0) then --se ritorna 0 allora ho modificato correttamente il db
+                    print(" Punteggio e livello correttamente modificati!")
+                else
+                    print("ho provato a fare l'update della tabella ma non ci sono riuscito. codice errore: "..pushQuery) --errore
+                end
+            else
+                --devo solamente aumentare il punteggio"
+                local query =("UPDATE levels SET scoreLevel1 = '" ..scoreCount .. "' WHERE ID = 1")
+                local pushQuery = db:exec (query)  
+                if(pushQuery == 0) then
+                    print(" Punteggio correttamente modificato!")
+                else
+                    print("ho provato a fare l'update della tabella ma non ci sono riuscito. codice errore: "..pushQuery)
+                end
+            end
+         end
+    end
+    if ( db and db:isopen() ) then --chiuso la connessione al database
+        db:close()
+    end
 end
 ----------------------------------------------
 
@@ -542,36 +553,7 @@ function resetScene( tipo)
             table_plasticbag[i] = nil        -- Nil Out Table Instance
         end
     elseif tipo == "gamefinished" then
-        
-        local sqlite3 = require( "sqlite3" )	
-        -- Create a file path for the database file "data.db"
-        local path = system.pathForFile( "data.db", system.DocumentsDirectory )
-            -- Open the database for access
-        local db = sqlite3.open( path )
-        local levels = {}
-        local oldScore
-        for row in db:nrows( "SELECT * FROM levels" ) do
-            --print( "Row:", row.level )
-            --Crea una tabella dove inserire i dati che troviamo dentro la tabella dei livelli
-            levels[#levels+1] =
-            {
-                FirstName = row.FirstName,
-                level = row.level,
-                scoreLevel1 = row.scoreLevel1,
-                --print( "ID del giocatore:".. row.ID .. " - Livello: " ..row.level .. "- Punteggio: " ..row.scoreLevel1)
-            }
-            oldScore= levels[1].scoreLevel1
-            --print("questo è il punteggio:"..oldScore)
-            if (tonumber(oldScore)<scoreCount) then
-                updateHighScore(scoreCount)
-            end
-        end
-        
-        --[[if (oldScore<scoreCount) 
-            then
-            updateHighScore(scoreCount);
-        end--]]
-        
+
         --ELIMINO I LISTENERS
         Runtime:removeEventListener("enterFrame", spriteScrollToCastle)
         Runtime:removeEventListener("enterFrame", castleScroll)
