@@ -19,7 +19,7 @@ local callingEnemies
 local castle
 local callingPlasticbag
 local timeplayed  --varaiabile che misura da quanti secondi sono all'interno del gioco e farà cambiare la velocità
-local timeToPlay = 10 --variabile che conterrà quanto l'utente dovrà sopravvivere all'interno del gioco
+local timeToPlay = 100 --variabile che conterrà quanto l'utente dovrà sopravvivere all'interno del gioco
 local scoreCount    --variabile conteggio punteggio iniziale
 local gameFinished
 local newTimerOut
@@ -74,6 +74,10 @@ function scene:show( event )
                 local secondsPlayed = 0 --quanti secondi sono passati dall'inizio del gioco
                 local castleAppared = 0 --variabile fuffa che mi servirà per controllare se il castello è già apparso sullo schermo una volta
                 local scoreCount = 0 --variabile conteggio punteggio iniziale
+                --TESTO DELLO SCORE
+                local scoreText = display.newText( scoreCount.."/5", display.contentCenterX, display.contentCenterY-300, native.systemFont, 28 )
+                scoreText:setFillColor( 1, 1, 0 )
+                group_elements:insert(scoreText)
                 gameFinished = 0
             -- VARIABILI PER LO SFONDO DI BACKGROUND {
                 local _w = display.actualContentWidth  -- Width of screen
@@ -242,7 +246,7 @@ function scene:show( event )
             ------------------------------------------------
             -- FUNZIONI PER IL SACCHETTO DI PLASTICA CHE VOLA{
                 local function plasticbagScroll(self, event)
-                    --fa scorrere il nemico nello schermo
+                    --fa scorrere il sacchetto nello schermo
                     if stop == 0 then
                         self.x = self.x - (enemySpeed*2)
                         local spostamentoaria = math.random(-5, 5)
@@ -251,7 +255,7 @@ function scene:show( event )
                 end
                 ------------------------------------------------
                 local function createPlasticbag()
-                    --crea un oggetto di un nuovo sprite nemico e lo aggiunge alla tabella table_plasticbag[]
+                    --crea un oggetto di un nuovo sprite del sacchetto e lo aggiunge alla tabella table_plasticbag[]
                     --da implementare meglio, mi faccio passare che tipo di nemico devo inserire
                     local plasticbag = display.newSprite( plasticbagSheet, plasticbagData )
                     plasticbag.name = "plasticbag"
@@ -290,11 +294,9 @@ function scene:show( event )
                 if( event.phase == "began" ) then		
                     --tutte le informazioni dell'elemento che ho toccato le troviamo dentro event.other
                     if(event.other.name ==  "plasticbag") then --mi sono scontrato con il sacchetto
-                        scoreCount = scoreCount+100;
+                        scoreCount = scoreCount+1;
                         print(scoreCount)
-                        --TESTO DELLO SCORE
-                        local scoreText = display.newText( scoreCount, 100, 200, native.systemFont, 16 )
-                        scoreText:setFillColor( 1, 0, 0 )
+                        scoreText.text = scoreCount.."/5"
                         Runtime:removeEventListener("enterFrame", event.other) --rimuovo il listener dello scroll, così non si muove più
                         local indexToRemove = table.indexOf(table_plasticbag, event.other ) --trovo l'indice che ha all'interno della tabella dei sacchetti di plastica
                         table.remove(table_plasticbag, indexToRemove) --lo rimuovo dalla tabella, utilizzando l'indice 'indexToRemove' 

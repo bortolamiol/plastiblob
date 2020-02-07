@@ -7,14 +7,7 @@
 
 local composer = require( "composer" )
 local scene = composer.newScene()
-local sqlite3 = require( "sqlite3" )	
 
-	-- Create a file path for the database file "data.db"
-	local path = system.pathForFile( "data.db", system.DocumentsDirectory )
-
-	-- Open the database for access
-	local db = sqlite3.open( path )
-	--controllo se la tabella 'levels' esiste già, sennò la devo creare
 
 -- include Corona's "widget" library
 local widget = require "widget"
@@ -49,16 +42,16 @@ function scene:create( event )
 			{
 				FirstName = row.FirstName,
 				level = row.level,
-				print( "ID del giocatore:", row.ID, " - Livello: ", row.level ),
+				print( "ID del giocatore:", row.ID, " - Livello: ", row.level, "- Punteggio: ", row.scoreLevel1),
 			}
 			livellicompletati = levels[1].level		
 		end
 	else
 	--Se dbexists ritorna 1 allora la tabella non esiste, vuol dire perciò che dovrà essere creata
-		local tableSetup = [[CREATE TABLE levels ( ID INTEGER PRIMARY KEY autoincrement, level );]]
+		local tableSetup = [[CREATE TABLE levels ( ID INTEGER PRIMARY KEY autoincrement, level, scoreLevel1);]]
 		db:exec( tableSetup )
 		--inserisco la riga di default nel database, se l'ho appena creato andrò al livello 1
-		local insertQuery = [[INSERT INTO levels VALUES ( null, "1" );]]
+		local insertQuery = [[INSERT INTO levels VALUES ( null, "1", 0 );]]
 		db:exec( insertQuery )
 		--dato che la tabella non esisteva vuol dire che è la prima volta che l'utente gioca, perciò lo faccio iniziare dal livello 1
 		livellicompletati = 1
