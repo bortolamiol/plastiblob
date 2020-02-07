@@ -351,7 +351,7 @@ function scene:show( event )
             
             sprite.preCollision = preCollisionEvent
             sprite:addEventListener( "preCollision" )
-------------------------------------------------
+            ------------------------------------------------
             local function touchListener()
             --funzione che capirà quale evento scatenare al click sullo schermo
             --[[
@@ -413,6 +413,8 @@ function scene:show( event )
                     end
                 end
             end
+           
+
             -- }
             --bottone per uscire dal livello e tornare al menu del livelli
             button_home = display.newImageRect( "immagini/menu/home.png", 100, 100 )
@@ -490,6 +492,23 @@ function scene:destroy( event )
 	local sceneGroup = self.view
 	
 end
+            ----------------------------------------------
+            --FUNZIONE PER AGGIORNARE L'HIGHSCORE
+            function updateHighScore(scoreCount)
+            --INVIO LO SCORE AL DATABASE
+            local sqlite3 = require( "sqlite3" )	
+            -- Create a file path for the database file "data.db"
+            local path = system.pathForFile( "data.db", system.DocumentsDirectory )
+                -- Open the database for access
+            local db = sqlite3.open( path )
+    
+                local scoreToDb =("UPDATE levels SET scoreLevel1 = '" ..scoreCount .. "' WHERE ID = 1")
+                local pushQuery = db:exec (scoreToDb)  
+                --print("..scoreCount..",sql) --debug stuff
+                print(pushQuery)
+            end
+            ----------------------------------------------
+
 function resetScene( tipo) 
     if tipo == "all" then
         timer.cancel( gameLoop )
@@ -498,17 +517,12 @@ function resetScene( tipo)
         timer.cancel( timeplayed )
         physics.pause()
 
-        --INVIO LO SCORE AL DATABASE
-        local sqlite3 = require( "sqlite3" )	
-            -- Create a file path for the database file "data.db"
-        local path = system.pathForFile( "data.db", system.DocumentsDirectory )
-            -- Open the database for access
-        local db = sqlite3.open( path )
         
         --Faccio update del db scoreLevel1
-        local scoreToDb = [[UPDATE levels SET scoreLevel1="]] ..scoreCount .. [[" WHERE UserID=1;]]
-        local resultOfQuery = db:exec( scoreToDb )
-        print("risultato della")
+       -- local scoreToDb = [[UPDATE levels SET scoreLevel1="]] ..scoreCount .. [[" WHERE UserID=1;]]
+        --local resultOfQuery = db:exec( scoreToDb )
+        --print("risultato della")
+
         --ELIMINO I LISTENERS
         Runtime:removeEventListener("enterFrame",enemy)
         Runtime:removeEventListener("enterFrame",plasticbag)
@@ -525,7 +539,7 @@ function resetScene( tipo)
             table_plasticbag[i] = nil        -- Nil Out Table Instance
         end
     elseif tipo == "gamefinished" then
-
+        updateHighScore(scoreCount);
         --ELIMINO I LISTENERS
         Runtime:removeEventListener("enterFrame", spriteScrollToCastle)
         Runtime:removeEventListener("enterFrame", castleScroll)
