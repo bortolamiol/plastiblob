@@ -53,7 +53,7 @@ function scene:show( event )
 		physics.start()
 		-- Overlays collision outlines on normal display objects
         physics.setGravity( 0,20 )
-       -- physics.setDrawMode( "hybrid" )
+        physics.setDrawMode( "hybrid" )
 		-- The default Corona renderer, with no collision outlines
 		--physics.setDrawMode( "normal" )
 		-- Shows collision engine outlines only
@@ -171,8 +171,9 @@ function scene:show( event )
             local posY_sprite =  ground.y 
             sprite.x = (display.contentWidth/2)-300 ; sprite.y = posY_sprite-100
             local frameIndex = 1
-            local outlinePersonaggio = graphics.newOutline(2, spriteWalkingSheet, frameIndex)   --outline personaggio
-            physics.addBody(sprite, { outline=outlinePersonaggio, density=10, bounce=0, friction=1})    --sprite diventa corpo con fisica
+            local outlineSpriteWalking = graphics.newOutline(2, spriteWalkingSheet, frameIndex)   --outline personaggio
+            local outlineSpriteJumping = graphics.newOutline(2, spriteJumpingSheet, frameIndex)   --outline personaggio
+            physics.addBody(sprite, { outline=outlineSpriteWalking, density=10, bounce=0, friction=1})    --sprite diventa corpo con fisica
             sprite.gravityScale = 3.8
             sprite.isFixedRotation = true --rotazione bloccata
             sprite.isJumping = false
@@ -385,7 +386,7 @@ function scene:show( event )
                 end
             end
             function spriteScrollToCastle() --avvicina lo sprite al castello
-                local CastlePosition = ( display.actualContentWidth - (display.actualContentWidth / 4)) --piglio la posizione del castello
+                local CastlePosition = castle.x - 20 --piglio la posizione del castello
                 if(sprite.x <= CastlePosition) then --se la posizione dello sprite è dietro a quella del castello, vado ancora avanti
                     sprite.x = sprite. x + 3 --lo sposto in avanti di 3
                 else
@@ -413,6 +414,7 @@ function scene:show( event )
                             castleAppared = 1 --non lo faccio più riapparire
                             timer.cancel( callingEnemies ) --non chiamo più nemici
                             timer.cancel( callingPlasticbag ) --non chiamo più sacchetti di plastica
+                            sprite:removeEventListener("collision")
                             Runtime:addEventListener("enterFrame", castleScroll) --chiamo la funzione castleScroll per spostare il castello
                         end
                     end
@@ -552,7 +554,6 @@ function resetScene( tipo)
         
         
         --ELIMINO I LISTENERS
-        sprite:removeEventListener("collision")
         Runtime:removeEventListener("enterFrame", spriteScrollToCastle)
         Runtime:removeEventListener("enterFrame", castleScroll)
         Runtime:removeEventListener("enterFrame",enemy)
