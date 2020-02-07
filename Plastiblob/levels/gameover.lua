@@ -33,8 +33,46 @@ function scene:show( event )
  
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
-        --[[
+       local button_home 
+       local button_retry
+       local background = display.newImageRect(group_background,"immagini/menu/sfondo-menu.png",3000,2000)
+             --bottone per uscire dal livello e tornare al menu del livelli
 
+             button_home = display.newImageRect(group_buttons, "immagini/menu/home.png", 100, 100 )
+             button_home.anchorX =  0
+             button_home.anchorY =  0
+             button_home.x =  50
+             button_home.y = 50
+             group_buttons:insert(button_home)
+
+             function button_home:touch( event )
+                if event.phase == "began" then
+                    timer.performWithDelay( 500, function() composer.gotoScene( "menu-levels", "fade", 500 ) end)  --ritorno al menu dei livelli
+                end
+            end
+            button_home:addEventListener( "touch", touch )
+             
+ 
+         
+             --bottone per uscire dal livello e ricominciare
+             button_retry = display.newImageRect( group_buttons,"immagini/menu/restart.png", 100, 100 )
+             button_retry.anchorX =  0
+             button_retry.anchorY =  0
+             button_retry.x = display.actualContentWidth - 120
+             button_retry.y = 50
+             group_buttons:insert(button_retry)
+
+             function button_retry:touch( event )
+                if event.phase == "began" then
+                    timer.performWithDelay( 500, function() composer.gotoScene( "levels.level1", "fade", 200 ) end)  --ricomicio
+                end
+            end
+            button_retry:addEventListener( "touch", touch )
+ 
+           
+             
+            
+ --[[
             INSERISCI QUI IL CODICE LASTON
 
         ]]--
