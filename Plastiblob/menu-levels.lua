@@ -30,7 +30,7 @@ function scene:create( event )
 	--controllo se la tabella 'levels' esiste già, sennò la devo creare
 	local checkifdbexists = [[SELECT * from levels]]
 	local dbexists = db:exec( checkifdbexists )
-	print("il database esiste: "..dbexists .. "  (se è 0 già esiste, se 1 allora non esiste)")
+	print("il DATABASE esiste: "..dbexists .. "  (se è 0 già esiste, se 1 allora non esiste)")
 	if(dbexists == 0) then
 		--Se dbexists ritorna 0 allora il Database già esiste nella memoria, mi serve prendere i dati
 		local levels = {}
@@ -42,8 +42,8 @@ function scene:create( event )
 			{
 				FirstName = row.FirstName,
 				level = row.level,
-				score1 = row.scoreLevel1
-				print( "ID del giocatore:", row.ID, " - Livello: ", row.level, "- Punteggio: ", row.scoreLevel1),
+				score1 = row.scoreLevel1,
+				print( "ID del giocatore:".. row.ID .. " - Livello: " ..row.level .. "- Punteggio: " ..row.scoreLevel1)
 			}
 			livellicompletati = levels[1].level		
 		end
