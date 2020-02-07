@@ -496,22 +496,23 @@ function scene:destroy( event )
 	local sceneGroup = self.view
 	
 end
-            ----------------------------------------------
-            --FUNZIONE PER AGGIORNARE L'HIGHSCORE
-            function updateHighScore(scoreCount)
-            --INVIO LO SCORE AL DATABASE
-            local sqlite3 = require( "sqlite3" )	
-            -- Create a file path for the database file "data.db"
-            local path = system.pathForFile( "data.db", system.DocumentsDirectory )
-                -- Open the database for access
-            local db = sqlite3.open( path )
-    
-                local scoreToDb =("UPDATE levels SET scoreLevel1 = '" ..scoreCount .. "' WHERE ID = 1")
-                local pushQuery = db:exec (scoreToDb)  
-                --print("..scoreCount..",sql) --debug stuff
-                print(pushQuery)
-            end
-            ----------------------------------------------
+----------------------------------------------
+--FUNZIONE PER AGGIORNARE L'HIGHSCORE
+function updateHighScore(scoreCount)
+    --INVIO LO SCORE AL DATABASE
+    local sqlite3 = require( "sqlite3" )	
+    -- Create a file path for the database file "data.db"
+    local path = system.pathForFile( "data.db", system.DocumentsDirectory )
+        -- Open the database for access
+    local db = sqlite3.open( path )
+        local scoreToDb =("UPDATE levels SET scoreLevel1 = '" ..scoreCount .. "' WHERE ID = 1")
+        local pushQuery = db:exec (scoreToDb)  
+        print(pushQuery)
+        if ( db and db:isopen() ) then
+            db:close()
+        end
+end
+----------------------------------------------
 
 function resetScene( tipo) 
     if tipo == "gameOver" then
@@ -539,16 +540,34 @@ function resetScene( tipo)
         end
     elseif tipo == "gamefinished" then
         
-        if (scoreCount) then
-            local sqlite3 = require( "sqlite3" )	
-            -- Create a file path for the database file "data.db"
-            local path = system.pathForFile( "data.db", system.DocumentsDirectory )
-                -- Open the database for access
-            local db = sqlite3.open( path )
-    
+        local sqlite3 = require( "sqlite3" )	
+        -- Create a file path for the database file "data.db"
+        local path = system.pathForFile( "data.db", system.DocumentsDirectory )
+            -- Open the database for access
+        local db = sqlite3.open( path )
+        local levels = {}
+        local oldScore
+        for row in db:nrows( "SELECT * FROM levels" ) do
+            --print( "Row:", row.level )
+            --Crea una tabella dove inserire i dati che troviamo dentro la tabella dei livelli
+            levels[#levels+1] =
+            {
+                FirstName = row.FirstName,
+                level = row.level,
+                scoreLevel1 = row.scoreLevel1,
+                --print( "ID del giocatore:".. row.ID .. " - Livello: " ..row.level .. "- Punteggio: " ..row.scoreLevel1)
+            }
+            oldScore= levels[1].scoreLevel1
+            --print("questo è il punteggio:"..oldScore)
+            if (tonumber(oldScore)<scoreCount) then
+                updateHighScore(scoreCount)
+            end
+        end
+        
+        --[[if (oldScore<scoreCount) 
+            then
             updateHighScore(scoreCount);
-        
-        
+        end--]]
         
         --ELIMINO I LISTENERS
         sprite:removeEventListener("collision")
