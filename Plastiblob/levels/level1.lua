@@ -24,6 +24,7 @@ local scoreCount    --variabile conteggio punteggio iniziale
 local gameFinished
 local newTimerOut
 local nextScene = "menu-levels"
+print("fuori")
 function scene:create( event )
 
 	-- Called when the scene's view does not exist.
@@ -57,7 +58,7 @@ function scene:show( event )
 		--physics.setDrawMode( "normal" )
 		-- Shows collision engine outlines only
         --physics.setDrawMode( "debug" )
-
+        print("create")
 		
     elseif phase == "did" then
         if(tutorial == 0) then 
