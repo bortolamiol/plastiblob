@@ -19,14 +19,15 @@ local callingEnemies
 local castle
 local callingPlasticbag
 local timeplayed  --varaiabile che misura da quanti secondi sono all'interno del gioco e farà cambiare la velocità
-local timeToPlay = 20 --variabile che conterrà quanto l'utente dovrà sopravvivere all'interno del gioco
+local timeToPlay = 10 --variabile che conterrà quanto l'utente dovrà sopravvivere all'interno del gioco
 local scoreCount    --variabile conteggio punteggio iniziale
 local gameFinished
 local newTimerOut
 local nextScene = "menu-levels"
-
 function scene:create( event )
+
 	-- Called when the scene's view does not exist.
+	-- 
 	-- INSERT code here to initialize the scene
     -- e.g. add display objects to 'sceneGroup', add touch listeners, etc.
     local sceneGroup = self.view
@@ -70,7 +71,7 @@ function scene:show( event )
         elseif(tutorial == 1) then
             --VARIABILE CHE CONTIENE TUTTE LE INFORMAZIONI DEL LIVELLO
             local options = {
-                effect = "crossFade",
+                effect = "fade",
                 time = 1000,
                 params = { level="level1"}
             }
@@ -78,8 +79,7 @@ function scene:show( event )
             -- INIZIALIZZO LE VARIABILI CHE VERRANNO USATE NEL GIOCO
                 local secondsPlayed = 0 --quanti secondi sono passati dall'inizio del gioco
                 local castleAppared = 0 --variabile fuffa che mi servirà per controllare se il castello è già apparso sullo schermo una volta
-                local scoreCount = 0 --variabile conteggio punteggio iniziale
-                gameFinished = 0
+                scoreCount = 0 --variabile conteggio punteggio iniziale
             -- VARIABILI PER LO SFONDO DI BACKGROUND {
                 local _w = display.actualContentWidth  -- Width of screen
                 local _h = display.actualContentHeight  -- Height of screen
@@ -102,8 +102,8 @@ function scene:show( event )
 
                 ------------------------------------------------------------
                 -- VARIABILI MOLTO IMPORTANTI PER IL GIOCO: VELOCITA' DI GIOCO
-                local enemySpeed_max = 10 -- massima velocità di spostamento del nemico
-                local enemySpeed_min = 4  -- minima velocità di spostamento del nemico
+                local enemySpeed_max = 8 -- massima velocità di spostamento del nemico
+                local enemySpeed_min = 2 -- minima velocità di spostamento del nemico
                 local enemySpeed = enemySpeed_min --velocità di spostamento del nemico
 
                 local frame_speed = 20 --questa sarà la velocità dello scorrimento del nostro sfondo, in base a questa velocità alzeremo anche quella del gioco
@@ -113,6 +113,8 @@ function scene:show( event )
                 
                 local spriteFrameSpeed = 800 --velocità del movimento delle gambe dello sprite [250 - 800]
                 local spriteFrameSpeed_max = 200 --velocità del movimento delle gambe dello sprite [250 - 800]
+                
+                local plasticToCatch = 10 
                 ------------------------------------------------------------
             --}
             --VARIABILI PER GLI ELEMENTI DELLO SCHERMO{
@@ -124,7 +126,14 @@ function scene:show( event )
             ground.x = display.contentCenterX
             ground.y = display.contentHeight- groundHeight/2
             physics.addBody(ground, "static",{bounce=0, friction=1 } )
-            --}
+            --
+        
+            --TESTO DELLO SCORE
+            local scoreText = display.newText( scoreCount.."/"..plasticToCatch, display.contentCenterX, display.contentCenterY-300, native.systemFont, 28 )
+            scoreText:setFillColor( 1, 1, 0 )
+            group_elements:insert(scoreText)
+            gameFinished = 0
+        --}
             --VARIABILI PER GLI SPRITE { 
 
             --PERSONAGGIO DEL GIOCO
@@ -168,13 +177,13 @@ function scene:show( event )
             sprite.isJumping = false
             
             -- PRIMO NEMICO
-            local enemyWalkingSheetData = { width=200, height=200, numFrames=6, sheetContentWidth=1200, sheetContentHeight=200 }
+            local enemyWalkingSheetData = { width=200, height=200, numFrames=8, sheetContentWidth=1600, sheetContentHeight=200 }
             local enemyWalkingSheet = graphics.newImageSheet( "immagini/livello-1/zombiewalking.png", enemyWalkingSheetData )
             local enemyData = {
-                { name="walking", sheet=enemyWalkingSheet, start=1, count=6, time=500, loopCount=0 }
+                { name="walking", sheet=enemyWalkingSheet, start=1, count=8, time=800, loopCount=0 }
             }
-            local enemyTimeSpawnMin = 3000
-            local enemyTimeSpawnMax  = 5000
+            local enemyTimeSpawnMin = 5000
+            local enemyTimeSpawnMax  = 9000
 
             -- SACCHETTO IN PLASTICA
             local plasticbagSheetData = { width=130, height=130, numFrames=4, sheetContentWidth=520, sheetContentHeight=130 }
@@ -247,7 +256,7 @@ function scene:show( event )
             ------------------------------------------------
             -- FUNZIONI PER IL SACCHETTO DI PLASTICA CHE VOLA{
                 local function plasticbagScroll(self, event)
-                    --fa scorrere il nemico nello schermo
+                    --fa scorrere il sacchetto nello schermo
                     if stop == 0 then
                         self.x = self.x - (enemySpeed*2)
                         local spostamentoaria = math.random(-5, 5)
@@ -256,7 +265,7 @@ function scene:show( event )
                 end
                 ------------------------------------------------
                 local function createPlasticbag()
-                    --crea un oggetto di un nuovo sprite nemico e lo aggiunge alla tabella table_plasticbag[]
+                    --crea un oggetto di un nuovo sprite del sacchetto e lo aggiunge alla tabella table_plasticbag[]
                     --da implementare meglio, mi faccio passare che tipo di nemico devo inserire
                     local plasticbag = display.newSprite( plasticbagSheet, plasticbagData )
                     plasticbag.name = "plasticbag"
@@ -295,11 +304,8 @@ function scene:show( event )
                 if( event.phase == "began" ) then		
                     --tutte le informazioni dell'elemento che ho toccato le troviamo dentro event.other
                     if(event.other.name ==  "plasticbag") then --mi sono scontrato con il sacchetto
-                        scoreCount = scoreCount+100;
-                        print(scoreCount)
-                        --TESTO DELLO SCORE
-                        local scoreText = display.newText( scoreCount, 100, 200, native.systemFont, 16 )
-                        scoreText:setFillColor( 1, 0, 0 )
+                        scoreCount = scoreCount+1;
+                        scoreText.text = scoreCount.."/"..plasticToCatch
                         Runtime:removeEventListener("enterFrame", event.other) --rimuovo il listener dello scroll, così non si muove più
                         local indexToRemove = table.indexOf(table_plasticbag, event.other ) --trovo l'indice che ha all'interno della tabella dei sacchetti di plastica
                         table.remove(table_plasticbag, indexToRemove) --lo rimuovo dalla tabella, utilizzando l'indice 'indexToRemove' 
@@ -307,6 +313,7 @@ function scene:show( event )
                         group_elements:remove(event.other) --lo rimuovo dal gruppo (????? serve??? NON LO SO, VEDIAMO SE DARA' PROBLEMI)
                     end
                     if(event.other.name ==  "enemy") then 
+                        print("mi sono scontrato col nemico")
                         resetScene("all")
                         composer.gotoScene( "levels.gameover", options )
                     end
@@ -316,8 +323,6 @@ function scene:show( event )
                             self.isJumping = false
                             self:setSequence("walking")
                             self:play()
-                        --print("Landed @ ", system.getTimer())
-                            --print("------------------------\n")
                         end
                     end
                 end
@@ -332,7 +337,7 @@ function scene:show( event )
                     self.isJumping = true
                     self:setSequence("jumping")
                     self:play()
-                    print("Jumped @ ", system.getTimer())
+                    --print("Jumped @ ", system.getTimer())
                 end
             end
             Runtime:addEventListener( "touch", sprite )
@@ -340,13 +345,14 @@ function scene:show( event )
             local function preCollisionEvent( self, event )
             
             local collideObject = event.other
-                if ( collideObject.collType == "passthru" ) then
-                    event.contact.isEnabled = false  --disable this specific collision
-                end
+            if ( collideObject.collType == "passthru" ) then
+                event.contact.isEnabled = false  --disable this specific collision
             end
+            end
+            
             sprite.preCollision = preCollisionEvent
             sprite:addEventListener( "preCollision" )
-            ------------------------------------------------
+------------------------------------------------
             local function touchListener()
             --funzione che capirà quale evento scatenare al click sullo schermo
             --[[
@@ -372,6 +378,7 @@ function scene:show( event )
                     castle.x = castle.x - 20 --sposto il castello di 20 pixel
                 else
                     Runtime:removeEventListener("enterFrame", castleScroll) -- rimuovo l'evento event scroll 
+                    gameFinished = 1 --imposto la variabile a 1, grazie a questo eliminerò anche le funzioni che ho creato qui  sopra
                     timer.cancel( gameLoop ) --non mando più avanti lo sfondo di background
                     Runtime:addEventListener("enterFrame", spriteScrollToCastle) --faccio parire la funzione che manderà avanti di un po' lo scroll
                 end
@@ -380,16 +387,17 @@ function scene:show( event )
                 local CastlePosition = ( display.actualContentWidth - (display.actualContentWidth / 4)) --piglio la posizione del castello
                 if(sprite.x <= CastlePosition) then --se la posizione dello sprite è dietro a quella del castello, vado ancora avanti
                     sprite.x = sprite. x + 3 --lo sposto in avanti di 3
-                    newTimerOut = timer.performWithDelay( 3000, goToTheNewScene, 1) --inizio a mandare l'utente alla nuova scena, usando un fade
+                else
+                    goToTheNewScene()
                 end
             end
             function goToTheNewScene()
-                composer.gotoScene( "menu-levels", "fade", 1000 ) --vado alla nuova scena
+                composer.gotoScene( "menu-levels", "fade", 500 ) --vado alla nuova scena
             end
             ----------------------------------------------
             local function increaseGameSpeed(event)
                 secondsPlayed = secondsPlayed + 1 --ogni secondo che passa aumento questa variabile che tiene conto di quanto tempo è passato
-                print(secondsPlayed)
+                print("seconds played: " ..secondsPlayed)
                 if(gameLoop._delay >= time_speed_max) then --minimo di millisecondi a cui può spingersi la funzione loop
                     --time speed con cui viene richiamata la funzione loop
                     local x_time_speed = ((time_speed_max * secondsPlayed) / timeToPlay) --ottiene un numero da 1 a 6
@@ -399,12 +407,13 @@ function scene:show( event )
                     enemySpeed = enemySpeed_min + x_enemySpeed --la velocità è data dalla velocità minima (2) + il risultato della proporzione
                 end
                 if(secondsPlayed >= timeToPlay) then --se è ora di far finire il gioco, vado al passo successivo
-                    gameFinished = 1 --imposto la variabile a 1, grazie a questo eliminerò anche le funzioni che ho creato qui  sopra
-                    if (castleAppared == 0 ) then --se non ho già fatto apparire il castello, lo faccio apparire
-                        castleAppared = 1 --non lo faccio più riapparire
-                        timer.cancel( callingEnemies ) --non chiamo più nemici
-                        timer.cancel( callingPlasticbag ) --non chiamo più sacchetti di plastica
-                        Runtime:addEventListener("enterFrame", castleScroll) --chiamo la funzione castleScroll per spostare il castello
+                    if(scoreCount >= 1) then
+                        if (castleAppared == 0 ) then --se non ho già fatto apparire il castello, lo faccio apparire
+                            castleAppared = 1 --non lo faccio più riapparire
+                            timer.cancel( callingEnemies ) --non chiamo più nemici
+                            timer.cancel( callingPlasticbag ) --non chiamo più sacchetti di plastica
+                            Runtime:addEventListener("enterFrame", castleScroll) --chiamo la funzione castleScroll per spostare il castello
+                        end
                     end
                 end
             end
@@ -444,7 +453,7 @@ function scene:hide( event )
 		-- INSERT code here to pause the scene
 		-- e.g. stop timers, stop animation, unload sounds, etc.)
         --QUI BISOGNA SALVARE I DATI DEL GIOCATORE COME IL PUNTEGGIO
-        print("game finished: " .. gameFinished)
+        print("game finished : " .. gameFinished)
         if(gameFinished == 1) then
             -- Mi connetto al database e dico che ho completato il livello 1!
             --[[local sqlite3 = require( "sqlite3" )
@@ -464,7 +473,6 @@ function scene:hide( event )
                 --db:exec( q )) SCOMMENTARE QUESTA RIGA
             --end SCOMMENTARE QUESTA RIGA
             resetScene("gamefinished") --se entro qui devo cancellare anche un timeloop che è partito con l'avvicinamento del castello di sabbia
-                
         else
             resetScene("all")  --se entro qui sono uscito prima dal livello, devo eliminare meno timer all'interno del gioco
         end
@@ -493,8 +501,20 @@ function resetScene( tipo)
         timer.cancel( callingPlasticbag )
         timer.cancel( timeplayed )
         physics.pause()
+
+        --INVIO LO SCORE AL DATABASE
+        local sqlite3 = require( "sqlite3" )	
+            -- Create a file path for the database file "data.db"
+        local path = system.pathForFile( "data.db", system.DocumentsDirectory )
+            -- Open the database for access
+        local db = sqlite3.open( path )
         
+        --Faccio update del db scoreLevel1
+        local scoreToDb = [[UPDATE levels SET scoreLevel1="]] ..scoreCount .. [[" WHERE UserID=1;]]
+        local resultOfQuery = db:exec( scoreToDb )
+        print("risultato della")
         --ELIMINO I LISTENERS
+        sprite:removeEventListener("collision")
         Runtime:removeEventListener("enterFrame",enemy)
         Runtime:removeEventListener("enterFrame",plasticbag)
         Runtime:removeEventListener( "touch", sprite )
@@ -512,6 +532,7 @@ function resetScene( tipo)
     elseif tipo == "gamefinished" then
 
         --ELIMINO I LISTENERS
+        sprite:removeEventListener("collision")
         Runtime:removeEventListener("enterFrame", spriteScrollToCastle)
         Runtime:removeEventListener("enterFrame", castleScroll)
         Runtime:removeEventListener("enterFrame",enemy)
@@ -523,7 +544,7 @@ function resetScene( tipo)
         timer.cancel( callingEnemies )
         timer.cancel( callingPlasticbag )
         timer.cancel( timeplayed )
-        timer.cancel( newTimerOut )
+        --timer.cancel( newTimerOut )
         physics.pause()
 
         --SVUOTO LE TABELLE
