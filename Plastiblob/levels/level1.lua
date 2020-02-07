@@ -521,12 +521,6 @@ function resetScene( tipo)
         timer.cancel( timeplayed )
         physics.pause()
 
-        
-        --Faccio update del db scoreLevel1
-       -- local scoreToDb = [[UPDATE levels SET scoreLevel1="]] ..scoreCount .. [[" WHERE UserID=1;]]
-        --local resultOfQuery = db:exec( scoreToDb )
-        --print("risultato della")
-
         --ELIMINO I LISTENERS
         sprite:removeEventListener("collision")
         Runtime:removeEventListener("enterFrame",enemy)
@@ -544,7 +538,18 @@ function resetScene( tipo)
             table_plasticbag[i] = nil        -- Nil Out Table Instance
         end
     elseif tipo == "gamefinished" then
-        updateHighScore(scoreCount);
+        
+        if (scoreCount) then
+            local sqlite3 = require( "sqlite3" )	
+            -- Create a file path for the database file "data.db"
+            local path = system.pathForFile( "data.db", system.DocumentsDirectory )
+                -- Open the database for access
+            local db = sqlite3.open( path )
+    
+            updateHighScore(scoreCount);
+        
+        
+        
         --ELIMINO I LISTENERS
         sprite:removeEventListener("collision")
         Runtime:removeEventListener("enterFrame", spriteScrollToCastle)
