@@ -19,14 +19,15 @@ local callingEnemies
 local castle
 local callingPlasticbag
 local timeplayed  --varaiabile che misura da quanti secondi sono all'interno del gioco e farà cambiare la velocità
-local timeToPlay = 20 --variabile che conterrà quanto l'utente dovrà sopravvivere all'interno del gioco
+local timeToPlay = 10 --variabile che conterrà quanto l'utente dovrà sopravvivere all'interno del gioco
 local scoreCount    --variabile conteggio punteggio iniziale
 local gameFinished
 local newTimerOut
 local nextScene = "menu-levels"
-
 function scene:create( event )
+
 	-- Called when the scene's view does not exist.
+	-- 
 	-- INSERT code here to initialize the scene
     -- e.g. add display objects to 'sceneGroup', add touch listeners, etc.
     local sceneGroup = self.view
@@ -68,12 +69,6 @@ function scene:show( event )
 
             ]]--
         elseif(tutorial == 1) then
-            --VARIABILE CHE CONTIENE TUTTE LE INFORMAZIONI DEL LIVELLO
-            local options = {
-                effect = "crossFade",
-                time = 1000,
-                params = { level="level1"}
-            }
             --ELIMINARE IL GRUPPO DEL TUTORIAL 
             -- INIZIALIZZO LE VARIABILI CHE VERRANNO USATE NEL GIOCO
                 local secondsPlayed = 0 --quanti secondi sono passati dall'inizio del gioco
@@ -102,8 +97,8 @@ function scene:show( event )
 
                 ------------------------------------------------------------
                 -- VARIABILI MOLTO IMPORTANTI PER IL GIOCO: VELOCITA' DI GIOCO
-                local enemySpeed_max = 10 -- massima velocità di spostamento del nemico
-                local enemySpeed_min = 4  -- minima velocità di spostamento del nemico
+                local enemySpeed_max = 8 -- massima velocità di spostamento del nemico
+                local enemySpeed_min = 2 -- minima velocità di spostamento del nemico
                 local enemySpeed = enemySpeed_min --velocità di spostamento del nemico
 
                 local frame_speed = 20 --questa sarà la velocità dello scorrimento del nostro sfondo, in base a questa velocità alzeremo anche quella del gioco
@@ -173,8 +168,8 @@ function scene:show( event )
             local enemyData = {
                 { name="walking", sheet=enemyWalkingSheet, start=1, count=6, time=500, loopCount=0 }
             }
-            local enemyTimeSpawnMin = 3000
-            local enemyTimeSpawnMax  = 5000
+            local enemyTimeSpawnMin = 5000
+            local enemyTimeSpawnMax  = 9000
 
             -- SACCHETTO IN PLASTICA
             local plasticbagSheetData = { width=130, height=130, numFrames=4, sheetContentWidth=520, sheetContentHeight=130 }
@@ -307,8 +302,13 @@ function scene:show( event )
                         group_elements:remove(event.other) --lo rimuovo dal gruppo (????? serve??? NON LO SO, VEDIAMO SE DARA' PROBLEMI)
                     end
                     if(event.other.name ==  "enemy") then 
-                        resetScene("all")
-                        composer.gotoScene( "levels.gameover", options )
+                        --mi sono scontrato col nemico
+                       --print("Collisione con il nemico")
+                       --[[
+
+                            INSERIRE QUI GAME OVER
+
+                       ]]--
                     end
                     if(self.isJumping) then
                         if(event.other.name == "ground")
@@ -340,13 +340,14 @@ function scene:show( event )
             local function preCollisionEvent( self, event )
             
             local collideObject = event.other
-                if ( collideObject.collType == "passthru" ) then
-                    event.contact.isEnabled = false  --disable this specific collision
-                end
+            if ( collideObject.collType == "passthru" ) then
+                event.contact.isEnabled = false  --disable this specific collision
             end
+            end
+            
             sprite.preCollision = preCollisionEvent
             sprite:addEventListener( "preCollision" )
-            ------------------------------------------------
+------------------------------------------------
             local function touchListener()
             --funzione che capirà quale evento scatenare al click sullo schermo
             --[[
@@ -444,27 +445,9 @@ function scene:hide( event )
 		-- INSERT code here to pause the scene
 		-- e.g. stop timers, stop animation, unload sounds, etc.)
         --QUI BISOGNA SALVARE I DATI DEL GIOCATORE COME IL PUNTEGGIO
-        print("game finished: " .. gameFinished)
+        print(gameFinished)
         if(gameFinished == 1) then
-            -- Mi connetto al database e dico che ho completato il livello 1!
-            --[[local sqlite3 = require( "sqlite3" )
-            local path = system.pathForFile( "data.db", system.DocumentsDirectory )
-            local db = sqlite3.open( path )
-            local levelsw = {}
-            for row in db:nrows( "SELECT * FROM levels" ) do --prima devo controllare che non l'utente non lo abbia già fatto
-               levelsw[#levelsw+1] =
-               {
-                   FirstName = row.FirstName,
-                   level = row.level,
-               }
-               local livellicompletati = levelsw[1].level
-            end
-            if livellicompletati == 1 then]]--
-                --local q = [[UPDATE levels SET level='2' WHERE ID=1;]] SCOMMENTARE QUESTA RIGA
-                --db:exec( q )) SCOMMENTARE QUESTA RIGA
-            --end SCOMMENTARE QUESTA RIGA
             resetScene("gamefinished") --se entro qui devo cancellare anche un timeloop che è partito con l'avvicinamento del castello di sabbia
-                
         else
             resetScene("all")  --se entro qui sono uscito prima dal livello, devo eliminare meno timer all'interno del gioco
         end
@@ -521,6 +504,7 @@ function resetScene( tipo)
 
         timer.cancel( gameLoop )
         timer.cancel( callingEnemies )
+        print(sex)
         timer.cancel( callingPlasticbag )
         timer.cancel( timeplayed )
         timer.cancel( newTimerOut )
