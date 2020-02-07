@@ -33,8 +33,10 @@ function scene:show( event )
         -- Code here runs when the scene is entirely on screen
        local button_home 
        local button_retry
-       local background = display.newImageRect(group_background,"immagini/menu/sfondo-menu.png",3000,2000)
-             --bottone per uscire dal livello e tornare al menu del livelli
+       local background = display.newImageRect(group_background,"immagini/menu/sfondo-menu.png",1280,720)
+           background.anchorX = 0
+           background.anchorY = 0  
+       --bottone per uscire dal livello e tornare al menu del livelli
 
              button_home = display.newImageRect(group_buttons, "immagini/menu/home.png", 100, 100 )
              button_home.anchorX =  0
