@@ -69,6 +69,12 @@ function scene:show( event )
 
             ]]--
         elseif(tutorial == 1) then
+            --VARIABILE CHE CONTIENE TUTTE LE INFORMAZIONI DEL LIVELLO
+            local options = {
+                effect = "fade",
+                time = 1000,
+                params = { level="level1"}
+            }
             --ELIMINARE IL GRUPPO DEL TUTORIAL 
             -- INIZIALIZZO LE VARIABILI CHE VERRANNO USATE NEL GIOCO
                 local secondsPlayed = 0 --quanti secondi sono passati dall'inizio del gioco
@@ -304,13 +310,8 @@ function scene:show( event )
                         group_elements:remove(event.other) --lo rimuovo dal gruppo (????? serve??? NON LO SO, VEDIAMO SE DARA' PROBLEMI)
                     end
                     if(event.other.name ==  "enemy") then 
-                        --mi sono scontrato col nemico
-                       --print("Collisione con il nemico")
-                       --[[
-
-                            INSERIRE QUI GAME OVER
-
-                       ]]--
+                        resetScene("all")
+                        composer.gotoScene( "levels.gameover", options )
                     end
                     if(self.isJumping) then
                         if(event.other.name == "ground")
