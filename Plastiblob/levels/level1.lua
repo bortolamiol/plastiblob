@@ -301,7 +301,6 @@ function scene:show( event )
                     --tutte le informazioni dell'elemento che ho toccato le troviamo dentro event.other
                     if(event.other.name ==  "plasticbag") then --mi sono scontrato con il sacchetto
                         scoreCount = scoreCount+1;
-                        print(scoreCount)
                         scoreText.text = scoreCount.."/5"
                         Runtime:removeEventListener("enterFrame", event.other) --rimuovo il listener dello scroll, così non si muove più
                         local indexToRemove = table.indexOf(table_plasticbag, event.other ) --trovo l'indice che ha all'interno della tabella dei sacchetti di plastica
@@ -319,8 +318,6 @@ function scene:show( event )
                             self.isJumping = false
                             self:setSequence("walking")
                             self:play()
-                        --print("Landed @ ", system.getTimer())
-                            --print("------------------------\n")
                         end
                     end
                 end
@@ -335,7 +332,7 @@ function scene:show( event )
                     self.isJumping = true
                     self:setSequence("jumping")
                     self:play()
-                    print("Jumped @ ", system.getTimer())
+                    --print("Jumped @ ", system.getTimer())
                 end
             end
             Runtime:addEventListener( "touch", sprite )
@@ -393,7 +390,7 @@ function scene:show( event )
             ----------------------------------------------
             local function increaseGameSpeed(event)
                 secondsPlayed = secondsPlayed + 1 --ogni secondo che passa aumento questa variabile che tiene conto di quanto tempo è passato
-                print(secondsPlayed)
+                print("seconds played: " ..secondsPlayed)
                 if(gameLoop._delay >= time_speed_max) then --minimo di millisecondi a cui può spingersi la funzione loop
                     --time speed con cui viene richiamata la funzione loop
                     local x_time_speed = ((time_speed_max * secondsPlayed) / timeToPlay) --ottiene un numero da 1 a 6
@@ -448,7 +445,7 @@ function scene:hide( event )
 		-- INSERT code here to pause the scene
 		-- e.g. stop timers, stop animation, unload sounds, etc.)
         --QUI BISOGNA SALVARE I DATI DEL GIOCATORE COME IL PUNTEGGIO
-        print(gameFinished)
+        print("game finished : " .. gameFinished)
         if(gameFinished == 1) then
             -- Mi connetto al database e dico che ho completato il livello 1!
             --[[local sqlite3 = require( "sqlite3" )
