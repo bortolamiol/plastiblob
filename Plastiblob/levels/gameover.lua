@@ -8,6 +8,8 @@ local scene = composer.newScene()
 
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
+
+--print( event.params.level ) QUEST
 -- -----------------------------------------------------------------------------------
  
 -- create()
@@ -15,11 +17,11 @@ function scene:create( event )
  
     local sceneGroup = self.view
     -- Code here runs when the scene is first created but has not yet appeared on screenlocal sceneGroup = self.view
-    group_background = display.newGroup() --group_background conterrà la foto di sfondo che scrollerà
-    group_buttons = display.newGroup() --group_elements conterrà tutti gli altri elementi dello schermo: sprite del personaggio, nemici e bottoni per uscire dal gioco
+    group_background = display.newGroup() --group_background conterrà la foto di sfondo 
+    group_buttons = display.newGroup() --group_elements conterrà i due bottoni di sfondo
     
     sceneGroup:insert( group_background ) --inserisco il gruppo group_background dentro la scena
-    sceneGroup:insert( group_buttons ) --inserisco il gruppo castle sopra la scena e sotto i personaggi
+    sceneGroup:insert( group_buttons ) --inserisco il gruppo dei bottoni sopra quello del background
     
 end
  
@@ -36,7 +38,12 @@ function scene:show( event )
         --[[
 
             INSERISCI QUI IL CODICE LASTON
-
+            1) fai vedere la foto di sfondo
+            2) crea un bottone per tornare alla home
+            3) crea un bottone per re-iniziare il livello
+            4) guarda su internet o su elearning come inserire i listener per capire se si ha cliccato sui bottoni
+            5) crea due funzioni di click sui due bottoni
+            6) scrivi sul gruppo se hai problemi
         ]]--
     end
 end

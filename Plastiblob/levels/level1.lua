@@ -70,7 +70,7 @@ function scene:show( event )
         elseif(tutorial == 1) then
             --VARIABILE CHE CONTIENE TUTTE LE INFORMAZIONI DEL LIVELLO
             local options = {
-                effect = "fade",
+                effect = "crossFade",
                 time = 1000,
                 params = { level="level1"}
             }
