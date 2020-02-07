@@ -21,7 +21,9 @@ function scene:create( event )
     sceneGroup:insert( group_background ) --inserisco il gruppo group_background dentro la scena
     sceneGroup:insert( group_buttons ) --inserisco il gruppo castle sopra la scena e sotto i personaggi
 end
- 
+-- audio 
+ local audiogameover = audio.loadSound("MUSIC/PERDENTE.mp3")
+ audio.play(audiogameover)
  
 -- show()
 function scene:show( event )
