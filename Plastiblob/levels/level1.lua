@@ -318,7 +318,7 @@ function scene:show( event )
                         -- audio 
                         audio.setMaxVolume(0.02)
                         local audiogameover = audio.loadSound("MUSIC/PERDENTE.mp3")
-                        audio.play(audiogameover)
+                        --audio.play(audiogameover)
                         resetScene("all")
                         composer.gotoScene( "levels.gameover", options )
                     end
@@ -350,9 +350,9 @@ function scene:show( event )
             local function preCollisionEvent( self, event )
             
             local collideObject = event.other
-            if ( collideObject.collType == "passthru" ) then
-                event.contact.isEnabled = false  --disable this specific collision
-            end
+                if ( collideObject.collType == "passthru" ) then
+                    event.contact.isEnabled = false  --disable this specific collision
+                end
             end
             
             sprite.preCollision = preCollisionEvent
