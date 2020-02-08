@@ -12,5 +12,5 @@ local composer = require "composer"
 
 -- load menu screen
 --NON CANCELLARE LA PROSSIMA RIGA
-composer.gotoScene( "menu" )
---composer.gotoScene( "levels.level1" )
+--composer.gotoScene( "menu" )
+composer.gotoScene( "levels.level1" )
