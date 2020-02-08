@@ -20,7 +20,7 @@ local callingEnemies
 local castle
 local callingPlasticbag
 local timeplayed  --varaiabile che misura da quanti secondi sono all'interno del gioco e farà cambiare la velocità
-local timeToPlay = 10 --variabile che conterrà quanto l'utente dovrà sopravvivere all'interno del gioco
+local timeToPlay = 80 --variabile che conterrà quanto l'utente dovrà sopravvivere all'interno del gioco
 local scoreCount    --variabile conteggio punteggio iniziale
 local gameFinished
 local newTimerOut
@@ -102,8 +102,8 @@ function scene:show( event )
 
                 ------------------------------------------------------------
                 -- VARIABILI MOLTO IMPORTANTI PER IL GIOCO: VELOCITA' DI GIOCO
-                local enemySpeed_max = 8 -- massima velocità di spostamento del nemico
-                local enemySpeed_min = 2 -- minima velocità di spostamento del nemico
+                local enemySpeed_max = 10 -- massima velocità di spostamento del nemico
+                local enemySpeed_min = 4-- minima velocità di spostamento del nemico
                 local enemySpeed = enemySpeed_min --velocità di spostamento del nemico
 
                 local frame_speed = 20 --questa sarà la velocità dello scorrimento del nostro sfondo, in base a questa velocità alzeremo anche quella del gioco
@@ -315,6 +315,9 @@ function scene:show( event )
                     end
                     if(event.other.name ==  "enemy") then 
                         print("mi sono scontrato col nemico")
+                        -- audio 
+                        local audiogameover = audio.loadSound("MUSIC/PERDENTE.mp3")
+                        --audio.play(audiogameover)
                         resetScene("all")
                         composer.gotoScene( "levels.gameover", options )
                     end
