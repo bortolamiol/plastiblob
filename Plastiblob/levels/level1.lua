@@ -161,7 +161,7 @@ function scene:show( event )
       -- In your sequences, add the parameter 'sheet=', referencing which image sheet the sequence should use
       local spriteData = {
         { name="walking", sheet=spriteWalkingSheet, start=1, count=8, time=spriteFrameSpeed, loopCount=0 },
-        { name="jumping", sheet=spriteJumpingSheet, start=1, count=8, time=1000, loopCount=0 }
+        { name="jumping", sheet=spriteJumpingSheet, start=1, count=8, time=800, loopCount=0 }
       }
       --metto assieme tutti i dettagli dello sprite, elencati in precedenza
       sprite = display.newSprite( spriteWalkingSheet, spriteData )
@@ -189,7 +189,7 @@ function scene:show( event )
 
       -- SACCHETTO IN PLASTICA
       local plasticbagSheetData = { width=130, height=130, numFrames=4, sheetContentWidth=520, sheetContentHeight=130 }
-      local plasticbagSheet = graphics.newImageSheet( "immagini/livello-1/paper.png", plasticbagSheetData )
+      local plasticbagSheet = graphics.newImageSheet( "immagini/livello-1/sacchetto.png", plasticbagSheetData )
       local plasticbagData = {
         { name="plastic", sheet=plasticbagSheet, start=1, count=4, time=500, loopCount=0 }
       }
@@ -372,7 +372,8 @@ function scene:show( event )
         sprite:play()
         
         local vx, vy = sprite:getLinearVelocity()
-        if(vy > 300) and (sprite.isJumping) then --se sto tornando a terra cambio l'outline e il mio corpo in walking
+        if(vy > 800) and (sprite.isJumping) then --se sto tornando a terra cambio l'outline e il mio corpo in walking
+            print(vy)
             if(sprite.mustChangeOutlineToWalk) then --ci entrà solo 1 volta per salto
                 changeOutline("walk")
                 print("changed")
@@ -467,7 +468,7 @@ function scene:show( event )
       timeplayed = timer.performWithDelay( 1000, increaseGameSpeed, 0 )
       gameLoop = timer.performWithDelay( time_speed_min, loop, 0 )
       callingEnemies = timer.performWithDelay( math.random(enemyTimeSpawnMin, enemyTimeSpawnMax), enemiesLoop, 0 )
-      callingPlasticbag = timer.performWithDelay( plasticbagTimeSpawn, plasticbagLoop, 0)
+      callingPlasticbag = timer.performWithDelay( (timeToPlay/plasticToCatch)*1000, plasticbagLoop, plasticToCatch)
     end
   end
 end
