@@ -338,7 +338,7 @@ function scene:show( event )
             --quando avviene touch personaggio salta e avvia animazione salto
             function sprite.touch( self,event)
                 if( event.phase == "began" and not self.isJumping ) then
-                    self:setLinearVelocity(0,-1200)
+                    self:setLinearVelocity(0,-1400)
                     self.isJumping = true
                     self:setSequence("jumping")
                     self:play()
