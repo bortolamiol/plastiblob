@@ -39,11 +39,11 @@ function scene:create( event )
 	
 	-- create/position logo/title image on upper-half of the screen
 	
-	local titleLogo = display.newImageRect( "immagini/menu/logo.png", display.contentWidth/2, display.contentHeight/2)
+	local titleLogo = display.newImageRect( "immagini/menu/logo.png", display.contentWidth, display.contentHeight)
 	titleLogo.anchorX = 0
 	titleLogo.anchorY = 0
 	titleLogo.x= contentCenterX
-	titleLogo.y= contentCenterY
+	titleLogo.y= -100
 	
 	
 	-- create a widget button (which will loads level1.lua on release)
