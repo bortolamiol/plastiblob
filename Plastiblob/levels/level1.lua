@@ -316,8 +316,9 @@ function scene:show( event )
                     if(event.other.name ==  "enemy") then 
                         print("mi sono scontrato col nemico")
                         -- audio 
+                        audio.setMaxVolume(0.02)
                         local audiogameover = audio.loadSound("MUSIC/PERDENTE.mp3")
-                        --audio.play(audiogameover)
+                        audio.play(audiogameover)
                         resetScene("all")
                         composer.gotoScene( "levels.gameover", options )
                     end
