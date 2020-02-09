@@ -5,7 +5,7 @@
 -----------------------------------------------------------------------------------------
 
 -- dichiaro delle variabili che andrò a usare in varie scene del livello
-local localLevel = 1 --VARIABILE CHE CONTIENE IL NUMERO DI LIVELLO A CUI APPARTIENE IL FILE LUA: IN QUESTO CASO SIAMO AL LIVELLO 1
+local localLevel = 2 --VARIABILE CHE CONTIENE IL NUMERO DI LIVELLO A CUI APPARTIENE IL FILE LUA: IN QUESTO CASO SIAMO AL LIVELLO 1
 local composer = require( "composer" ) --richiedo la libreria composer
 local scene = composer.newScene() --nuova scena composer
 local tutorial = 1 --ho completato il tutorial? se è 0 devo ancora farlo!
@@ -329,18 +329,10 @@ function scene:show( event )
 
       ------------------------------------------------
       --quando avviene touch personaggio salta e avvia animazione salto
-      function sprite.touch( self,event)
-        vx, vy = sprite:getLinearVelocity()
-        if( event.phase == "began" and not self.isJumping ) then
-          self:setLinearVelocity(0,-1800)
-          self.isJumping = true -- se ho toccato imposto la variabile isJumping del mio personaggio a true
-          self:setSequence("jumping") --lo sprite si muove con animazione jumping
-          self:play()
-          changeOutline("jump") --cambio l'outline del personaggio in modo da renderlo più 'corto'
-          sprite.mustChangeOutlineToWalk = true
-        end
+      --[[function sprite.touch( self,event)
+        
       end
-      Runtime:addEventListener( "touch", sprite )
+      Runtime:addEventListener( "touch", sprite )]]--
       -----------------------------------------------
       local function preCollisionEvent( self, event )
         local collideObject = event.other
@@ -354,15 +346,6 @@ function scene:show( event )
       end
       sprite.preCollision = preCollisionEvent
       sprite:addEventListener( "preCollision" )
-      ------------------------------------------------
-      local function touchListener()
-        --funzione che capirà quale evento scatenare al click sullo schermo
-        --[[
-
-        DA FARE!
-
-        ]]--
-      end
       ------------------------------------------------
       local function loop( event )
         --qui dentro metteremo tutte le cose che necessitano di un loop all'interno del gioco
@@ -464,6 +447,28 @@ function scene:show( event )
       end
       button_home:addEventListener( "touch", touch )
 
+      --------------------------------------------------
+      --------- PARTI AGGIUNTE NEL LIVELLO 2 -----------
+      --------------------------------------------------
+      local function touchListener(event)
+        if(event.x >= 0 ) and (event.x <= display.actualContentWidth) then
+          vx, vy = sprite:getLinearVelocity()
+          if( event.phase == "began" and not sprite.isJumping ) then
+            sprite:setLinearVelocity(0,-1800)
+            sprite.isJumping = true -- se ho toccato imposto la variabile isJumping del mio personaggio a true
+            sprite:setSequence("jumping") --lo sprite si muove con animazione jumping
+            sprite:play()
+            changeOutline("jump") --cambio l'outline del personaggio in modo da renderlo più 'corto'
+            sprite.mustChangeOutlineToWalk = true
+          end
+        elseif (event.x > display.actualContentWidth) and (event.x <= display.actualContentWidth) then
+          print("ho cliccato nella parte DESTRA del display")
+        end
+      end
+      Runtime:addEventListener( "touch", touchListener )
+    
+
+
       --PARTE FINALE: richiamo le funzioni e aggiungo gli elementi allo schermo e ai gruppi
       timeplayed = timer.performWithDelay( 1000, increaseGameSpeed, 0 )
       gameLoop = timer.performWithDelay( time_speed_min, loop, 0 )
@@ -494,7 +499,7 @@ function scene:hide( event )
   elseif phase == "did" then
     -- Called when the scene is now off screen
     --cancella tutto il contenuto all'interno di una scena senza salvare i contenuti
-    local sceneToRemove = "levels.level"..localLevel --questo codice prende in modo dinamico la scena su cui siamo ed elimina gli elementi all'interno
+    local sceneToRemove = "levels.level"..localLevel
     composer.removeScene( sceneToRemove)
   end
 
@@ -569,6 +574,7 @@ function resetScene( tipo)
     Runtime:removeEventListener("enterFrame",plasticbag)
     Runtime:removeEventListener( "touch", sprite )
     button_home:removeEventListener( "touch", touch )
+    Runtime:removeEventListener( "touch", touchListener )
 
     --SVUOTO LE TABELLE
     for i=1, #enemies do
@@ -586,7 +592,7 @@ function resetScene( tipo)
     Runtime:removeEventListener("enterFrame", castleScroll)
     Runtime:removeEventListener("enterFrame",enemy)
     Runtime:removeEventListener("enterFrame",plasticbag)
-    Runtime:removeEventListener( "touch", sprite )
+    --Runtime:removeEventListener( "touch", sprite )
     button_home:removeEventListener( "touch", touch )
 
     timer.cancel( gameLoop )
