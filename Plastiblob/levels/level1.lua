@@ -20,7 +20,7 @@ local callingEnemies
 local castle
 local callingPlasticbag
 local timeplayed  --varaiabile che misura da quanti secondi sono all'interno del gioco e farà cambiare la velocità
-local timeToPlay = 80 --variabile che conterrà quanto l'utente dovrà sopravvivere all'interno del gioco
+local timeToPlay = 10 --variabile che conterrà quanto l'utente dovrà sopravvivere all'interno del gioco
 local scoreCount    --variabile conteggio punteggio iniziale
 local gameFinished
 local newTimerOut
@@ -315,6 +315,7 @@ function scene:show( event )
             group_elements:remove(event.other) --lo rimuovo dal gruppo (????? serve??? NON LO SO, VEDIAMO SE DARA' PROBLEMI)
           end
           if(event.other.name ==  "enemy") then
+            stop = 1
             print("mi sono scontrato col nemico")
             -- audio
             audio.setMaxVolume(0.02)
@@ -420,6 +421,7 @@ function scene:show( event )
         end
         if(secondsPlayed >= timeToPlay) then --se è ora di far finire il gioco, vado al passo successivo
           if(scoreCount >= 1) then
+            stop = 1
             if (castleAppared == 0 ) then --se non ho già fatto apparire il castello, lo faccio apparire
               castleAppared = 1 --non lo faccio più riapparire
               timer.cancel( callingEnemies ) --non chiamo più nemici

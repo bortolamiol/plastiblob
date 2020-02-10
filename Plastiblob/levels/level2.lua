@@ -21,7 +21,7 @@ local callingEnemies
 local castle
 local callingPlasticbag
 local timeplayed  --varaiabile che misura da quanti secondi sono all'interno del gioco e farà cambiare la velocità
-local timeToPlay = 80 --variabile che conterrà quanto l'utente dovrà sopravvivere all'interno del gioco
+local timeToPlay = 60 --variabile che conterrà quanto l'utente dovrà sopravvivere all'interno del gioco
 local scoreCount    --variabile conteggio punteggio iniziale
 local gameFinished
 local newTimerOut
@@ -66,7 +66,7 @@ function scene:show( event )
 
 
       --visualizzare il tutorial del gioco, all'interno del gruppo 'group_tutorial'
-
+    
 
       ]]--
     elseif(tutorial == 1) then
@@ -349,7 +349,6 @@ function scene:show( event )
         if(event.other.name == "ground") then
             self.isJumping = false
         end
-        --print("Jumped @ ", system.getTimer())
       end
       sprite.preCollision = preCollisionEvent
       sprite:addEventListener( "preCollision" )
@@ -363,7 +362,7 @@ function scene:show( event )
         
         local vx, vy = sprite:getLinearVelocity()
         if(vy > 800) and (sprite.isJumping) then --se sto tornando a terra cambio l'outline e il mio corpo in walking
-            print(vy)
+            --print(vy)
             if(sprite.mustChangeOutlineToWalk) then --ci entrà solo 1 volta per salto
                 changeOutline("walk") --cambio l'outline del mio personaggio a quella della camminata -> più grossa e tozza
                 sprite.mustChangeOutlineToWalk = false
@@ -409,6 +408,7 @@ function scene:show( event )
         end
         if(secondsPlayed >= timeToPlay) then --se è ora di far finire il gioco, vado al passo successivo
           if(scoreCount >= 1) then
+            stop = 1 
             if (castleAppared == 0 ) then --se non ho già fatto apparire il castello, lo faccio apparire
               castleAppared = 1 --non lo faccio più riapparire
               timer.cancel( callingEnemies ) --non chiamo più nemici
@@ -465,8 +465,8 @@ function scene:show( event )
             if self.x > display.actualContentWidth + 30 then --se c'è un sacchetto di plastica che ha superato il limite di -200, lo togliamo!
               self:removeEventListener( "collision", onBulletCollision ) --rimuovo l'ascoltatore per la collisione di quel sprite
               Runtime:removeEventListener("enterFrame",self) --rimuovo l'ascoltatore che lo fa scrollare 
-              display.remove(self) --rimuove QUEL sacchetto di plastica dal display display
               group_elements:remove(self)
+              display.remove(self) --rimuove QUEL sacchetto di plastica dal display display
               local res = table.remove(table_bullets, table.indexOf( table_bullets, self )) --lo rimuove anche dalla tabella dei proeittili
             end
           end
@@ -506,7 +506,6 @@ function scene:show( event )
           local bullet = display.newSprite( bulletSheet, bulletData )
           bullet.name = "bullet"
           bullet:play()
-          --print("mi hanno richiamato")
           group_elements:insert(bullet)
           bullet.x = sprite.x
           bullet.y = sprite.y
@@ -515,13 +514,13 @@ function scene:show( event )
           bullet.isBullet = true
           bullet.isSensor = true
           bullet.bodyType = "static"
-          bullet:addEventListener( "collision", onBulletCollision )
           return bullet
         end
         ------------------------------------------------
         local function bulletsLoop()
           bullet = createBullet() --creo un'istanza di un oggetto sprite plastic bag         
           table.insert(table_bullets, bullet)
+          bullet:addEventListener( "collision", onBulletCollision )
           bullet.enterFrame = bulletScroll --lo faccio scrollare, grazie alla funzione plasticbagScroll
           Runtime:addEventListener("enterFrame", bullet) --assegno all'evento enterframe lo scroll
         end
@@ -544,8 +543,6 @@ function scene:show( event )
       end
       Runtime:addEventListener( "touch", touchListener )
       -----------------------------------------------------
-    
-
 
       --PARTE FINALE: richiamo le funzioni e aggiungo gli elementi allo schermo e ai gruppi
       timeplayed = timer.performWithDelay( 1000, increaseGameSpeed, 0 )
@@ -566,7 +563,7 @@ function scene:hide( event )
     -- INSERT code here to pause the scene
     -- e.g. stop timers, stop animation, unload sounds, etc.)
     --QUI BISOGNA SALVARE I DATI DEL GIOCATORE COME IL PUNTEGGIO
-    print("game finished : " .. gameFinished)
+    print("game finished : " .. tostring(gameFinished))
     if(gameFinished == 1) then
       updateHighScore(scoreCount) --mando il punteggio appena raggiunto alla funzione che permetterà di aggiornarlo
       resetScene("gamefinished") --se entro qui devo cancellare anche un timeloop che è partito con l'avvicinamento del castello di sabbia
@@ -599,20 +596,21 @@ function updateHighScore(scoreCount) --funzione che serve per aggiornare l'high 
   local path = system.pathForFile( "data.db", system.DocumentsDirectory )
   local db = sqlite3.open( path )
   local levels = {} --creo una  tabella per memorizzare i dati che mi servrà per scegliere se il punteggio è un record o no
-  for row in db:nrows( "SELECT * FROM levels" ) do
+  for row in db:nrows( "SELECT level, scoreLevel"..localLevel.." FROM levels" ) do
     levels[#levels+1] =
     {
-      FirstName = row.FirstName,
+      print(tostring(row)),
+      --FirstName = row.FirstName,
       level = row.level,
-      scoreLevel1 = row.scoreLevel1
+      scoreLevel = row.scoreLevel2
     }
-    local oldScore= levels[1].scoreLevel1 --salvo il punteggio che è già presente all'interno del database
+    local oldScore= levels[1].scoreLevel --salvo il punteggio che è già presente all'interno del database
     local levelReached = levels[1].level --mi scrivo il livello a cui è arrivato l'utente all'interno del gioco, se è l'1 allora aggiorneremo a 2 e gli permetteremo di fare un nuovo livello
-    print("livello appena completato: ".. levelReached.." - vecchio punteggio:"..oldScore)
-    if (tonumber(oldScore)<scoreCount) then --se il nuovo è punteggio è maggiore di quello già presente nel db entro nell'if
-      if(tonumber(levelReached) == tonumber(localLevel)) then --se sono al livello 1, devo aumentare il livello
+    print("livello appena completato: ".. localLevel.." - vecchio punteggio:"..oldScore)
+    if(tonumber(levelReached) == tonumber(localLevel)) then --se sono al livello 1, devo aumentare il livello
+      if (tonumber(oldScore)<scoreCount) then --se il nuovo è punteggio è maggiore di quello già presente nel db entro nell'if
         print("devo aumentare di livello e inoltre aumento il punteggio")
-        local query =("UPDATE levels SET level ='" .. (levelReached+1) .. "' ,scoreLevel1 = '" ..scoreCount .. "' WHERE ID = 1")
+        local query =("UPDATE levels SET level ='" .. (levelReached+1) .. "' ,scoreLevel2 = '" ..scoreCount .. "' WHERE ID = 1")
         print("query: ".. query)
         local pushQuery = db:exec (query)
         if(pushQuery == 0) then --se ritorna 0 allora ho modificato correttamente il db
@@ -620,9 +618,20 @@ function updateHighScore(scoreCount) --funzione che serve per aggiornare l'high 
         else
           print("ho provato a fare l'update della tabella ma non ci sono riuscito. codice errore: "..pushQuery) --errore
         end
-      else
-        --devo solamente aumentare il punteggio"
-        local query =("UPDATE levels SET scoreLevel1 = '" ..scoreCount .. "' WHERE ID = 1")
+      elseif (tonumber(oldScore) >= scoreCount) then
+        --devo solamente aumentare solo il livello"
+        local query =("UPDATE levels SET level ='" .. (levelReached+1) .. "' WHERE ID = 1")
+        print("query: ".. query)
+        local pushQuery = db:exec (query)
+        if(pushQuery == 0) then --se ritorna 0 allora ho modificato correttamente il db
+          print("livello correttamente modificati!")
+        else
+          print("ho provato a fare l'update della tabella ma non ci sono riuscito. codice errore: "..pushQuery) --errore
+        end
+      end
+    else
+      if((tonumber(oldScore) < scoreCount)) then
+        local query =("UPDATE levels SET scoreLevel2 = '" ..scoreCount .. "' WHERE ID = 1")
         local pushQuery = db:exec (query)
         if(pushQuery == 0) then
           print(" Punteggio correttamente modificato!")
@@ -652,8 +661,8 @@ function resetScene( tipo)
     Runtime:removeEventListener("enterFrame",plasticbag)
     --Runtime:removeEventListener( "touch", sprite )
     button_home:removeEventListener( "touch", touch )
-    Runtime:removeEventListener("enterFrame", bullet) 
     Runtime:removeEventListener( "touch", touchListener )
+    Runtime:removeEventListener("enterFrame", bullet)
 
     --SVUOTO LE TABELLE
     for i=1, #enemies do
@@ -666,16 +675,14 @@ function resetScene( tipo)
     end
     for i=1, #table_bullets do 
       Runtime:addEventListener("enterFrame",  table_bullets[i])
-      table_bullets[i]:removeEventListener( "collision", onGlobalCollision )
+      table_bullets[i]:removeEventListener( "collision", onBulletCollision )
       table_bullets[i]:removeSelf() -- Optional Display Object Removal
       table_bullets[i] = nil        -- Nil Out Table Instance
     end
   elseif tipo == "gamefinished" then
 
     --ELIMINO I LISTENERS
-    
-    bullet:removeEventListener( "collision", onGlobalCollision )
-    Runtime:removeEventListener( "collision", onGlobalCollision )
+    Runtime:removeEventListener( "collision", onBulletCollision )
     Runtime:removeEventListener( "touch", touchListener )
     Runtime:removeEventListener("enterFrame", spriteScrollToCastle)
     Runtime:removeEventListener("enterFrame", castleScroll)
@@ -703,7 +710,7 @@ function resetScene( tipo)
     end
     for i=1, #table_bullets do
       Runtime:addEventListener("enterFrame",  table_bullets[i])
-      table_bullets[i]:removeEventListener( "collision", onGlobalCollision )
+      table_bullets[i]:removeEventListener( "collision", onBulletCollision )
       table_bullets[i]:removeSelf() -- Optional Display Object Removal
       table_bullets[i] = nil        -- Nil Out Table Instance
     end

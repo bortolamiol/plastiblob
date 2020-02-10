@@ -62,10 +62,10 @@ function scene:show( event )
 			end
 		else
 		--Se dbexists ritorna 1 allora la tabella non esiste, vuol dire perciò che dovrà essere creata
-			local tableSetup = [[CREATE TABLE levels ( ID INTEGER PRIMARY KEY autoincrement, level, scoreLevel1);]]
+			local tableSetup = [[CREATE TABLE levels ( ID INTEGER PRIMARY KEY autoincrement, level, scoreLevel1, scoreLevel2);]]
 			db:exec( tableSetup )
 			--inserisco la riga di default nel database, se l'ho appena creato andrò al livello 1
-			local insertQuery = [[INSERT INTO levels VALUES ( null, "1", 0 );]]
+			local insertQuery = [[INSERT INTO levels VALUES ( null, "1", 0, 0 );]]
 			db:exec( insertQuery )
 			--dato che la tabella non esisteva vuol dire che è la prima volta che l'utente gioca, perciò lo faccio iniziare dal livello 1
 			livellicompletati = 1
