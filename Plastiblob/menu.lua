@@ -10,6 +10,7 @@ local scene = composer.newScene()
 -- include Corona's "widget" library
 local widget = require "widget"
 
+local musicTrack
 --------------------------------------------
 
 -- forward declarations and other locals
@@ -80,6 +81,10 @@ function scene:create( event )
 	deletedata.x = display.actualContentWidth - 100
 	deletedata.y = display.actualContentHeight - 100
 
+	-- aggiungiamo la musica di background del menù
+
+	musicTrack = audio.loadStream("MUSIC/THEME.mp3")
+
 	--funzione per cancellare i dati dal database
 	function deletedata:touch( event )
 		if event.phase == "began" then
@@ -115,6 +120,9 @@ function scene:show( event )
 		-- 
 		-- INSERT code here to make the scene come alive
 		-- e.g. start timers, begin animation, play audio, etc.
+		
+		-- Start the music!
+        audio.play( musicTrack, { channel=1, loops=-1 } )
 	end	
 end
 
@@ -129,6 +137,8 @@ function scene:hide( event )
 		-- e.g. stop timers, stop animation, unload sounds, etc.)
 	elseif phase == "did" then
 		-- Called when the scene is now off screen
+		-- Stop the music!
+			audio.stop( 1 )
 	end	
 end
 
@@ -140,6 +150,8 @@ function scene:destroy( event )
 	-- INSERT code here to cleanup the scene
 	-- e.g. remove display objects, remove touch listeners, save state, etc.
 	
+	audio.dispose( musicTrack )
+
 	if playBtn then
 		playBtn:removeSelf()	-- widgets must be manually removed
 		playBtn = nil
