@@ -185,8 +185,8 @@ function scene:show( event )
       local enemyData = {
         { name="walking", sheet=enemyWalkingSheet, start=1, count=8, time=800, loopCount=0 }
       }
-      local enemyTimeSpawnMin = 5000
-      local enemyTimeSpawnMax  = 9000
+      local enemyTimeSpawnMin = 500
+      local enemyTimeSpawnMax  = 1000
 
       -- SACCHETTO IN PLASTICA
       local plasticbagSheetData = { width=130, height=130, numFrames=4, sheetContentWidth=520, sheetContentHeight=130 }
@@ -201,6 +201,12 @@ function scene:show( event )
       local bulletSheet = graphics.newImageSheet( "immagini/livello-1/plastic-bottle.png", bulletSheetData )
       local bulletData = {
         { name="plastic-bottle", sheet=plasticbagSheet, start=1, count=4, time=400, loopCount=0 }
+      }
+      --ESPLOSIONE QUANDO SI COLPISCE IL NEMICO CON IL PROIETTILE
+      local explosionSheetData = { width=200, height=200, numFrames=20, sheetContentWidth=1000, sheetContentHeight=800 }
+      local explosionSheet = graphics.newImageSheet( "immagini/livello-2/explosion.png", explosionSheetData )
+      local explosionData = {
+        { name="explosion", sheet=explosionSheet, start=1, count=20, time=400, loopCount=1}
       }
 
 
@@ -243,7 +249,7 @@ function scene:show( event )
         frameIndexNemico = 1;
         local outlineNemico = graphics.newOutline(5, enemyWalkingSheet, frameIndexNemico)
         physics.addBody(enemy, { outline=outlineNemico, density=5, bounce=0, friction=1})
-        enemy.bodyType = "static"
+        enemy.bodyType = "dynamic"
         enemy.isFixedRotation = true
         enemy.gravityScale = 5
         table.insert(enemies, enemy)
@@ -457,13 +463,43 @@ function scene:show( event )
           if stop == 0 then
             self.x = self.x + 10 --fa andare  avanti il proiettile in x senza spostarsi in y
             if self.x > display.actualContentWidth + 30 then --se c'è un sacchetto di plastica che ha superato il limite di -200, lo togliamo!
-              Runtime:removeEventListener("enterFrame",self) --rimuovo l'ascoltatore che lo fa scrollare
+              self:removeEventListener( "collision", onBulletCollision ) --rimuovo l'ascoltatore per la collisione di quel sprite
+              Runtime:removeEventListener("enterFrame",self) --rimuovo l'ascoltatore che lo fa scrollare 
               display.remove(self) --rimuove QUEL sacchetto di plastica dal display display
+              group_elements:remove(self)
               local res = table.remove(table_bullets, table.indexOf( table_bullets, self )) --lo rimuove anche dalla tabella dei proeittili
             end
           end
         end
         ------------------------------------------------
+        -- Global collision handling
+        function onBulletCollision( event )
+          if(tostring(event.other.name) == "enemy") then --se il proiettile si è scontrato contro un nemico allora..
+            enemyKilled = event.other --salvo dentro enemyKilled l'indirizzo che mi porta al nemico ucciso
+            --Riproduco l'animazione dell'esplosione nelle stesse coordinate in cui si trova il nemico nel momento della collisione
+            local explosion = display.newSprite( explosionSheet, explosionData ) --salvo dentro explosion l'animazione dell'esplosione
+            explosion.name = "explosion"
+            group_elements:insert(explosion)
+            explosion.x = enemyKilled.x
+            explosion.y = enemyKilled.y
+            explosion:play()
+
+            --rimuovo il nemico dallo schermo
+            Runtime:removeEventListener("enterFrame", enemyKilled) --non faccio più muovere il nemico
+            display.remove(enemyKilled) --rimuovo dal display il nemico
+            local position = table.indexOf(enemies, enemyKilled) --carico dentro la variabile position la posizione del nemico colpito dentro la tabella dei nemici 
+            table.remove(enemies,position) --rimuovo dalla tabella enemies il nemico colpito
+
+            --rimuovo la bottiglia appena lanciata
+            group_elements:remove(event.target)
+            event.target:removeEventListener( "collision", onBulletCollision ) --rimuovo l'ascoltatore per la collisione di quel sprite
+            Runtime:removeEventListener("enterFrame",event.target) --rimuovo l'ascoltatore che lo fa scrollare 
+            display.remove(event.target) --rimuove QUELLA bottiglia di plastica dal display 
+            local res = table.remove(table_bullets, table.indexOf( table_bullets, event.target )) --lo rimuove anche dalla tabella dei proeittili
+            
+          end
+        end
+        ---------------------------------------------------
         local function createBullet()
           --crea un oggetto di un nuovo sprite del sacchetto e lo aggiunge alla tabella table_plasticbag[]
           --da implementare meglio, mi faccio passare che tipo di nemico devo inserire
@@ -479,11 +515,11 @@ function scene:show( event )
           bullet.isBullet = true
           bullet.isSensor = true
           bullet.bodyType = "static"
+          bullet:addEventListener( "collision", onBulletCollision )
           return bullet
         end
         ------------------------------------------------
         local function bulletsLoop()
-         --print("mi hanno richiamato")
           bullet = createBullet() --creo un'istanza di un oggetto sprite plastic bag         
           table.insert(table_bullets, bullet)
           bullet.enterFrame = bulletScroll --lo faccio scrollare, grazie alla funzione plasticbagScroll
@@ -502,7 +538,6 @@ function scene:show( event )
             sprite.mustChangeOutlineToWalk = true
           elseif (event.x > display.actualContentWidth / 2) and (event.x <= display.contentWidth) then
             --ho cliccato sulla parte destra dello shcermo, devo sparare
-            print("mi hanno richiamato")
             bulletsLoop()
           end
         end
@@ -631,6 +666,7 @@ function resetScene( tipo)
     end
     for i=1, #table_bullets do 
       Runtime:addEventListener("enterFrame",  table_bullets[i])
+      table_bullets[i]:removeEventListener( "collision", onGlobalCollision )
       table_bullets[i]:removeSelf() -- Optional Display Object Removal
       table_bullets[i] = nil        -- Nil Out Table Instance
     end
@@ -638,6 +674,8 @@ function resetScene( tipo)
 
     --ELIMINO I LISTENERS
     
+    bullet:removeEventListener( "collision", onGlobalCollision )
+    Runtime:removeEventListener( "collision", onGlobalCollision )
     Runtime:removeEventListener( "touch", touchListener )
     Runtime:removeEventListener("enterFrame", spriteScrollToCastle)
     Runtime:removeEventListener("enterFrame", castleScroll)
@@ -665,6 +703,7 @@ function resetScene( tipo)
     end
     for i=1, #table_bullets do
       Runtime:addEventListener("enterFrame",  table_bullets[i])
+      table_bullets[i]:removeEventListener( "collision", onGlobalCollision )
       table_bullets[i]:removeSelf() -- Optional Display Object Removal
       table_bullets[i] = nil        -- Nil Out Table Instance
     end
