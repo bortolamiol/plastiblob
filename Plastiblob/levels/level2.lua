@@ -14,6 +14,7 @@ local punteggio --variabile che conterrà il mio punteggio del livello
 local sprite --sprite del personaggio
 local enemies = {} --sprite dei nemici
 local table_plasticbag = {}
+local table_bullets = {} --tabella che conterrà al suo interno i proiettili che sono sullo schermo
 local button_home --bottone per uscire dal livello e tornare alla button_home dei livelli
 local stop =  0 --variabile che servirà per capire se stoppare il gioco
 local callingEnemies
@@ -73,7 +74,7 @@ function scene:show( event )
       local options = {
         effect = "fade",
         time = 1000,
-        params = { level="level1"}
+        params = { level="level2"}
       }
       --ELIMINARE IL GRUPPO DEL TUTORIAL
       -- INIZIALIZZO LE VARIABILI CHE VERRANNO USATE NEL GIOCO
@@ -195,6 +196,13 @@ function scene:show( event )
       }
       local plasticbagTimeSpawn = 5000
 
+      --PROIETTILE
+      local bulletSheetData = { width=160, height=160, numFrames=4, sheetContentWidth=640, sheetContentHeight=160 }
+      local bulletSheet = graphics.newImageSheet( "immagini/livello-1/plastic-bottle.png", bulletSheetData )
+      local bulletData = {
+        { name="plastic-bottle", sheet=plasticbagSheet, start=1, count=4, time=400, loopCount=0 }
+      }
+
 
       --CASTELLO DI SABBIA IN CUI ENTRERO' A FINE LIVELLO
       castle = display.newImageRect( "immagini/livello-1/sandcastle-duck.png", 700, 700 )
@@ -299,7 +307,6 @@ function scene:show( event )
       end
       --}
       ------------------------------------------------
-      --}
 
       --funzione che capisce se c'è collisione con un elemento
       function sprite.collision( self, event )
@@ -315,7 +322,7 @@ function scene:show( event )
             group_elements:remove(event.other) --lo rimuovo dal gruppo (????? serve??? NON LO SO, VEDIAMO SE DARA' PROBLEMI)
           end
           if(event.other.name ==  "enemy") then
-            print("mi sono scontrato col nemico")
+            stop = 1 -- grazie a questo le animazioni personagggi non scrolleranno più
             -- audio
             audio.setMaxVolume(0.02)
             local audiogameover = audio.loadSound("MUSIC/PERDENTE.mp3")
@@ -328,12 +335,6 @@ function scene:show( event )
       sprite:addEventListener("collision")
 
       ------------------------------------------------
-      --quando avviene touch personaggio salta e avvia animazione salto
-      --[[function sprite.touch( self,event)
-        
-      end
-      Runtime:addEventListener( "touch", sprite )]]--
-      -----------------------------------------------
       local function preCollisionEvent( self, event )
         local collideObject = event.other
         if ( collideObject.collType == "passthru" ) then
@@ -358,8 +359,7 @@ function scene:show( event )
         if(vy > 800) and (sprite.isJumping) then --se sto tornando a terra cambio l'outline e il mio corpo in walking
             print(vy)
             if(sprite.mustChangeOutlineToWalk) then --ci entrà solo 1 volta per salto
-                changeOutline("walk")
-                print("changed")
+                changeOutline("walk") --cambio l'outline del mio personaggio a quella della camminata -> più grossa e tozza
                 sprite.mustChangeOutlineToWalk = false
             end
         end
@@ -450,22 +450,65 @@ function scene:show( event )
       --------------------------------------------------
       --------- PARTI AGGIUNTE NEL LIVELLO 2 -----------
       --------------------------------------------------
-      local function touchListener(event)
-        if(event.x >= 0 ) and (event.x <= display.actualContentWidth) then
-          vx, vy = sprite:getLinearVelocity()
-          if( event.phase == "began" and not sprite.isJumping ) then
-            sprite:setLinearVelocity(0,-1800)
+
+      -- FUNZIONI PER IL PROIETTILE 'LATTINA DI PLASTICA'
+        local function bulletScroll(self, event)
+          --fa scorrere il sacchetto nello schermo
+          if stop == 0 then
+            self.x = self.x + 10 --fa andare  avanti il proiettile in x senza spostarsi in y
+            if self.x > display.actualContentWidth + 30 then --se c'è un sacchetto di plastica che ha superato il limite di -200, lo togliamo!
+              Runtime:removeEventListener("enterFrame",self) --rimuovo l'ascoltatore che lo fa scrollare
+              display.remove(self) --rimuove QUEL sacchetto di plastica dal display display
+              local res = table.remove(table_bullets, table.indexOf( table_bullets, self )) --lo rimuove anche dalla tabella dei proeittili
+            end
+          end
+        end
+        ------------------------------------------------
+        local function createBullet()
+          --crea un oggetto di un nuovo sprite del sacchetto e lo aggiunge alla tabella table_plasticbag[]
+          --da implementare meglio, mi faccio passare che tipo di nemico devo inserire
+          local bullet = display.newSprite( bulletSheet, bulletData )
+          bullet.name = "bullet"
+          bullet:play()
+          --print("mi hanno richiamato")
+          group_elements:insert(bullet)
+          bullet.x = sprite.x
+          bullet.y = sprite.y
+          local outlineBullet= graphics.newOutline(20, bulletSheet, 1)
+          physics.addBody(bullet, { outline=outlineBullet, density=1, bounce=0, friction=1})
+          bullet.isBullet = true
+          bullet.isSensor = true
+          bullet.bodyType = "static"
+          return bullet
+        end
+        ------------------------------------------------
+        local function bulletsLoop()
+         --print("mi hanno richiamato")
+          bullet = createBullet() --creo un'istanza di un oggetto sprite plastic bag         
+          table.insert(table_bullets, bullet)
+          bullet.enterFrame = bulletScroll --lo faccio scrollare, grazie alla funzione plasticbagScroll
+          Runtime:addEventListener("enterFrame", bullet) --assegno all'evento enterframe lo scroll
+        end
+
+      function touchListener(event)
+        if ( event.phase == "ended" ) then --è finito il processo di touch dello sschermo
+          if(event.x >= 0 ) and (event.x <= display.actualContentWidth/2) and (not sprite.isJumping) then
+            --parte sinistra del display --> devo saltare
+            sprite:setLinearVelocity(0,-1800) -- applico una forza al personaggio per saltare
             sprite.isJumping = true -- se ho toccato imposto la variabile isJumping del mio personaggio a true
             sprite:setSequence("jumping") --lo sprite si muove con animazione jumping
             sprite:play()
             changeOutline("jump") --cambio l'outline del personaggio in modo da renderlo più 'corto'
             sprite.mustChangeOutlineToWalk = true
+          elseif (event.x > display.actualContentWidth / 2) and (event.x <= display.contentWidth) then
+            --ho cliccato sulla parte destra dello shcermo, devo sparare
+            print("mi hanno richiamato")
+            bulletsLoop()
           end
-        elseif (event.x > display.actualContentWidth) and (event.x <= display.actualContentWidth) then
-          print("ho cliccato nella parte DESTRA del display")
         end
       end
       Runtime:addEventListener( "touch", touchListener )
+      -----------------------------------------------------
     
 
 
@@ -572,8 +615,9 @@ function resetScene( tipo)
     sprite:removeEventListener("collision")
     Runtime:removeEventListener("enterFrame",enemy)
     Runtime:removeEventListener("enterFrame",plasticbag)
-    Runtime:removeEventListener( "touch", sprite )
+    --Runtime:removeEventListener( "touch", sprite )
     button_home:removeEventListener( "touch", touch )
+    Runtime:removeEventListener("enterFrame", bullet) 
     Runtime:removeEventListener( "touch", touchListener )
 
     --SVUOTO LE TABELLE
@@ -585,15 +629,23 @@ function resetScene( tipo)
       table_plasticbag[i]:removeSelf() -- Optional Display Object Removal
       table_plasticbag[i] = nil        -- Nil Out Table Instance
     end
+    for i=1, #table_bullets do 
+      Runtime:addEventListener("enterFrame",  table_bullets[i])
+      table_bullets[i]:removeSelf() -- Optional Display Object Removal
+      table_bullets[i] = nil        -- Nil Out Table Instance
+    end
   elseif tipo == "gamefinished" then
 
     --ELIMINO I LISTENERS
+    
+    Runtime:removeEventListener( "touch", touchListener )
     Runtime:removeEventListener("enterFrame", spriteScrollToCastle)
     Runtime:removeEventListener("enterFrame", castleScroll)
     Runtime:removeEventListener("enterFrame",enemy)
     Runtime:removeEventListener("enterFrame",plasticbag)
     --Runtime:removeEventListener( "touch", sprite )
     button_home:removeEventListener( "touch", touch )
+    Runtime:removeEventListener("enterFrame", bullet)
 
     timer.cancel( gameLoop )
     timer.cancel( callingEnemies )
@@ -610,6 +662,11 @@ function resetScene( tipo)
     for i=1, #table_plasticbag do
       table_plasticbag[i]:removeSelf() -- Optional Display Object Removal
       table_plasticbag[i] = nil        -- Nil Out Table Instance
+    end
+    for i=1, #table_bullets do
+      Runtime:addEventListener("enterFrame",  table_bullets[i])
+      table_bullets[i]:removeSelf() -- Optional Display Object Removal
+      table_bullets[i] = nil        -- Nil Out Table Instance
     end
   end
 end
