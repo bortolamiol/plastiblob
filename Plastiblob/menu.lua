@@ -10,6 +10,7 @@ local scene = composer.newScene()
 -- include Corona's "widget" library
 local widget = require "widget"
 
+local musicTrack1
 --------------------------------------------
 
 -- forward declarations and other locals
@@ -39,12 +40,12 @@ function scene:create( event )
 	
 	-- create/position logo/title image on upper-half of the screen
 	
-	--[[local titleLogo = display.newImageRect( "immagini/menu/logo.png", display.contentWidth, display.contentHeight)
+	local titleLogo = display.newImageRect( "immagini/menu/logo.png", display.contentWidth, display.contentHeight)
 	titleLogo.anchorX = 0
 	titleLogo.anchorY = 0
 	titleLogo.x= contentCenterX
 	titleLogo.y= -100
-	]]--
+	
 	
 	-- create a widget button (which will loads level1.lua on release)
 	-- Example assumes 'imageSheet' is already created from graphics.newImageSheet()
@@ -80,6 +81,10 @@ function scene:create( event )
 	deletedata.x = display.actualContentWidth - 100
 	deletedata.y = display.actualContentHeight - 100
 
+	-- aggiungiamo la musica di background del menù
+
+	musicTrack1 = audio.loadStream("MUSIC/THEME.mp3")
+
 	--funzione per cancellare i dati dal database
 	function deletedata:touch( event )
 		if event.phase == "began" then
@@ -99,6 +104,7 @@ function scene:create( event )
 	end
 	deletedata:addEventListener( "touch", goback )
 	sceneGroup:insert( background )
+	sceneGroup:insert( titleLogo)
 	sceneGroup:insert( playBtn )
 	sceneGroup:insert(deletedata)
 end
@@ -114,6 +120,9 @@ function scene:show( event )
 		-- 
 		-- INSERT code here to make the scene come alive
 		-- e.g. start timers, begin animation, play audio, etc.
+		
+		-- Start the music!
+        audio.play( musicTrack1, { channel=1, loops=-1 } )
 	end	
 end
 
@@ -128,6 +137,9 @@ function scene:hide( event )
 		-- e.g. stop timers, stop animation, unload sounds, etc.)
 	elseif phase == "did" then
 		-- Called when the scene is now off screen
+		-- Stop the music!
+		--audio.fade( )
+		audio.stop(1)
 	end	
 end
 
@@ -139,6 +151,8 @@ function scene:destroy( event )
 	-- INSERT code here to cleanup the scene
 	-- e.g. remove display objects, remove touch listeners, save state, etc.
 	
+	audio.dispose( musicTrack1 )
+
 	if playBtn then
 		playBtn:removeSelf()	-- widgets must be manually removed
 		playBtn = nil
