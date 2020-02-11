@@ -24,7 +24,7 @@ local castle
 local platform --variabile che conterrà al suo interno l'immagine della piattaforma che sarà visualizzata nel gioco
 local callingPlasticbag
 local timeplayed  --varaiabile che misura da quanti secondi sono all'interno del gioco e farà cambiare la velocità
-local timeToPlay = 60 --variabile che conterrà quanto l'utente dovrà sopravvivere all'interno del gioco
+local timeToPlay = 70 --variabile che conterrà quanto l'utente dovrà sopravvivere all'interno del gioco
 local scoreCount    --variabile conteggio punteggio iniziale
 local gameFinished
 local newTimerOut
@@ -57,7 +57,7 @@ function scene:show( event )
     physics.start()
     -- Overlays collision outlines on normal display objects
     physics.setGravity( 0,20 )
-    physics.setDrawMode( "hybrid" )
+    --physics.setDrawMode( "hybrid" )
     -- The default Corona renderer, with no collision outlines
     --physics.setDrawMode( "normal" )
     -- Shows collision engine outlines only
@@ -177,7 +177,7 @@ function scene:show( event )
       local outlineSpriteWalking = graphics.newOutline(2, spriteWalkingSheet, frameIndex)   --outline personaggio
       local outlineSpriteJumping = graphics.newOutline(2, spriteJumpingSheet, 4)   --outline personaggio
       physics.addBody(sprite, { outline=outlineSpriteWalking, density=10, bounce=0, friction=1})    --sprite diventa corpo con fisica
-      sprite.gravityScale = 3.8
+      sprite.gravityScale = 1
       sprite.isFixedRotation = true --rotazione bloccata
       sprite.isJumping = false
       sprite.mustChangeOutlineToWalk = false --variabile che mi servirà per  cambiare l'outline del personaggio da jumping a walking
@@ -235,7 +235,7 @@ function scene:show( event )
      -- platform.x = display.actualContentWidth + 800
       --platform.y = display.contentHeight / 2
       --group_castle:insert(platform)
-      local platformTimeSpawn = 6000
+      local platformTimeSpawn = 18000
       --FUNZIONI {
 
       local function moveBackground(self)
@@ -380,6 +380,7 @@ function scene:show( event )
         sprite:play()
         
         local vx, vy = sprite:getLinearVelocity()
+        print(vy)
         if(vy > 800) and (sprite.isJumping) then --se sto tornando a terra cambio l'outline e il mio corpo in walking
             --print(vy)
             if(sprite.mustChangeOutlineToWalk) then --ci entrà solo 1 volta per salto
@@ -649,7 +650,7 @@ function scene:show( event )
       callingPlasticbag = timer.performWithDelay( (timeToPlay/plasticToCatch)*1000, plasticbagLoop, plasticToCatch)
 
       -- AGGIUNTO NEL LIVELLO 3 --
-      callingPool = timer.performWithDelay( poolTimeSpawn, poolLoop, 0)
+      --callingPool = timer.performWithDelay( poolTimeSpawn, poolLoop, 0)
       callingPlatform = timer.performWithDelay( platformTimeSpawn, platformLoop, 0)
     end
   end
@@ -755,7 +756,7 @@ function resetScene( tipo)
     timer.cancel( callingEnemies )
     timer.cancel( callingPlasticbag )
     timer.cancel( timeplayed )
-    timer.cancel( callingPool )
+    --timer.cancel( callingPool )
     timer.cancel( callingPlatform )
     physics.pause()
 
@@ -810,7 +811,7 @@ function resetScene( tipo)
     timer.cancel( callingEnemies )
     timer.cancel( callingPlasticbag )
     timer.cancel( timeplayed )
-    timer.cancel( callingPool )
+    --timer.cancel( callingPool )
     timer.cancel( callingPlatform )
     --timer.cancel( newTimerOut )
     physics.pause()
