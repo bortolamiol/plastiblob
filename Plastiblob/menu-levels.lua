@@ -22,10 +22,24 @@ function scene:show( event )
 	
 	if phase == "will" then
 		-- Called when the scene is still off screen and is about to move on screen
+		
 	elseif phase == "did" then
 		print("entrato")
 		local backgroundImage = self.view
 		local menu = self.view
+		local musicTrack1 = audio.loadStream("MUSIC/THEME.mp3")
+		--se audio non è già avviato, fallo partire
+		--[[composer.isAudioPlaying
+		composer.isAudioPlayingMenu--]]
+		audio.setVolume(0.2)
+		if (composer.isAudioPlayingMenu==1) then
+			print("channel 1 sta già suonando, non fare nulla")
+		elseif (composer.isAudioPlaying==0) then
+			audio.play( musicTrack1, { channel=2, loops=-1 } )
+			composer.isAudioPlaying=1
+			print("faccio partire audio da levels nel channel 2!")
+		end
+		--print(_G.isAudioPlayingMenu.." significa lo stato dell'audio nel menu 1")
 		
 		--creo una variabile che contenga i livelli a cui sono arrivato, se non ho passato nessun livello partirà da 1
 		local livellicompletati 
@@ -100,6 +114,9 @@ function scene:show( event )
 				if(tonumber(livellicompletati) >= tonumber(nlevel)) then
 					local leveltargetpath = "levels.level" .. nlevel;
 					composer.gotoScene( leveltargetpath, "fade", 500 )
+					audio.stop();
+					audio.dispose( musicTrack1 )
+					print("audio disposato")
 				end
 				return true
 			end
@@ -173,6 +190,9 @@ function scene:hide( event )
 		--
 		-- INSERT code here to pause the scene
 		-- e.g. stop timers, stop animation, unload sounds, etc.)
+		audio.dispose( musicTrack1 )
+		_G.audioPlaying = 0
+		print("ho aggiornato audioPlaying")
 	elseif phase == "did" then
 		-- Called when the scene is now off screen
 		--composer.removeScene( "menu-levels" )
@@ -181,7 +201,10 @@ end
 
 function scene:destroy( event )
 	local sceneGroup = self.view
+	audio.dispose( musicTrack1 )
 	
+	--_G.audioPlaying = 0
+	--print("ho aggiornato audioPlaying")
 	-- Called prior to the removal of scene's "view" (sceneGroup)
 	-- 
 	-- INSERT code here to cleanup the scene
