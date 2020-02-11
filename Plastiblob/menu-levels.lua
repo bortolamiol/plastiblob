@@ -84,10 +84,10 @@ function scene:show( event )
 			local tableSetup = [[CREATE TABLE levels ( ID INTEGER PRIMARY KEY autoincrement, level, scoreLevel1, scoreLevel2, scoreLevel3, scoreLevel4, scoreLevel5, scoreLevel6, scoreLevel7, scoreLevel8);]]
 			db:exec( tableSetup )
 			--inserisco la riga di default nel database, se l'ho appena creato andrò al livello 1
-			local insertQuery = [[INSERT INTO levels VALUES ( null, "2", 0, 0, 0, 0, 0, 0, 0, 0);]]
+			local insertQuery = [[INSERT INTO levels VALUES ( null, "1", 0, 0, 0, 0, 0, 0, 0, 0);]]
 			db:exec( insertQuery )
 			--dato che la tabella non esisteva vuol dire che è la prima volta che l'utente gioca, perciò lo faccio iniziare dal livello 1
-			livellicompletati = 2
+			livellicompletati = 1
 		end
 		
 		--inserisco le immagini dei livelli dentro un vettore/tabella
