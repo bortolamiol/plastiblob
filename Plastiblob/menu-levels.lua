@@ -68,19 +68,26 @@ function scene:show( event )
 					FirstName = row.FirstName,
 					level = row.level,
 					scoreLevel1 = row.scoreLevel1,
-					print( "ID del giocatore:".. row.ID .. " - Livello: " ..row.level .. "- Punteggio: " ..row.scoreLevel1)
+					scoreLevel2 = row.scoreLevel2,
+					scoreLevel3 = row.scoreLevel3,
+					scoreLevel4 = row.scoreLevel4,
+					scoreLevel5 = row.scoreLevel5,
+					scoreLevel6 = row.scoreLevel6,
+					scoreLevel7 = row.scoreLevel7,
+					scoreLevel8 = row.scoreLevel8,
+					print("Livello: " ..row.level .. "  || 1: " ..row.scoreLevel1 .. " || 2: " ..row.scoreLevel2 .. " || 3: " ..row.scoreLevel3 .. " || 4: " ..row.scoreLevel4 .. " || 5: " ..row.scoreLevel5 .. " || 6: " ..row.scoreLevel6 .. " || 7: " ..row.scoreLevel7 .. " || 8: " ..row.scoreLevel8) 
 				}
 				livellicompletati = levels[1].level		
 			end
 		else
 		--Se dbexists ritorna 1 allora la tabella non esiste, vuol dire perciò che dovrà essere creata
-			local tableSetup = [[CREATE TABLE levels ( ID INTEGER PRIMARY KEY autoincrement, level, scoreLevel1);]]
+			local tableSetup = [[CREATE TABLE levels ( ID INTEGER PRIMARY KEY autoincrement, level, scoreLevel1, scoreLevel2, scoreLevel3, scoreLevel4, scoreLevel5, scoreLevel6, scoreLevel7, scoreLevel8);]]
 			db:exec( tableSetup )
 			--inserisco la riga di default nel database, se l'ho appena creato andrò al livello 1
-			local insertQuery = [[INSERT INTO levels VALUES ( null, "1", 0 );]]
+			local insertQuery = [[INSERT INTO levels VALUES ( null, "2", 0, 0, 0, 0, 0, 0, 0, 0);]]
 			db:exec( insertQuery )
 			--dato che la tabella non esisteva vuol dire che è la prima volta che l'utente gioca, perciò lo faccio iniziare dal livello 1
-			livellicompletati = 1
+			livellicompletati = 2
 		end
 		
 		--inserisco le immagini dei livelli dentro un vettore/tabella

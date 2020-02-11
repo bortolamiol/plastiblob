@@ -170,9 +170,8 @@ function scene:show( event )
       sprite = display.newSprite( spriteWalkingSheet, spriteData )
       sprite.name = "sprite"
       group_elements:insert(sprite)
-      local posY_sprite =  ground.y
       sprite.x = (display.contentWidth/2)-350
-      sprite.y = posY_sprite-100
+      sprite.y = ground.y - 100
       local frameIndex = 1
       local outlineSpriteWalking = graphics.newOutline(2, spriteWalkingSheet, frameIndex)   --outline personaggio
       local outlineSpriteJumping = graphics.newOutline(2, spriteJumpingSheet, 4)   --outline personaggio
@@ -201,7 +200,7 @@ function scene:show( event )
 
 
       --CASTELLO DI SABBIA IN CUI ENTRERO' A FINE LIVELLO
-      castle = display.newImageRect( "immagini/livello-1/sandcastle-duck.png", 700, 700 )
+      castle = display.newImageRect( "immagini/livello-1/last-destination.png", 700, 700 )
       castle.x = display.actualContentWidth + 800
       castle.y = ground.y - castle.height/2 - groundHeight/2
       group_castle:insert(castle)
@@ -383,6 +382,7 @@ function scene:show( event )
         moveBackground(bg[1])
         moveBackground(bg[2])
         sprite:play()
+        print("posizione in x dello sprite: " .. tostring(sprite.x))
         
         local vx, vy = sprite:getLinearVelocity()
         if(vy > 800) and (sprite.isJumping) then --se sto tornando a terra cambio l'outline e il mio corpo in walking
