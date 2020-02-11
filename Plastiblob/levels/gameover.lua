@@ -42,7 +42,7 @@ function scene:show( event )
         button_home = display.newImageRect(group_buttons, "immagini/menu/home.png", 200, 200 )
         button_home.anchorX =  0
         button_home.anchorY =  0
-        button_home.x =  display.contentWidth/2 - 200
+        button_home.x =  display.contentWidth/2 - 220
         button_home.y = display.contentHeight/2 + 100
         group_buttons:insert(button_home)
 
@@ -57,7 +57,7 @@ function scene:show( event )
         button_retry = display.newImageRect( group_buttons,"immagini/menu/restart.png", 200, 200 )
         button_retry.anchorX =  0
         button_retry.anchorY =  0
-        button_retry.x = display.actualContentWidth/2 + 50
+        button_retry.x = display.actualContentWidth/2 + 30
         button_retry.y = display.actualContentHeight/2 + 100 
         group_buttons:insert(button_retry)
 
