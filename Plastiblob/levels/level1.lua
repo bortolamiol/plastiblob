@@ -16,6 +16,7 @@ local enemies = {} --sprite dei nemici
 local table_plasticbag = {}
 local button_home --bottone per uscire dal livello e tornare alla button_home dei livelli
 local stop =  0 --variabile che servirà per capire se stoppare il gioco
+local stopCreatingEnemies =  0 --variabile che servirà per capire se stoppare il gioco
 local callingEnemies
 local castle
 local callingPlasticbag
@@ -25,6 +26,7 @@ local scoreCount    --variabile conteggio punteggio iniziale
 local gameFinished
 local newTimerOut
 local nextScene = "menu-levels"
+local crunchSound = audio.loadSound("MUSIC/crunch.mp3")
 function scene:create( event )
 
   -- Called when the scene's view does not exist.
@@ -102,7 +104,7 @@ function scene:show( event )
 
       ------------------------------------------------------------
       -- VARIABILI MOLTO IMPORTANTI PER IL GIOCO: VELOCITA' DI GIOCO
-      local enemySpeed_max = 10 -- massima velocità di spostamento del nemico
+      local enemySpeed_max = 7.5 -- massima velocità di spostamento del nemico
       local enemySpeed_min = 4-- minima velocità di spostamento del nemico
       local enemySpeed = enemySpeed_min --velocità di spostamento del nemico
 
@@ -127,6 +129,7 @@ function scene:show( event )
       ground.y = display.contentHeight- groundHeight/2
       physics.addBody(ground, "static",{bounce=0, friction=1 } )
       --
+
 
       --TESTO DELLO SCORE
       local scoreText = display.newText( scoreCount.."/"..plasticToCatch, display.contentCenterX, display.contentCenterY-300, native.systemFont, 28 )
@@ -168,12 +171,13 @@ function scene:show( event )
       sprite.name = "sprite"
       group_elements:insert(sprite)
       local posY_sprite =  ground.y
-      sprite.x = (display.contentWidth/2)-300 ; sprite.y = posY_sprite-100
+      sprite.x = (display.contentWidth/2)-350
+      sprite.y = posY_sprite-100
       local frameIndex = 1
       local outlineSpriteWalking = graphics.newOutline(2, spriteWalkingSheet, frameIndex)   --outline personaggio
       local outlineSpriteJumping = graphics.newOutline(2, spriteJumpingSheet, 4)   --outline personaggio
-      physics.addBody(sprite, { outline=outlineSpriteWalking, density=10, bounce=0, friction=1})    --sprite diventa corpo con fisica
-      sprite.gravityScale = 3.8
+      physics.addBody(sprite, { outline=outlineSpriteWalking, density=4, bounce=0, friction=1})    --sprite diventa corpo con fisica
+      sprite.gravityScale = 1
       sprite.isFixedRotation = true --rotazione bloccata
       sprite.isJumping = false
       sprite.mustChangeOutlineToWalk = false --variabile che mi servirà per  cambiare l'outline del personaggio da jumping a walking
@@ -185,7 +189,7 @@ function scene:show( event )
         { name="walking", sheet=enemyWalkingSheet, start=1, count=8, time=800, loopCount=0 }
       }
       local enemyTimeSpawnMin = 5000
-      local enemyTimeSpawnMax  = 9000
+      local enemyTimeSpawnMax  = 5000
 
       -- SACCHETTO IN PLASTICA
       local plasticbagSheetData = { width=130, height=130, numFrames=4, sheetContentWidth=520, sheetContentHeight=130 }
@@ -230,7 +234,7 @@ function scene:show( event )
         enemy.name = "enemy"
         enemy:play()
         group_elements:insert(enemy)
-        enemy.x = display.actualContentWidth + 200
+        enemy.x = display.actualContentWidth + 50
         enemy.y = ground.y-150
         frameIndexNemico = 1;
         local outlineNemico = graphics.newOutline(5, enemyWalkingSheet, frameIndexNemico)
@@ -243,14 +247,16 @@ function scene:show( event )
       end
       ------------------------------------------------
       local function enemiesLoop()
-        enemy = createEnemies()
-        enemy.enterFrame = enemyScroll
-        Runtime:addEventListener("enterFrame",enemy)
-        for i,thisEnemy in ipairs(enemies) do
-          if thisEnemy.x < -200 then
-            Runtime:removeEventListener("enterFrame",thisEnemy)
-            display.remove(thisEnemy)
-            table.remove(enemies,i)
+        if(stopCreatingEnemies == 0) then
+          enemy = createEnemies()
+          enemy.enterFrame = enemyScroll
+          Runtime:addEventListener("enterFrame",enemy)
+          for i,thisEnemy in ipairs(enemies) do
+            if thisEnemy.x < -200 then
+              Runtime:removeEventListener("enterFrame",thisEnemy)
+              display.remove(thisEnemy)
+              table.remove(enemies,i)
+            end
           end
         end
       end
@@ -273,7 +279,7 @@ function scene:show( event )
         plasticbag.name = "plasticbag"
         plasticbag:play()
         group_elements:insert(plasticbag)
-        plasticbag.x = display.actualContentWidth
+        plasticbag.x = display.actualContentWidth + 65
         plasticbag.y = 200
         local frameIndePlasticbag = 1;
         local outlinePlasticbag = graphics.newOutline(20, plasticbagSheet, frameIndePlasticbag)
@@ -286,14 +292,16 @@ function scene:show( event )
       end
       ------------------------------------------------
       local function plasticbagLoop()
-        plasticbag = createPlasticbag() --creo un'istanza di un oggetto sprite plastic bag
-        plasticbag.enterFrame = plasticbagScroll --lo faccio scrollare, grazie alla funzione plasticbagScroll
-        Runtime:addEventListener("enterFrame", plasticbag) --assegno all'evento enterframe lo scroll
-        for i,thisPlasticbag in ipairs(table_plasticbag) do  --ipairs ritorna: an iteration Function, a Table, and 0. (?? trovata online)
-          if thisPlasticbag.x < -200 then --se c'è un sacchetto di plastica che ha superato il limite di -200, lo togliamo!
-            Runtime:removeEventListener("enterFrame",thisPlasticbag) --rimuovo l'ascoltatore che lo fa scrollare
-            display.remove(thisPlasticbag) --rimuove QUEL sacchetto di plastica dal display display
-            table.remove(table_plasticbag,i) --lo rimuove anche dalla tabella dei sacchetti di plastica
+        if(stopCreatingEnemies == 0) then
+          plasticbag = createPlasticbag() --creo un'istanza di un oggetto sprite plastic bag
+          plasticbag.enterFrame = plasticbagScroll --lo faccio scrollare, grazie alla funzione plasticbagScroll
+          Runtime:addEventListener("enterFrame", plasticbag) --assegno all'evento enterframe lo scroll
+          for i,thisPlasticbag in ipairs(table_plasticbag) do  --ipairs ritorna: an iteration Function, a Table, and 0. (?? trovata online)
+            if thisPlasticbag.x < -200 then --se c'è un sacchetto di plastica che ha superato il limite di -200, lo togliamo!
+              Runtime:removeEventListener("enterFrame",thisPlasticbag) --rimuovo l'ascoltatore che lo fa scrollare
+              display.remove(thisPlasticbag) --rimuove QUEL sacchetto di plastica dal display display
+              table.remove(table_plasticbag,i) --lo rimuove anche dalla tabella dei sacchetti di plastica
+            end
           end
         end
       end
@@ -306,6 +314,8 @@ function scene:show( event )
         if( event.phase == "began" ) then
           --tutte le informazioni dell'elemento che ho toccato le troviamo dentro event.other
           if(event.other.name ==  "plasticbag") then --mi sono scontrato con il sacchetto
+            audio.setMaxVolume(0.03)
+            audio.play(crunchSound)
             scoreCount = scoreCount+1;
             scoreText.text = scoreCount.."/"..plasticToCatch
             Runtime:removeEventListener("enterFrame", event.other) --rimuovo il listener dello scroll, così non si muove più
@@ -318,7 +328,8 @@ function scene:show( event )
             stop = 1
             print("mi sono scontrato col nemico")
             -- audio
-            audio.setMaxVolume(0.02)
+            audio.pause(crunchSound)
+            audio.setMaxVolume(0.03)
             local audiogameover = audio.loadSound("MUSIC/PERDENTE.mp3")
             audio.play(audiogameover)
             resetScene("all")
@@ -333,7 +344,7 @@ function scene:show( event )
       function sprite.touch( self,event)
         vx, vy = sprite:getLinearVelocity()
         if( event.phase == "began" and not self.isJumping ) then
-          self:setLinearVelocity(0,-2000)
+          self:setLinearVelocity(0,- 1650)
           self.isJumping = true -- se ho toccato imposto la variabile isJumping del mio personaggio a true
           self:setSequence("jumping") --lo sprite si muove con animazione jumping
           self:play()
@@ -420,10 +431,12 @@ function scene:show( event )
           local x_enemySpeed = ((enemySpeed_max * secondsPlayed)/timeToPlay)
           enemySpeed = enemySpeed_min + x_enemySpeed --la velocità è data dalla velocità minima (2) + il risultato della proporzione
         end
-        if(secondsPlayed >= timeToPlay) then --se è ora di far finire il gioco, vado al passo successivo
-          if(scoreCount >= 1) then
+        if(secondsPlayed >= timeToPlay ) then --se è ora di far finire il gioco, vado al passo successivo
+          stopCreatingEnemies = 1 --non creo più nemici perchè il tempo è finito
+          if(secondsPlayed >= timeToPlay + 5) then --faccio apparire dopo 5 secondi il castello di sabbia
             stop = 1
             if (castleAppared == 0 ) then --se non ho già fatto apparire il castello, lo faccio apparire
+              print("dovrebbe apparire il castello")
               castleAppared = 1 --non lo faccio più riapparire
               timer.cancel( callingEnemies ) --non chiamo più nemici
               timer.cancel( callingPlasticbag ) --non chiamo più sacchetti di plastica
@@ -438,14 +451,14 @@ function scene:show( event )
         if(tostring(phase) == "walk") then
             sprite:setSequence("walking")
             physics.removeBody(sprite)
-            physics.addBody(sprite, { outline=outlineSpriteWalking, density=10, bounce=0, friction=1})    --sprite diventa corpo con fisica
-            sprite.gravityScale = 3.8
+            physics.addBody(sprite, { outline=outlineSpriteWalking, density=4, bounce=0, friction=1})    --sprite diventa corpo con fisica
+            sprite.gravityScale = 3
             sprite.isFixedRotation = true --rotazione bloccata
         elseif (tostring(phase) == "jump") then
             sprite:setSequence("jumping")
             physics.removeBody(sprite)
-            physics.addBody(sprite, { outline=outlineSpriteJumping, density=10, bounce=0, friction=1})    --sprite diventa corpo con fisica
-            sprite.gravityScale = 3.8
+            physics.addBody(sprite, { outline=outlineSpriteJumping, density=4, bounce=0, friction=1})    --sprite diventa corpo con fisica
+            sprite.gravityScale = 3
             sprite.isFixedRotation = true --rotazione bloccata
             end
          end
@@ -569,6 +582,12 @@ end
 
 function resetScene( tipo)
   if tipo == "gameOver" then
+    
+    --composer.isAudioPlayingMenu =0;
+    composer.isAudioPlaying=0;
+  
+    audio.dispose(crunchSound)
+    
     timer.cancel( gameLoop )
     timer.cancel( callingEnemies )
     timer.cancel( callingPlasticbag )
@@ -592,6 +611,9 @@ function resetScene( tipo)
       table_plasticbag[i] = nil        -- Nil Out Table Instance
     end
   elseif tipo == "gamefinished" then
+
+    audio.dispose(crunchSound)
+    print("audio disposato nel livello 1")
 
     --ELIMINO I LISTENERS
     Runtime:removeEventListener("enterFrame", spriteScrollToCastle)

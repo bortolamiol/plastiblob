@@ -25,7 +25,7 @@ end
 
 function scene:create( event )
 	local sceneGroup = self.view
-
+	_G.audioPlaying = 0
 	-- Called when the scene's view does not exist.
 	-- 
 	-- INSERT code here to initialize the scene
@@ -120,9 +120,21 @@ function scene:show( event )
 		-- 
 		-- INSERT code here to make the scene come alive
 		-- e.g. start timers, begin animation, play audio, etc.
-		
+		composer.isAudioPlaying = 0;
+		composer.isAudioPlayingMenu = 0;
 		-- Start the music!
-        audio.play( musicTrack1, { channel=1, loops=-1 } )
+		local checkChannel1 = audio.isChannelActive(1)
+		local checkChannel2 = audio.isChannelActive(2)
+		audio.setVolume(0.2)
+		if (composer.isAudioPlaying==1) then
+			print("channel 2 sta già suonando, non fare nulla")
+		elseif(composer.isAudioPlayingMenu==1) then
+			print("channel 1 sta già suonando, meglio non toccare nulla")
+		else	
+			audio.play( musicTrack1, { channel=1, loops=-1 } )
+			print("nessuno suona, allora vado col channel 1!")
+			composer.isAudioPlayingMenu =1
+		end
 	end	
 end
 
@@ -139,7 +151,7 @@ function scene:hide( event )
 		-- Called when the scene is now off screen
 		-- Stop the music!
 		--audio.fade( )
-		audio.stop(1)
+		--audio.stop(1)
 	end	
 end
 
@@ -151,7 +163,7 @@ function scene:destroy( event )
 	-- INSERT code here to cleanup the scene
 	-- e.g. remove display objects, remove touch listeners, save state, etc.
 	
-	audio.dispose( musicTrack1 )
+	--audio.dispose( musicTrack1 )
 
 	if playBtn then
 		playBtn:removeSelf()	-- widgets must be manually removed
