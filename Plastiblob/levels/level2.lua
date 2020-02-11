@@ -108,14 +108,14 @@ function scene:show( event )
 
       ------------------------------------------------------------
       -- VARIABILI MOLTO IMPORTANTI PER IL GIOCO: VELOCITA' DI GIOCO
-      local enemySpeed_max = 7 -- massima velocità di spostamento del nemico
+      local enemySpeed_max = 6.6 -- massima velocità di spostamento del nemico
       local enemySpeed_min = 4-- minima velocità di spostamento del nemico
       local enemySpeed = enemySpeed_min --velocità di spostamento del nemico
 
       local frame_speed = 20 --questa sarà la velocità dello scorrimento del nostro sfondo, in base a questa velocità alzeremo anche quella del gioco
 
       local time_speed_min = 30 -- ogni quanti millisecondi verranno chiamate le funzioni di loop (esempio di sfondo group_background)
-      local time_speed_max = 10 --massimo di velocità che time_speed può raggiungere
+      local time_speed_max = 15 --massimo di velocità che time_speed può raggiungere
 
       local spriteFrameSpeed = 800 --velocità del movimento delle gambe dello sprite [250 - 800]
       local spriteFrameSpeed_max = 200 --velocità del movimento delle gambe dello sprite [250 - 800]
@@ -173,7 +173,7 @@ function scene:show( event )
       sprite = display.newSprite( spriteWalkingSheet, spriteData )
       sprite.name = "sprite"
       group_elements:insert(sprite)
-      sprite.x = (display.contentWidth/2)-350	
+      sprite.x = (display.contentWidth/2)-390	
       sprite.y = ground.y - 100
       local frameIndex = 1
       local outlineSpriteWalking = graphics.newOutline(2, spriteWalkingSheet, frameIndex)   --outline personaggio
@@ -265,7 +265,7 @@ function scene:show( event )
         enemy.name = "enemy"
         enemy:play()
         group_elements:insert(enemy)
-        enemy.x = display.actualContentWidth
+        enemy.x = display.actualContentWidth  + 10
         enemy.y = ground.y-150
         frameIndexNemico = 1;
         local outlineNemico = graphics.newOutline(5, enemyWalkingSheet, frameIndexNemico)
@@ -599,7 +599,7 @@ function scene:show( event )
           pool.name = "pool"
           pool:play()
           group_elements:insert(pool)
-          pool.x = display.actualContentWidth 
+          pool.x = display.actualContentWidth + 50
           pool.y = ground.y - 100
           local outlinePool = graphics.newOutline(5, poolSheet, 8)
           physics.addBody(pool, { outline=outlinePool, density=1, bounce=0, friction=1})
@@ -610,15 +610,17 @@ function scene:show( event )
         end
         ------------------------------------------------
         local function poolLoop()
-          pool = createPool()
-          pool.enterFrame = poolScroll
-          table.insert(table_pool, pool)
-          Runtime:addEventListener("enterFrame",pool)
-          for i,thisPool in ipairs(table_pool) do
-            if thisPool.x < -200 then
-              Runtime:removeEventListener("enterFrame",thisPool)
-              display.remove(thisPool)
-              table.remove(table_pool,i)
+          if(stopCreatingEnemies == 0 ) then
+            pool = createPool()
+            pool.enterFrame = poolScroll
+            table.insert(table_pool, pool)
+            Runtime:addEventListener("enterFrame",pool)
+            for i,thisPool in ipairs(table_pool) do
+              if thisPool.x < -200 then
+                Runtime:removeEventListener("enterFrame",thisPool)
+                display.remove(thisPool)
+                table.remove(table_pool,i)
+              end
             end
           end
         end
@@ -670,7 +672,7 @@ function scene:show( event )
       callingPlasticbag = timer.performWithDelay( (timeToPlay/plasticToCatch)*1000, plasticbagLoop, plasticToCatch)
 
       -- AGGIUNTO NEL LIVELLO 3 --
-      callingPool = timer.performWithDelay( (timeToPlay/12)*1000, poolLoop, 0)
+      callingPool = timer.performWithDelay( (timeToPlay/14)*1000, poolLoop, 0)
       --callingPlatform = timer.performWithDelay( platformTimeSpawn, platformLoop, 0)
     end
   end
