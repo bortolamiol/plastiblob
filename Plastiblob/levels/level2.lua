@@ -16,10 +16,12 @@ local enemies = {} --sprite dei nemici
 local table_plasticbag = {} --tabella che conterrà al suo interno i sacchetti di plastica che sono sullo schermo
 local table_bullets = {} --tabella che conterrà al suo interno i proiettili che sono sullo schermo
 local table_pool = {} --tabella che conterrà al suo interno le pozze d'acqua che sono sullo schermo
+local table_platform = {} --tabella che conterrà al suo interno le piattaforme che saranno sullo schermo
 local button_home --bottone per uscire dal livello e tornare alla button_home dei livelli
 local stop =  0 --variabile che servirà per capire se stoppare il gioco
 local callingEnemies
 local castle
+local platform --variabile che conterrà al suo interno l'immagine della piattaforma che sarà visualizzata nel gioco
 local callingPlasticbag
 local timeplayed  --varaiabile che misura da quanti secondi sono all'interno del gioco e farà cambiare la velocità
 local timeToPlay = 60 --variabile che conterrà quanto l'utente dovrà sopravvivere all'interno del gioco
@@ -219,6 +221,8 @@ function scene:show( event )
       }
 
       -- AGGIUNTO NEL LIVELLO 3 --
+      
+      -- POZZA D'ACQUA ASSASSINA --
       local poolSheetData = { width=200, height=100, numFrames=3, sheetContentWidth=600, sheetContentHeight=100 }
       local poolSheet = graphics.newImageSheet( "immagini/livello-3/pool.png", poolSheetData )
       local poolData = {
@@ -226,6 +230,12 @@ function scene:show( event )
       }
       local poolTimeSpawn = 8000
 
+      -- PIATTAFORMA 
+     -- platform = display.newImageRect( "immagini/livello-2/platform.png", 320, 225 )
+     -- platform.x = display.actualContentWidth + 800
+      --platform.y = display.contentHeight / 2
+      --group_castle:insert(platform)
+      local platformTimeSpawn = 6000
       --FUNZIONI {
 
       local function moveBackground(self)
@@ -355,7 +365,7 @@ function scene:show( event )
         if ( collideObject.collType == "passthru" ) then
           event.contact.isEnabled = false  --disable this specific collision
         end
-        if(event.other.name == "ground") then
+        if(event.other.name == "ground") or (event.other.name == "platform") then
             self.isJumping = false
         end
       end
@@ -538,7 +548,7 @@ function scene:show( event )
         if ( event.phase == "ended" ) then --è finito il processo di touch dello sschermo
           if(event.x >= 0 ) and (event.x <= display.actualContentWidth/2) and (not sprite.isJumping) then
             --parte sinistra del display --> devo saltare
-            sprite:setLinearVelocity(0,-1800) -- applico una forza al personaggio per saltare
+            sprite:setLinearVelocity(0,-2000) -- applico una forza al personaggio per saltare
             sprite.isJumping = true -- se ho toccato imposto la variabile isJumping del mio personaggio a true
             sprite:setSequence("jumping") --lo sprite si muove con animazione jumping
             sprite:play()
@@ -595,6 +605,43 @@ function scene:show( event )
           end
         end
 
+        -- FUNZIONI PER LE PIATTAFORME {
+          local function platformScroll(self, event)
+            --fa scorrere il nemico nello schermo
+            if stop == 0 then
+              self.x = self.x - (enemySpeed*2)
+              self.y = (display.contentHeight / 2) - 20
+            end
+          end
+          ------------------------------------------------
+          local function createPlatform()
+            --crea un oggetto di un nuovo sprite nemico e lo aggiunge alla tabella enemies[]
+            --da implementare meglio, mi faccio passare che tipo di nemico devo inserire
+            local platform = display.newImageRect( "immagini/livello-2/platform.png", 320, 225 )
+            platform.name = "platform"
+            group_elements:insert(platform)
+            platform.x = display.actualContentWidth + 200
+            platform.y = display.contentHeight / 2
+            local outlinePlatform = graphics.newOutline(5, "immagini/livello-2/platform.png")
+            physics.addBody(platform, "static", { outline=outlinePlatform, bounce=0, friction=1 } )
+            print("creata una piattaforma")
+            return platform
+          end
+          ------------------------------------------------
+          local function platformLoop()
+            platform = createPlatform()
+            platform.enterFrame = platformScroll
+            table.insert(table_platform, platform)
+            Runtime:addEventListener("enterFrame",platform)
+            for i,thisPlatform in ipairs(table_platform) do
+              if thisPlatform.x < -300 then
+                Runtime:removeEventListener("enterFrame",thisPlatform)
+                display.remove(thisPlatform)
+                table.remove(table_platform,i)
+              end
+            end
+          end
+
       --PARTE FINALE: richiamo le funzioni e aggiungo gli elementi allo schermo e ai gruppi
       timeplayed = timer.performWithDelay( 1000, increaseGameSpeed, 0 )
       gameLoop = timer.performWithDelay( time_speed_min, loop, 0 )
@@ -603,6 +650,7 @@ function scene:show( event )
 
       -- AGGIUNTO NEL LIVELLO 3 --
       callingPool = timer.performWithDelay( poolTimeSpawn, poolLoop, 0)
+      callingPlatform = timer.performWithDelay( platformTimeSpawn, platformLoop, 0)
     end
   end
 end
@@ -708,6 +756,7 @@ function resetScene( tipo)
     timer.cancel( callingPlasticbag )
     timer.cancel( timeplayed )
     timer.cancel( callingPool )
+    timer.cancel( callingPlatform )
     physics.pause()
 
     --ELIMINO I LISTENERS
@@ -739,6 +788,11 @@ function resetScene( tipo)
       table_pool[i]:removeSelf() -- Optional Display Object Removal
       table_pool[i] = nil        -- Nil Out Table Instance
     end
+    for i=1, #table_platform do 
+      Runtime:removeEventListener("enterFrame",  table_platform[i])
+      table_platform[i]:removeSelf() -- Optional Display Object Removal
+      table_platform[i] = nil        -- Nil Out Table Instance
+    end
   elseif tipo == "gamefinished" then
 
     --ELIMINO I LISTENERS
@@ -757,6 +811,7 @@ function resetScene( tipo)
     timer.cancel( callingPlasticbag )
     timer.cancel( timeplayed )
     timer.cancel( callingPool )
+    timer.cancel( callingPlatform )
     --timer.cancel( newTimerOut )
     physics.pause()
 
@@ -779,6 +834,11 @@ function resetScene( tipo)
       Runtime:removeEventListener("enterFrame",  table_pool[i])
       table_pool[i]:removeSelf() -- Optional Display Object Removal
       table_pool[i] = nil        -- Nil Out Table Instance
+    end
+    for i=1, #table_platform do 
+      Runtime:removeEventListener("enterFrame",  table_platform[i])
+      table_platform[i]:removeSelf() -- Optional Display Object Removal
+      table_platform[i] = nil        -- Nil Out Table Instance
     end
   end
 end
