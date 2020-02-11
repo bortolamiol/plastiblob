@@ -5,7 +5,7 @@
 -----------------------------------------------------------------------------------------
 
 -- dichiaro delle variabili che andrò a usare in varie scene del livello
-local localLevel = 1 --VARIABILE CHE CONTIENE IL NUMERO DI LIVELLO A CUI APPARTIENE IL FILE LUA: IN QUESTO CASO SIAMO AL LIVELLO 1
+local localLevel = 2 --VARIABILE CHE CONTIENE IL NUMERO DI LIVELLO A CUI APPARTIENE IL FILE LUA: IN QUESTO CASO SIAMO AL LIVELLO 1
 local composer = require( "composer" ) --richiedo la libreria composer
 local scene = composer.newScene() --nuova scena composer
 local tutorial = 1 --ho completato il tutorial? se è 0 devo ancora farlo!
@@ -14,6 +14,7 @@ local punteggio --variabile che conterrà il mio punteggio del livello
 local sprite --sprite del personaggio
 local enemies = {} --sprite dei nemici
 local table_plasticbag = {}
+local table_bullets = {} --tabella che conterrà al suo interno i proiettili che sono sullo schermo
 local button_home --bottone per uscire dal livello e tornare alla button_home dei livelli
 local stop =  0 --variabile che servirà per capire se stoppare il gioco
 local callingEnemies
@@ -65,7 +66,7 @@ function scene:show( event )
 
 
       --visualizzare il tutorial del gioco, all'interno del gruppo 'group_tutorial'
-
+    
 
       ]]--
     elseif(tutorial == 1) then
@@ -73,7 +74,7 @@ function scene:show( event )
       local options = {
         effect = "fade",
         time = 1000,
-        params = { level="level1"}
+        params = { level="level2"}
       }
       --ELIMINARE IL GRUPPO DEL TUTORIAL
       -- INIZIALIZZO LE VARIABILI CHE VERRANNO USATE NEL GIOCO
@@ -184,8 +185,8 @@ function scene:show( event )
       local enemyData = {
         { name="walking", sheet=enemyWalkingSheet, start=1, count=8, time=800, loopCount=0 }
       }
-      local enemyTimeSpawnMin = 5000
-      local enemyTimeSpawnMax  = 9000
+      local enemyTimeSpawnMin = 500
+      local enemyTimeSpawnMax  = 1000
 
       -- SACCHETTO IN PLASTICA
       local plasticbagSheetData = { width=130, height=130, numFrames=4, sheetContentWidth=520, sheetContentHeight=130 }
@@ -194,6 +195,21 @@ function scene:show( event )
         { name="plastic", sheet=plasticbagSheet, start=1, count=4, time=500, loopCount=0 }
       }
       local plasticbagTimeSpawn = 5000
+      
+      -- AGGIUNTO NEL LIVELLO 2 ---
+      
+      --PROIETTILE
+      local bulletSheetData = { width=160, height=160, numFrames=4, sheetContentWidth=640, sheetContentHeight=160 }
+      local bulletSheet = graphics.newImageSheet( "immagini/livello-1/plastic-bottle.png", bulletSheetData )
+      local bulletData = {
+        { name="plastic-bottle", sheet=plasticbagSheet, start=1, count=4, time=400, loopCount=0 }
+      }
+      --ESPLOSIONE QUANDO SI COLPISCE IL NEMICO CON IL PROIETTILE
+      local explosionSheetData = { width=200, height=200, numFrames=20, sheetContentWidth=1000, sheetContentHeight=800 }
+      local explosionSheet = graphics.newImageSheet( "immagini/livello-2/explosion.png", explosionSheetData )
+      local explosionData = {
+        { name="explosion", sheet=explosionSheet, start=1, count=20, time=400, loopCount=1}
+      }
 
 
       --CASTELLO DI SABBIA IN CUI ENTRERO' A FINE LIVELLO
@@ -235,7 +251,7 @@ function scene:show( event )
         frameIndexNemico = 1;
         local outlineNemico = graphics.newOutline(5, enemyWalkingSheet, frameIndexNemico)
         physics.addBody(enemy, { outline=outlineNemico, density=5, bounce=0, friction=1})
-        enemy.bodyType = "static"
+        enemy.bodyType = "dynamic"
         enemy.isFixedRotation = true
         enemy.gravityScale = 5
         table.insert(enemies, enemy)
@@ -299,7 +315,6 @@ function scene:show( event )
       end
       --}
       ------------------------------------------------
-      --}
 
       --funzione che capisce se c'è collisione con un elemento
       function sprite.collision( self, event )
@@ -315,8 +330,7 @@ function scene:show( event )
             group_elements:remove(event.other) --lo rimuovo dal gruppo (????? serve??? NON LO SO, VEDIAMO SE DARA' PROBLEMI)
           end
           if(event.other.name ==  "enemy") then
-            stop = 1
-            print("mi sono scontrato col nemico")
+            stop = 1 -- grazie a questo le animazioni personagggi non scrolleranno più
             -- audio
             audio.setMaxVolume(0.02)
             local audiogameover = audio.loadSound("MUSIC/PERDENTE.mp3")
@@ -329,20 +343,6 @@ function scene:show( event )
       sprite:addEventListener("collision")
 
       ------------------------------------------------
-      --quando avviene touch personaggio salta e avvia animazione salto
-      function sprite.touch( self,event)
-        vx, vy = sprite:getLinearVelocity()
-        if( event.phase == "began" and not self.isJumping ) then
-          self:setLinearVelocity(0,-1800)
-          self.isJumping = true -- se ho toccato imposto la variabile isJumping del mio personaggio a true
-          self:setSequence("jumping") --lo sprite si muove con animazione jumping
-          self:play()
-          changeOutline("jump") --cambio l'outline del personaggio in modo da renderlo più 'corto'
-          sprite.mustChangeOutlineToWalk = true
-        end
-      end
-      Runtime:addEventListener( "touch", sprite )
-      -----------------------------------------------
       local function preCollisionEvent( self, event )
         local collideObject = event.other
         if ( collideObject.collType == "passthru" ) then
@@ -351,19 +351,9 @@ function scene:show( event )
         if(event.other.name == "ground") then
             self.isJumping = false
         end
-        --print("Jumped @ ", system.getTimer())
       end
       sprite.preCollision = preCollisionEvent
       sprite:addEventListener( "preCollision" )
-      ------------------------------------------------
-      local function touchListener()
-        --funzione che capirà quale evento scatenare al click sullo schermo
-        --[[
-
-        DA FARE!
-
-        ]]--
-      end
       ------------------------------------------------
       local function loop( event )
         --qui dentro metteremo tutte le cose che necessitano di un loop all'interno del gioco
@@ -374,10 +364,9 @@ function scene:show( event )
         
         local vx, vy = sprite:getLinearVelocity()
         if(vy > 800) and (sprite.isJumping) then --se sto tornando a terra cambio l'outline e il mio corpo in walking
-            print(vy)
+            --print(vy)
             if(sprite.mustChangeOutlineToWalk) then --ci entrà solo 1 volta per salto
-                changeOutline("walk")
-                print("changed")
+                changeOutline("walk") --cambio l'outline del mio personaggio a quella della camminata -> più grossa e tozza
                 sprite.mustChangeOutlineToWalk = false
             end
         end
@@ -421,7 +410,7 @@ function scene:show( event )
         end
         if(secondsPlayed >= timeToPlay) then --se è ora di far finire il gioco, vado al passo successivo
           if(scoreCount >= 1) then
-            stop = 1
+            stop = 1 
             if (castleAppared == 0 ) then --se non ho già fatto apparire il castello, lo faccio apparire
               castleAppared = 1 --non lo faccio più riapparire
               timer.cancel( callingEnemies ) --non chiamo più nemici
@@ -466,6 +455,97 @@ function scene:show( event )
       end
       button_home:addEventListener( "touch", touch )
 
+      --------------------------------------------------
+      --------- PARTI AGGIUNTE NEL LIVELLO 2 -----------
+      --------------------------------------------------
+
+      -- FUNZIONI PER IL PROIETTILE 'LATTINA DI PLASTICA'
+        local function bulletScroll(self, event)
+          --fa scorrere il sacchetto nello schermo
+          if stop == 0 then
+            self.x = self.x + 10 --fa andare  avanti il proiettile in x senza spostarsi in y
+            if self.x > display.actualContentWidth + 30 then --se c'è un sacchetto di plastica che ha superato il limite di -200, lo togliamo!
+              self:removeEventListener( "collision", onBulletCollision ) --rimuovo l'ascoltatore per la collisione di quel sprite
+              Runtime:removeEventListener("enterFrame",self) --rimuovo l'ascoltatore che lo fa scrollare 
+              group_elements:remove(self)
+              display.remove(self) --rimuove QUEL sacchetto di plastica dal display display
+              local res = table.remove(table_bullets, table.indexOf( table_bullets, self )) --lo rimuove anche dalla tabella dei proeittili
+            end
+          end
+        end
+        ------------------------------------------------
+        -- Global collision handling
+        function onBulletCollision( event )
+          if(tostring(event.other.name) == "enemy") then --se il proiettile si è scontrato contro un nemico allora..
+            enemyKilled = event.other --salvo dentro enemyKilled l'indirizzo che mi porta al nemico ucciso
+            --Riproduco l'animazione dell'esplosione nelle stesse coordinate in cui si trova il nemico nel momento della collisione
+            local explosion = display.newSprite( explosionSheet, explosionData ) --salvo dentro explosion l'animazione dell'esplosione
+            explosion.name = "explosion"
+            group_elements:insert(explosion)
+            explosion.x = enemyKilled.x
+            explosion.y = enemyKilled.y
+            explosion:play()
+
+            --rimuovo il nemico dallo schermo
+            Runtime:removeEventListener("enterFrame", enemyKilled) --non faccio più muovere il nemico
+            display.remove(enemyKilled) --rimuovo dal display il nemico
+            local position = table.indexOf(enemies, enemyKilled) --carico dentro la variabile position la posizione del nemico colpito dentro la tabella dei nemici 
+            table.remove(enemies,position) --rimuovo dalla tabella enemies il nemico colpito
+
+            --rimuovo la bottiglia appena lanciata
+            group_elements:remove(event.target)
+            event.target:removeEventListener( "collision", onBulletCollision ) --rimuovo l'ascoltatore per la collisione di quel sprite
+            Runtime:removeEventListener("enterFrame",event.target) --rimuovo l'ascoltatore che lo fa scrollare 
+            display.remove(event.target) --rimuove QUELLA bottiglia di plastica dal display 
+            local res = table.remove(table_bullets, table.indexOf( table_bullets, event.target )) --lo rimuove anche dalla tabella dei proeittili
+            
+          end
+        end
+        ---------------------------------------------------
+        local function createBullet()
+          --crea un oggetto di un nuovo sprite del sacchetto e lo aggiunge alla tabella table_plasticbag[]
+          --da implementare meglio, mi faccio passare che tipo di nemico devo inserire
+          local bullet = display.newSprite( bulletSheet, bulletData )
+          bullet.name = "bullet"
+          bullet:play()
+          group_elements:insert(bullet)
+          bullet.x = sprite.x
+          bullet.y = sprite.y
+          local outlineBullet= graphics.newOutline(20, bulletSheet, 1)
+          physics.addBody(bullet, { outline=outlineBullet, density=1, bounce=0, friction=1})
+          bullet.isBullet = true
+          bullet.isSensor = true
+          bullet.bodyType = "static"
+          return bullet
+        end
+        ------------------------------------------------
+        local function bulletsLoop()
+          bullet = createBullet() --creo un'istanza di un oggetto sprite plastic bag         
+          table.insert(table_bullets, bullet)
+          bullet:addEventListener( "collision", onBulletCollision )
+          bullet.enterFrame = bulletScroll --lo faccio scrollare, grazie alla funzione plasticbagScroll
+          Runtime:addEventListener("enterFrame", bullet) --assegno all'evento enterframe lo scroll
+        end
+
+      function touchListener(event)
+        if ( event.phase == "ended" ) then --è finito il processo di touch dello sschermo
+          if(event.x >= 0 ) and (event.x <= display.actualContentWidth/2) and (not sprite.isJumping) then
+            --parte sinistra del display --> devo saltare
+            sprite:setLinearVelocity(0,-1800) -- applico una forza al personaggio per saltare
+            sprite.isJumping = true -- se ho toccato imposto la variabile isJumping del mio personaggio a true
+            sprite:setSequence("jumping") --lo sprite si muove con animazione jumping
+            sprite:play()
+            changeOutline("jump") --cambio l'outline del personaggio in modo da renderlo più 'corto'
+            sprite.mustChangeOutlineToWalk = true
+          elseif (event.x > display.actualContentWidth / 2) and (event.x <= display.contentWidth) then
+            --ho cliccato sulla parte destra dello shcermo, devo sparare
+            bulletsLoop()
+          end
+        end
+      end
+      Runtime:addEventListener( "touch", touchListener )
+      -----------------------------------------------------
+
       --PARTE FINALE: richiamo le funzioni e aggiungo gli elementi allo schermo e ai gruppi
       timeplayed = timer.performWithDelay( 1000, increaseGameSpeed, 0 )
       gameLoop = timer.performWithDelay( time_speed_min, loop, 0 )
@@ -485,7 +565,7 @@ function scene:hide( event )
     -- INSERT code here to pause the scene
     -- e.g. stop timers, stop animation, unload sounds, etc.)
     --QUI BISOGNA SALVARE I DATI DEL GIOCATORE COME IL PUNTEGGIO
-    print("game finished : " .. gameFinished)
+    print("game finished : " .. tostring(gameFinished))
     if(gameFinished == 1) then
       updateHighScore(scoreCount) --mando il punteggio appena raggiunto alla funzione che permetterà di aggiornarlo
       resetScene("gamefinished") --se entro qui devo cancellare anche un timeloop che è partito con l'avvicinamento del castello di sabbia
@@ -496,7 +576,7 @@ function scene:hide( event )
   elseif phase == "did" then
     -- Called when the scene is now off screen
     --cancella tutto il contenuto all'interno di una scena senza salvare i contenuti
-    local sceneToRemove = "levels.level"..localLevel --questo codice prende in modo dinamico la scena su cui siamo ed elimina gli elementi all'interno
+    local sceneToRemove = "levels.level"..localLevel
     composer.removeScene( sceneToRemove)
   end
 
@@ -524,7 +604,7 @@ function updateHighScore(scoreCount) --funzione che serve per aggiornare l'high 
       print(tostring(row)),
       --FirstName = row.FirstName,
       level = row.level,
-      scoreLevel = row.scoreLevel1
+      scoreLevel = row.scoreLevel2
     }
     local oldScore= levels[1].scoreLevel --salvo il punteggio che è già presente all'interno del database
     local levelReached = levels[1].level --mi scrivo il livello a cui è arrivato l'utente all'interno del gioco, se è l'1 allora aggiorneremo a 2 e gli permetteremo di fare un nuovo livello
@@ -532,7 +612,7 @@ function updateHighScore(scoreCount) --funzione che serve per aggiornare l'high 
     if(tonumber(levelReached) == tonumber(localLevel)) then --se sono al livello 1, devo aumentare il livello
       if (tonumber(oldScore)<scoreCount) then --se il nuovo è punteggio è maggiore di quello già presente nel db entro nell'if
         print("devo aumentare di livello e inoltre aumento il punteggio")
-        local query =("UPDATE levels SET level ='" .. (levelReached+1) .. "' ,scoreLevel1 = '" ..scoreCount .. "' WHERE ID = 1")
+        local query =("UPDATE levels SET level ='" .. (levelReached+1) .. "' ,scoreLevel2 = '" ..scoreCount .. "' WHERE ID = 1")
         print("query: ".. query)
         local pushQuery = db:exec (query)
         if(pushQuery == 0) then --se ritorna 0 allora ho modificato correttamente il db
@@ -553,7 +633,7 @@ function updateHighScore(scoreCount) --funzione che serve per aggiornare l'high 
       end
     else
       if((tonumber(oldScore) < scoreCount)) then
-        local query =("UPDATE levels SET scoreLevel1 = '" ..scoreCount .. "' WHERE ID = 1")
+        local query =("UPDATE levels SET scoreLevel2 = '" ..scoreCount .. "' WHERE ID = 1")
         local pushQuery = db:exec (query)
         if(pushQuery == 0) then
           print(" Punteggio correttamente modificato!")
@@ -562,6 +642,9 @@ function updateHighScore(scoreCount) --funzione che serve per aggiornare l'high 
         end
       end
     end
+  end
+  if ( db and db:isopen() ) then --chiuso la connessione al database
+    db:close()
   end
 end
 ----------------------------------------------
@@ -578,8 +661,10 @@ function resetScene( tipo)
     sprite:removeEventListener("collision")
     Runtime:removeEventListener("enterFrame",enemy)
     Runtime:removeEventListener("enterFrame",plasticbag)
-    Runtime:removeEventListener( "touch", sprite )
+    --Runtime:removeEventListener( "touch", sprite )
     button_home:removeEventListener( "touch", touch )
+    Runtime:removeEventListener( "touch", touchListener )
+    Runtime:removeEventListener("enterFrame", bullet)
 
     --SVUOTO LE TABELLE
     for i=1, #enemies do
@@ -590,15 +675,24 @@ function resetScene( tipo)
       table_plasticbag[i]:removeSelf() -- Optional Display Object Removal
       table_plasticbag[i] = nil        -- Nil Out Table Instance
     end
+    for i=1, #table_bullets do 
+      Runtime:addEventListener("enterFrame",  table_bullets[i])
+      table_bullets[i]:removeEventListener( "collision", onBulletCollision )
+      table_bullets[i]:removeSelf() -- Optional Display Object Removal
+      table_bullets[i] = nil        -- Nil Out Table Instance
+    end
   elseif tipo == "gamefinished" then
 
     --ELIMINO I LISTENERS
+    Runtime:removeEventListener( "collision", onBulletCollision )
+    Runtime:removeEventListener( "touch", touchListener )
     Runtime:removeEventListener("enterFrame", spriteScrollToCastle)
     Runtime:removeEventListener("enterFrame", castleScroll)
     Runtime:removeEventListener("enterFrame",enemy)
     Runtime:removeEventListener("enterFrame",plasticbag)
-    Runtime:removeEventListener( "touch", sprite )
+    --Runtime:removeEventListener( "touch", sprite )
     button_home:removeEventListener( "touch", touch )
+    Runtime:removeEventListener("enterFrame", bullet)
 
     timer.cancel( gameLoop )
     timer.cancel( callingEnemies )
@@ -615,6 +709,12 @@ function resetScene( tipo)
     for i=1, #table_plasticbag do
       table_plasticbag[i]:removeSelf() -- Optional Display Object Removal
       table_plasticbag[i] = nil        -- Nil Out Table Instance
+    end
+    for i=1, #table_bullets do
+      Runtime:addEventListener("enterFrame",  table_bullets[i])
+      table_bullets[i]:removeEventListener( "collision", onBulletCollision )
+      table_bullets[i]:removeSelf() -- Optional Display Object Removal
+      table_bullets[i] = nil        -- Nil Out Table Instance
     end
   end
 end

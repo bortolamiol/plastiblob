@@ -13,8 +13,9 @@ local bg --variabile che durante lo show conterrà le due immagini di sfondo che
 local punteggio --variabile che conterrà il mio punteggio del livello
 local sprite --sprite del personaggio
 local enemies = {} --sprite dei nemici
-local table_plasticbag = {}
+local table_plasticbag = {} --tabella che conterrà al suo interno i sacchetti di plastica che sono sullo schermo
 local table_bullets = {} --tabella che conterrà al suo interno i proiettili che sono sullo schermo
+local table_pool = {} --tabella che conterrà al suo interno le pozze d'acqua che sono sullo schermo
 local button_home --bottone per uscire dal livello e tornare alla button_home dei livelli
 local stop =  0 --variabile che servirà per capire se stoppare il gioco
 local callingEnemies
@@ -185,8 +186,8 @@ function scene:show( event )
       local enemyData = {
         { name="walking", sheet=enemyWalkingSheet, start=1, count=8, time=800, loopCount=0 }
       }
-      local enemyTimeSpawnMin = 500
-      local enemyTimeSpawnMax  = 1000
+      local enemyTimeSpawnMin = 2000
+      local enemyTimeSpawnMax  = 4000
 
       -- SACCHETTO IN PLASTICA
       local plasticbagSheetData = { width=130, height=130, numFrames=4, sheetContentWidth=520, sheetContentHeight=130 }
@@ -195,6 +196,14 @@ function scene:show( event )
         { name="plastic", sheet=plasticbagSheet, start=1, count=4, time=500, loopCount=0 }
       }
       local plasticbagTimeSpawn = 5000
+
+      --CASTELLO DI SABBIA IN CUI ENTRERO' A FINE LIVELLO
+      castle = display.newImageRect( "immagini/livello-1/sandcastle-duck.png", 700, 700 )
+      castle.x = display.actualContentWidth + 800
+      castle.y = ground.y - castle.height/2 - groundHeight/2
+      group_castle:insert(castle)
+      
+      -- AGGIUNTO NEL LIVELLO 2 ---
 
       --PROIETTILE
       local bulletSheetData = { width=160, height=160, numFrames=4, sheetContentWidth=640, sheetContentHeight=160 }
@@ -209,13 +218,13 @@ function scene:show( event )
         { name="explosion", sheet=explosionSheet, start=1, count=20, time=400, loopCount=1}
       }
 
-
-      --CASTELLO DI SABBIA IN CUI ENTRERO' A FINE LIVELLO
-      castle = display.newImageRect( "immagini/livello-1/sandcastle-duck.png", 700, 700 )
-      castle.x = display.actualContentWidth + 800
-      castle.y = ground.y - castle.height/2 - groundHeight/2
-      group_castle:insert(castle)
-
+      -- AGGIUNTO NEL LIVELLO 3 --
+      local poolSheetData = { width=200, height=100, numFrames=3, sheetContentWidth=600, sheetContentHeight=100 }
+      local poolSheet = graphics.newImageSheet( "immagini/livello-3/pool.png", poolSheetData )
+      local poolData = {
+        { name="pool", sheet=poolSheet, start=1, count=3, time=500, loopCount=0 }
+      }
+      local poolTimeSpawn = 8000
 
       --FUNZIONI {
 
@@ -327,7 +336,7 @@ function scene:show( event )
             display:remove(event.other) --lo rimuovo dal display
             group_elements:remove(event.other) --lo rimuovo dal gruppo (????? serve??? NON LO SO, VEDIAMO SE DARA' PROBLEMI)
           end
-          if(event.other.name ==  "enemy") then
+          if(event.other.name ==  "enemy") or (event.other.name ==  "pool") then
             stop = 1 -- grazie a questo le animazioni personagggi non scrolleranno più
             -- audio
             audio.setMaxVolume(0.02)
@@ -542,13 +551,58 @@ function scene:show( event )
         end
       end
       Runtime:addEventListener( "touch", touchListener )
-      -----------------------------------------------------
+
+       --------------------------------------------------
+      --------- PARTI AGGIUNTE NEL LIVELLO 3 -----------
+      --------------------------------------------------
+      -- FUNZIONI PER LE POZZE DI LIQUIDO ASSASSINO {
+        local function poolScroll(self, event)
+          --fa scorrere il nemico nello schermo
+          if stop == 0 then
+            self.x = self.x - (enemySpeed*2)
+            self.y = ground.y - 60
+          end
+        end
+        ------------------------------------------------
+        local function createPool()
+          --crea un oggetto di un nuovo sprite nemico e lo aggiunge alla tabella enemies[]
+          --da implementare meglio, mi faccio passare che tipo di nemico devo inserire
+          local pool = display.newSprite( poolSheet, poolData )
+          pool.name = "pool"
+          pool:play()
+          group_elements:insert(pool)
+          pool.x = display.actualContentWidth + 200
+          pool.y = ground.y - 60
+          local outlinePool = graphics.newOutline(5, poolSheet, 1)
+          physics.addBody(pool, { outline=outlinePool, density=1, bounce=0, friction=1})
+          pool.isBullet = true
+          pool.isSensor = true
+          pool.bodyType = "dynamic"
+          return pool
+        end
+        ------------------------------------------------
+        local function poolLoop()
+          pool = createPool()
+          pool.enterFrame = poolScroll
+          table.insert(table_pool, pool)
+          Runtime:addEventListener("enterFrame",pool)
+          for i,thisPool in ipairs(table_pool) do
+            if thisPool.x < -200 then
+              Runtime:removeEventListener("enterFrame",thisPool)
+              display.remove(thisPool)
+              table.remove(table_pool,i)
+            end
+          end
+        end
 
       --PARTE FINALE: richiamo le funzioni e aggiungo gli elementi allo schermo e ai gruppi
       timeplayed = timer.performWithDelay( 1000, increaseGameSpeed, 0 )
       gameLoop = timer.performWithDelay( time_speed_min, loop, 0 )
       callingEnemies = timer.performWithDelay( math.random(enemyTimeSpawnMin, enemyTimeSpawnMax), enemiesLoop, 0 )
       callingPlasticbag = timer.performWithDelay( (timeToPlay/plasticToCatch)*1000, plasticbagLoop, plasticToCatch)
+
+      -- AGGIUNTO NEL LIVELLO 3 --
+      callingPool = timer.performWithDelay( poolTimeSpawn, poolLoop, 0)
     end
   end
 end
@@ -653,6 +707,7 @@ function resetScene( tipo)
     timer.cancel( callingEnemies )
     timer.cancel( callingPlasticbag )
     timer.cancel( timeplayed )
+    timer.cancel( callingPool )
     physics.pause()
 
     --ELIMINO I LISTENERS
@@ -674,10 +729,15 @@ function resetScene( tipo)
       table_plasticbag[i] = nil        -- Nil Out Table Instance
     end
     for i=1, #table_bullets do 
-      Runtime:addEventListener("enterFrame",  table_bullets[i])
+      Runtime:removeEventListener("enterFrame",  table_bullets[i])
       table_bullets[i]:removeEventListener( "collision", onBulletCollision )
       table_bullets[i]:removeSelf() -- Optional Display Object Removal
       table_bullets[i] = nil        -- Nil Out Table Instance
+    end
+    for i=1, #table_pool do 
+      Runtime:removeEventListener("enterFrame",  table_pool[i])
+      table_pool[i]:removeSelf() -- Optional Display Object Removal
+      table_pool[i] = nil        -- Nil Out Table Instance
     end
   elseif tipo == "gamefinished" then
 
@@ -696,6 +756,7 @@ function resetScene( tipo)
     timer.cancel( callingEnemies )
     timer.cancel( callingPlasticbag )
     timer.cancel( timeplayed )
+    timer.cancel( callingPool )
     --timer.cancel( newTimerOut )
     physics.pause()
 
@@ -713,6 +774,11 @@ function resetScene( tipo)
       table_bullets[i]:removeEventListener( "collision", onBulletCollision )
       table_bullets[i]:removeSelf() -- Optional Display Object Removal
       table_bullets[i] = nil        -- Nil Out Table Instance
+    end
+    for i=1, #table_pool do 
+      Runtime:removeEventListener("enterFrame",  table_pool[i])
+      table_pool[i]:removeSelf() -- Optional Display Object Removal
+      table_pool[i] = nil        -- Nil Out Table Instance
     end
   end
 end

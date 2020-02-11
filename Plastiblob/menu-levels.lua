@@ -12,10 +12,8 @@ local scene = composer.newScene()
 -- include Corona's "widget" library
 local widget = require "widget"
 
-local musicTrack2
-
 function scene:create( event )
-	musicTrack2 = audio.loadStream("MUSIC/THEME 2.mp3")
+	
 end
 
 function scene:show( event )
@@ -62,10 +60,10 @@ function scene:show( event )
 			end
 		else
 		--Se dbexists ritorna 1 allora la tabella non esiste, vuol dire perciò che dovrà essere creata
-			local tableSetup = [[CREATE TABLE levels ( ID INTEGER PRIMARY KEY autoincrement, level, scoreLevel1, scoreLevel2);]]
+			local tableSetup = [[CREATE TABLE levels ( ID INTEGER PRIMARY KEY autoincrement, level, scoreLevel1);]]
 			db:exec( tableSetup )
 			--inserisco la riga di default nel database, se l'ho appena creato andrò al livello 1
-			local insertQuery = [[INSERT INTO levels VALUES ( null, "1", 0, 0 );]]
+			local insertQuery = [[INSERT INTO levels VALUES ( null, "1", 0 );]]
 			db:exec( insertQuery )
 			--dato che la tabella non esisteva vuol dire che è la prima volta che l'utente gioca, perciò lo faccio iniziare dal livello 1
 			livellicompletati = 1
@@ -137,8 +135,6 @@ function scene:show( event )
 			menu:insert(levels[i])
 		end
 	end
-
-	audio.play( musicTrack2, { channel=2, loops=-1 } )
 end
 function checkImagePositionX(i)
 	local x
@@ -180,9 +176,6 @@ function scene:hide( event )
 	elseif phase == "did" then
 		-- Called when the scene is now off screen
 		--composer.removeScene( "menu-levels" )
-		-- Stop the music!
-		--audio.fade( )
-		audio.stop(2)
 	end	
 end
 
@@ -193,9 +186,6 @@ function scene:destroy( event )
 	-- 
 	-- INSERT code here to cleanup the scene
 	-- e.g. remove display objects, remove touch listeners, save state, etc.
-
-	audio.dispose( musicTrack2 )
-
 end
 
 ---------------------------------------------------------------------------------
