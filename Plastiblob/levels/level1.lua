@@ -20,7 +20,7 @@ local callingEnemies
 local castle
 local callingPlasticbag
 local timeplayed  --varaiabile che misura da quanti secondi sono all'interno del gioco e farà cambiare la velocità
-local timeToPlay = 80 --variabile che conterrà quanto l'utente dovrà sopravvivere all'interno del gioco
+local timeToPlay = 60 --variabile che conterrà quanto l'utente dovrà sopravvivere all'interno del gioco
 local scoreCount    --variabile conteggio punteggio iniziale
 local gameFinished
 local newTimerOut
@@ -315,6 +315,7 @@ function scene:show( event )
             group_elements:remove(event.other) --lo rimuovo dal gruppo (????? serve??? NON LO SO, VEDIAMO SE DARA' PROBLEMI)
           end
           if(event.other.name ==  "enemy") then
+            stop = 1
             print("mi sono scontrato col nemico")
             -- audio
             audio.setMaxVolume(0.02)
@@ -421,6 +422,7 @@ function scene:show( event )
         end
         if(secondsPlayed >= timeToPlay) then --se è ora di far finire il gioco, vado al passo successivo
           if(scoreCount >= 1) then
+            stop = 1
             if (castleAppared == 0 ) then --se non ho già fatto apparire il castello, lo faccio apparire
               castleAppared = 1 --non lo faccio più riapparire
               timer.cancel( callingEnemies ) --non chiamo più nemici
@@ -517,18 +519,19 @@ function updateHighScore(scoreCount) --funzione che serve per aggiornare l'high 
   local path = system.pathForFile( "data.db", system.DocumentsDirectory )
   local db = sqlite3.open( path )
   local levels = {} --creo una  tabella per memorizzare i dati che mi servrà per scegliere se il punteggio è un record o no
-  for row in db:nrows( "SELECT * FROM levels" ) do
+  for row in db:nrows( "SELECT level, scoreLevel"..localLevel.." FROM levels" ) do
     levels[#levels+1] =
     {
-      FirstName = row.FirstName,
+      print(tostring(row)),
+      --FirstName = row.FirstName,
       level = row.level,
-      scoreLevel1 = row.scoreLevel1
+      scoreLevel = row.scoreLevel1
     }
-    local oldScore= levels[1].scoreLevel1 --salvo il punteggio che è già presente all'interno del database
+    local oldScore= levels[1].scoreLevel --salvo il punteggio che è già presente all'interno del database
     local levelReached = levels[1].level --mi scrivo il livello a cui è arrivato l'utente all'interno del gioco, se è l'1 allora aggiorneremo a 2 e gli permetteremo di fare un nuovo livello
-    print("livello appena completato: ".. levelReached.." - vecchio punteggio:"..oldScore)
-    if (tonumber(oldScore)<scoreCount) then --se il nuovo è punteggio è maggiore di quello già presente nel db entro nell'if
-      if(tonumber(levelReached) == tonumber(localLevel)) then --se sono al livello 1, devo aumentare il livello
+    print("livello appena completato: ".. localLevel.." - vecchio punteggio:"..oldScore)
+    if(tonumber(levelReached) == tonumber(localLevel)) then --se sono al livello 1, devo aumentare il livello
+      if (tonumber(oldScore)<scoreCount) then --se il nuovo è punteggio è maggiore di quello già presente nel db entro nell'if
         print("devo aumentare di livello e inoltre aumento il punteggio")
         local query =("UPDATE levels SET level ='" .. (levelReached+1) .. "' ,scoreLevel1 = '" ..scoreCount .. "' WHERE ID = 1")
         print("query: ".. query)
@@ -538,8 +541,19 @@ function updateHighScore(scoreCount) --funzione che serve per aggiornare l'high 
         else
           print("ho provato a fare l'update della tabella ma non ci sono riuscito. codice errore: "..pushQuery) --errore
         end
-      else
-        --devo solamente aumentare il punteggio"
+      elseif (tonumber(oldScore) >= scoreCount) then
+        --devo solamente aumentare solo il livello"
+        local query =("UPDATE levels SET level ='" .. (levelReached+1) .. "' WHERE ID = 1")
+        print("query: ".. query)
+        local pushQuery = db:exec (query)
+        if(pushQuery == 0) then --se ritorna 0 allora ho modificato correttamente il db
+          print("livello correttamente modificati!")
+        else
+          print("ho provato a fare l'update della tabella ma non ci sono riuscito. codice errore: "..pushQuery) --errore
+        end
+      end
+    else
+      if((tonumber(oldScore) < scoreCount)) then
         local query =("UPDATE levels SET scoreLevel1 = '" ..scoreCount .. "' WHERE ID = 1")
         local pushQuery = db:exec (query)
         if(pushQuery == 0) then
@@ -549,9 +563,6 @@ function updateHighScore(scoreCount) --funzione che serve per aggiornare l'high 
         end
       end
     end
-  end
-  if ( db and db:isopen() ) then --chiuso la connessione al database
-    db:close()
   end
 end
 ----------------------------------------------

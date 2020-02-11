@@ -12,10 +12,8 @@ local scene = composer.newScene()
 -- include Corona's "widget" library
 local widget = require "widget"
 
-local musicTrack2
-
 function scene:create( event )
-	musicTrack2 = audio.loadStream("MUSIC/THEME 2.mp3")
+	
 end
 
 function scene:show( event )
@@ -137,8 +135,6 @@ function scene:show( event )
 			menu:insert(levels[i])
 		end
 	end
-
-	audio.play( musicTrack2, { channel=2, loops=-1 } )
 end
 function checkImagePositionX(i)
 	local x
@@ -180,9 +176,6 @@ function scene:hide( event )
 	elseif phase == "did" then
 		-- Called when the scene is now off screen
 		--composer.removeScene( "menu-levels" )
-		-- Stop the music!
-		--audio.fade( )
-		audio.stop(2)
 	end	
 end
 
@@ -193,9 +186,6 @@ function scene:destroy( event )
 	-- 
 	-- INSERT code here to cleanup the scene
 	-- e.g. remove display objects, remove touch listeners, save state, etc.
-
-	audio.dispose( musicTrack2 )
-
 end
 
 ---------------------------------------------------------------------------------
