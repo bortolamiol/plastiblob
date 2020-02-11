@@ -26,6 +26,7 @@ local scoreCount    --variabile conteggio punteggio iniziale
 local gameFinished
 local newTimerOut
 local nextScene = "menu-levels"
+local crunchSound = audio.loadSound("MUSIC/crunch.mp3")
 function scene:create( event )
 
   -- Called when the scene's view does not exist.
@@ -128,6 +129,7 @@ function scene:show( event )
       ground.y = display.contentHeight- groundHeight/2
       physics.addBody(ground, "static",{bounce=0, friction=1 } )
       --
+
 
       --TESTO DELLO SCORE
       local scoreText = display.newText( scoreCount.."/"..plasticToCatch, display.contentCenterX, display.contentCenterY-300, native.systemFont, 28 )
@@ -312,6 +314,8 @@ function scene:show( event )
         if( event.phase == "began" ) then
           --tutte le informazioni dell'elemento che ho toccato le troviamo dentro event.other
           if(event.other.name ==  "plasticbag") then --mi sono scontrato con il sacchetto
+            audio.setMaxVolume(0.03)
+            audio.play(crunchSound)
             scoreCount = scoreCount+1;
             scoreText.text = scoreCount.."/"..plasticToCatch
             Runtime:removeEventListener("enterFrame", event.other) --rimuovo il listener dello scroll, così non si muove più
@@ -324,7 +328,8 @@ function scene:show( event )
             stop = 1
             print("mi sono scontrato col nemico")
             -- audio
-            audio.setMaxVolume(0.02)
+            audio.pause(crunchSound)
+            audio.setMaxVolume(0.03)
             local audiogameover = audio.loadSound("MUSIC/PERDENTE.mp3")
             audio.play(audiogameover)
             resetScene("all")
@@ -577,6 +582,12 @@ end
 
 function resetScene( tipo)
   if tipo == "gameOver" then
+    
+    --composer.isAudioPlayingMenu =0;
+    composer.isAudioPlaying=0;
+  
+    audio.dispose(crunchSound)
+    
     timer.cancel( gameLoop )
     timer.cancel( callingEnemies )
     timer.cancel( callingPlasticbag )
@@ -600,6 +611,9 @@ function resetScene( tipo)
       table_plasticbag[i] = nil        -- Nil Out Table Instance
     end
   elseif tipo == "gamefinished" then
+
+    audio.dispose(crunchSound)
+    print("audio disposato nel livello 1")
 
     --ELIMINO I LISTENERS
     Runtime:removeEventListener("enterFrame", spriteScrollToCastle)
