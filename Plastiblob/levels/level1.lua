@@ -53,7 +53,7 @@ function scene:show( event )
     physics.start()
     -- Overlays collision outlines on normal display objects
     physics.setGravity( 0,20 )
-    physics.setDrawMode( "hybrid" )
+    --physics.setDrawMode( "hybrid" )
     -- The default Corona renderer, with no collision outlines
     --physics.setDrawMode( "normal" )
     -- Shows collision engine outlines only
@@ -161,7 +161,7 @@ function scene:show( event )
       -- In your sequences, add the parameter 'sheet=', referencing which image sheet the sequence should use
       local spriteData = {
         { name="walking", sheet=spriteWalkingSheet, start=1, count=8, time=spriteFrameSpeed, loopCount=0 },
-        { name="jumping", sheet=spriteJumpingSheet, start=1, count=8, time=800, loopCount=0 }
+        { name="jumping", sheet=spriteJumpingSheet, start=1, count=8, time=900, loopCount=0 }
       }
       --metto assieme tutti i dettagli dello sprite, elencati in precedenza
       sprite = display.newSprite( spriteWalkingSheet, spriteData )
@@ -319,7 +319,7 @@ function scene:show( event )
             -- audio
             audio.setMaxVolume(0.02)
             local audiogameover = audio.loadSound("MUSIC/PERDENTE.mp3")
-            --audio.play(audiogameover)
+            audio.play(audiogameover)
             resetScene("all")
             composer.gotoScene( "levels.gameover", options )
           end
@@ -332,12 +332,13 @@ function scene:show( event )
       function sprite.touch( self,event)
         vx, vy = sprite:getLinearVelocity()
         if( event.phase == "began" and not self.isJumping ) then
-          self:setLinearVelocity(0,-1800)
+          self:setLinearVelocity(0,-2000)
           self.isJumping = true -- se ho toccato imposto la variabile isJumping del mio personaggio a true
           self:setSequence("jumping") --lo sprite si muove con animazione jumping
           self:play()
           changeOutline("jump") --cambio l'outline del personaggio in modo da renderlo più 'corto'
           sprite.mustChangeOutlineToWalk = true
+          print(sprite.x.."è la posizione del mio sprite")
         end
       end
       Runtime:addEventListener( "touch", sprite )
