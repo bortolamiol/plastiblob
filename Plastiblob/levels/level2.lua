@@ -91,13 +91,13 @@ function scene:show( event )
       local _y = 0  -- Vertical centre of screen
 
       bg={} -- 'vettore' che conterrà i due sfondi del gioco
-      bg[1] = display.newImageRect("immagini/livello-1/plastic-beach.png", _w, _h)
+      bg[1] = display.newImageRect("immagini/livello-2/background.png", _w, _h)
       bg[1].anchorY = 0
       bg[1].anchorX = 0
       bg[1].x = 0
       bg[1].y = _y
       group_background:insert(bg[1])
-      bg[2] = display.newImageRect("immagini/livello-1/plastic-beach.png", _w, _h)
+      bg[2] = display.newImageRect("immagini/livello-2/background.png", _w, _h)
       bg[2].anchorY = 0
       bg[2].anchorX = 0
       bg[2].x = _w
