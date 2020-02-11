@@ -668,7 +668,7 @@ function scene:show( event )
       --PARTE FINALE: richiamo le funzioni e aggiungo gli elementi allo schermo e ai gruppi
       timeplayed = timer.performWithDelay( 1000, increaseGameSpeed, 0 )
       gameLoop = timer.performWithDelay( time_speed_min, loop, 0 )
-      callingEnemies = timer.performWithDelay( (timeToPlay/8)*1000, enemiesLoop, 0 )
+      callingEnemies = timer.performWithDelay( (timeToPlay/6)*1000, enemiesLoop, 0 )
       callingPlasticbag = timer.performWithDelay( (timeToPlay/plasticToCatch)*1000, plasticbagLoop, plasticToCatch)
 
       -- AGGIUNTO NEL LIVELLO 3 --
