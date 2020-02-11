@@ -25,7 +25,7 @@ local castle
 local platform --variabile che conterrà al suo interno l'immagine della piattaforma che sarà visualizzata nel gioco
 local callingPlasticbag
 local timeplayed  --varaiabile che misura da quanti secondi sono all'interno del gioco e farà cambiare la velocità
-local timeToPlay = 60 --variabile che conterrà quanto l'utente dovrà sopravvivere all'interno del gioco
+local timeToPlay = 70 --variabile che conterrà quanto l'utente dovrà sopravvivere all'interno del gioco
 local scoreCount    --variabile conteggio punteggio iniziale
 local gameFinished
 local newTimerOut
@@ -225,10 +225,10 @@ function scene:show( event )
       -- AGGIUNTO NEL LIVELLO 3 --
       
       -- POZZA D'ACQUA ASSASSINA --
-      local poolSheetData = { width=312, height=225, numFrames=3, sheetContentWidth=936, sheetContentHeight=225 }
+      local poolSheetData = { width=350, height=175, numFrames=16, sheetContentWidth=1400, sheetContentHeight=700 }
       local poolSheet = graphics.newImageSheet( "immagini/livello-2/pool.png", poolSheetData )
       local poolData = {
-        { name="pool", sheet=poolSheet, start=1, count=3, time=500, loopCount=0 }
+        { name="pool", sheet=poolSheet, start=1, count=16, time=800, loopCount=0 }
       }
       local poolTimeSpawn = 7000
 
@@ -265,7 +265,7 @@ function scene:show( event )
         enemy.name = "enemy"
         enemy:play()
         group_elements:insert(enemy)
-        enemy.x = display.actualContentWidth + 50
+        enemy.x = display.actualContentWidth
         enemy.y = ground.y-150
         frameIndexNemico = 1;
         local outlineNemico = graphics.newOutline(5, enemyWalkingSheet, frameIndexNemico)
@@ -599,9 +599,9 @@ function scene:show( event )
           pool.name = "pool"
           pool:play()
           group_elements:insert(pool)
-          pool.x = display.actualContentWidth + 200
+          pool.x = display.actualContentWidth 
           pool.y = ground.y - 100
-          local outlinePool = graphics.newOutline(5, poolSheet, 2)
+          local outlinePool = graphics.newOutline(5, poolSheet, 8)
           physics.addBody(pool, { outline=outlinePool, density=1, bounce=0, friction=1})
           pool.isBullet = true
           pool.isSensor = true
@@ -670,7 +670,7 @@ function scene:show( event )
       callingPlasticbag = timer.performWithDelay( (timeToPlay/plasticToCatch)*1000, plasticbagLoop, plasticToCatch)
 
       -- AGGIUNTO NEL LIVELLO 3 --
-      callingPool = timer.performWithDelay( (timeToPlay/13)*1000, poolLoop, 0)
+      callingPool = timer.performWithDelay( (timeToPlay/12)*1000, poolLoop, 0)
       --callingPlatform = timer.performWithDelay( platformTimeSpawn, platformLoop, 0)
     end
   end
