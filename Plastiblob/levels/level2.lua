@@ -185,8 +185,8 @@ function scene:show( event )
       sprite.mustChangeOutlineToWalk = false --variabile che mi servirà per  cambiare l'outline del personaggio da jumping a walking
 
       -- PRIMO NEMICO
-      local enemyWalkingSheetData = { width=200, height=200, numFrames=8, sheetContentWidth=1600, sheetContentHeight=200 }
-      local enemyWalkingSheet = graphics.newImageSheet( "immagini/livello-1/zombiewalking.png", enemyWalkingSheetData )
+      local enemyWalkingSheetData = { width=300, height=200, numFrames=8, sheetContentWidth=2400, sheetContentHeight=200 }
+      local enemyWalkingSheet = graphics.newImageSheet( "immagini/livello-2/serpentaccio.png", enemyWalkingSheetData )
       local enemyData = {
         { name="walking", sheet=enemyWalkingSheet, start=1, count=8, time=800, loopCount=0 }
       }
