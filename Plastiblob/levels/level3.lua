@@ -15,7 +15,7 @@ local sprite --sprite del personaggio
 local enemies = {} --sprite dei nemici
 local table_plasticbag = {} --tabella che conterrà al suo interno i sacchetti di plastica che sono sullo schermo
 local table_bullets = {} --tabella che conterrà al suo interno i proiettili che sono sullo schermo
-local table_pool = {} --tabella che conterrà al suo interno le pozze d'acqua che sono sullo schermo
+local table_spine = {} --tabella che conterrà al suo interno le pozze d'acqua che sono sullo schermo
 local table_platform = {} --tabella che conterrà al suo interno le piattaforme che saranno sullo schermo
 local button_home --bottone per uscire dal livello e tornare alla button_home dei livelli
 local stop =  0 --variabile che servirà per capire se stoppare il gioco
@@ -59,7 +59,7 @@ function scene:show( event )
     physics.start()
     -- Overlays collision outlines on normal display objects
     physics.setGravity( 0,20 )
-    --physics.setDrawMode( "hybrid" )
+    physics.setDrawMode( "hybrid" )
     -- The default Corona renderer, with no collision outlines
     --physics.setDrawMode( "normal" )
     -- Shows collision engine outlines only
@@ -234,12 +234,12 @@ function scene:show( event )
       -- AGGIUNTO NEL LIVELLO 3 --
       
       -- POZZA D'ACQUA ASSASSINA --
-      local poolSheetData = { width=350, height=175, numFrames=16, sheetContentWidth=1400, sheetContentHeight=700 }
-      local poolSheet = graphics.newImageSheet( "immagini/livello-2/pool.png", poolSheetData )
-      local poolData = {
-        { name="pool", sheet=poolSheet, start=1, count=16, time=800, loopCount=0 }
+      local spineSheetData = { width=200, height=200, numFrames=9, sheetContentWidth=1800, sheetContentHeight=200 }
+      local spineSheet = graphics.newImageSheet( "immagini/livello-3/spine.png", spineSheetData )
+      local spineData = {
+        { name="spine", sheet=spineSheet, start=1, count=9, time=800, loopCount=0 }
       }
-      local poolTimeSpawn = 7000
+      local spineTimeSpawn = 7000
 
       -- PIATTAFORMA 
      -- platform = display.newImageRect( "immagini/livello-2/platform.png", 320, 225 )
@@ -273,7 +273,7 @@ function scene:show( event )
         local enemy 
         if(type == "rat") then
           enemy = display.newSprite( enemyWalkingSheet, enemyData )
-          enemy.x = display.actualContentWidth  + 80
+          enemy.x = display.actualContentWidth  + 200
           enemy.y = ground.y-150
           frameIndexNemico = 1;
           local outlineNemico = graphics.newOutline(5, enemyWalkingSheet, frameIndexNemico)
@@ -281,7 +281,7 @@ function scene:show( event )
           enemy.bodyType = "dynamic"
         elseif (type == "bat") then
           enemy = display.newSprite( batWalkingSheet, batData )
-          enemy.x = display.actualContentWidth  + 10
+          enemy.x = display.actualContentWidth  + 50
           enemy.y = (display.contentHeight / 2) - 90
           frameIndexNemico = 1;
           local outlineNemico = graphics.newOutline(5, batWalkingSheet, frameIndexNemico)
@@ -402,7 +402,7 @@ function scene:show( event )
             display:remove(event.other) --lo rimuovo dal display
             group_elements:remove(event.other) --lo rimuovo dal gruppo (????? serve??? NON LO SO, VEDIAMO SE DARA' PROBLEMI)
           end
-          if(event.other.name ==  "enemy") or (event.other.name ==  "pool") then
+          if(event.other.name ==  "enemy") or (event.other.name ==  "spine") then
             gameOver()
           end
         end
@@ -623,7 +623,7 @@ function scene:show( event )
       Runtime:addEventListener( "touch", touchListener )
 
       -- FUNZIONI PER LE POZZE DI LIQUIDO ASSASSINO {
-        local function poolScroll(self, event)
+        local function spineScroll(self, event)
           --fa scorrere il nemico nello schermo
           if stop == 0 then
             self.x = self.x - (enemySpeed*2)
@@ -631,34 +631,34 @@ function scene:show( event )
           end
         end
         ------------------------------------------------
-        local function createPool()
+        local function createSpine()
           --crea un oggetto di un nuovo sprite nemico e lo aggiunge alla tabella enemies[]
           --da implementare meglio, mi faccio passare che tipo di nemico devo inserire
-          local pool = display.newSprite( poolSheet, poolData )
-          pool.name = "pool"
-          pool:play()
-          group_elements:insert(pool)
-          pool.x = display.actualContentWidth + 50
-          pool.y = ground.y - 100
-          local outlinePool = graphics.newOutline(5, poolSheet, 8)
-          physics.addBody(pool, { outline=outlinePool, density=1, bounce=0, friction=1})
-          pool.isBullet = true
-          pool.isSensor = true
-          pool.bodyType = "dynamic"
-          return pool
+          local spine = display.newSprite( spineSheet, spineData )
+          spine.name = "spine"
+          spine:play()
+          group_elements:insert(spine)
+          spine.x = display.actualContentWidth + 150
+          spine.y = ground.y - 100
+          local outlineSpine = graphics.newOutline(4, spineSheet, 5)
+          physics.addBody(spine, { outline=outlineSpine, density=1, bounce=0, friction=1})
+          spine.isBullet = true
+          spine.isSensor = true
+          spine.bodyType = "dynamic"
+          return spine
         end
         ------------------------------------------------
-        local function poolLoop()
+        local function spineLoop()
           if(stopCreatingEnemies == 0 ) then
-            pool = createPool()
-            pool.enterFrame = poolScroll
-            table.insert(table_pool, pool)
-            Runtime:addEventListener("enterFrame",pool)
-            for i,thisPool in ipairs(table_pool) do
-              if thisPool.x < -200 then
-                Runtime:removeEventListener("enterFrame",thisPool)
-                display.remove(thisPool)
-                table.remove(table_pool,i)
+            spine = createSpine()
+            spine.enterFrame = spineScroll
+            table.insert(table_spine, spine)
+            Runtime:addEventListener("enterFrame",spine)
+            for i,thisSpine in ipairs(table_spine) do
+              if thisSpine.x < -200 then
+                Runtime:removeEventListener("enterFrame",thisSpine)
+                display.remove(thisSpine)
+                table.remove(table_spine,i)
               end
             end
           end
@@ -682,7 +682,7 @@ function scene:show( event )
             platform.name = "platform"
             group_elements:insert(platform)
             platform.x = display.actualContentWidth + 200
-            platform.y = (display.contentHeight / 2) + 60
+            platform.y = (display.contentHeight / 2) + 40
             local outlinePlatform = graphics.newOutline(6, "immagini/livello-3/platform.png")
             physics.addBody(platform, "static", { outline=outlinePlatform, bounce=0, friction=1 } )
             print("creata una piattaforma")
@@ -706,11 +706,11 @@ function scene:show( event )
       --PARTE FINALE: richiamo le funzioni e aggiungo gli elementi allo schermo e ai gruppi
       timeplayed = timer.performWithDelay( 1000, increaseGameSpeed, 0 )
       gameLoop = timer.performWithDelay( time_speed_min, loop, 0 )
-      callingEnemies = timer.performWithDelay( 5000, enemiesLoop, 0 )
-      callingBats = timer.performWithDelay( 11000, enemiesBatLoop, 0 )
+      callingEnemies = timer.performWithDelay( 7000, enemiesLoop, 0 )
+      callingBats = timer.performWithDelay( 12000, enemiesBatLoop, 0 )
       callingPlasticbag = timer.performWithDelay( (timeToPlay/plasticToCatch)*1000, plasticbagLoop, plasticToCatch)
-      callingPool = timer.performWithDelay( 3800, poolLoop, 0)
-      callingPlatform = timer.performWithDelay( 10000, platformLoop, 0)
+      callingSpine = timer.performWithDelay( 5000, spineLoop, 0)
+      callingPlatform = timer.performWithDelay( 11000, platformLoop, 0)
     end
   end
 end
@@ -771,7 +771,7 @@ function updateHighScore(scoreCount) --funzione che serve per aggiornare l'high 
     if(tonumber(levelReached) == tonumber(localLevel)) then --se sono al livello 1, devo aumentare il livello
       if (tonumber(oldScore)<scoreCount) then --se il nuovo è punteggio è maggiore di quello già presente nel db entro nell'if
         print("devo aumentare di livello e inoltre aumento il punteggio")
-        local query =("UPDATE levels SET level ='" .. (levelReached+1) .. "' ,scoreLevel2 = '" ..scoreCount .. "' WHERE ID = 1")
+        local query =("UPDATE levels SET level ='" .. (levelReached+1) .. "' ,scoreLevel3 = '" ..scoreCount .. "' WHERE ID = 1")
         print("query: ".. query)
         local pushQuery = db:exec (query)
         if(pushQuery == 0) then --se ritorna 0 allora ho modificato correttamente il db
@@ -792,7 +792,7 @@ function updateHighScore(scoreCount) --funzione che serve per aggiornare l'high 
       end
     else
       if((tonumber(oldScore) < scoreCount)) then
-        local query =("UPDATE levels SET scoreLevel2 = '" ..scoreCount .. "' WHERE ID = 1")
+        local query =("UPDATE levels SET scoreLevel3 = '" ..scoreCount .. "' WHERE ID = 1")
         local pushQuery = db:exec (query)
         if(pushQuery == 0) then
           print(" Punteggio correttamente modificato!")
@@ -818,7 +818,7 @@ function resetScene( tipo)
     timer.cancel( callingEnemies )
     timer.cancel( callingPlasticbag )
     timer.cancel( timeplayed )
-    timer.cancel( callingPool )
+    timer.cancel( callingSpine )
     timer.cancel( callingPlatform )
     timer.cancel( callingBats )
     physics.pause()
@@ -846,10 +846,10 @@ function resetScene( tipo)
       table_bullets[i]:removeSelf() -- Optional Display Object Removal
       table_bullets[i] = nil        -- Nil Out Table Instance
     end
-    for i=1, #table_pool do 
-      Runtime:removeEventListener("enterFrame",  table_pool[i])
-      table_pool[i]:removeSelf() -- Optional Display Object Removal
-      table_pool[i] = nil        -- Nil Out Table Instance
+    for i=1, #table_spine do 
+      Runtime:removeEventListener("enterFrame",  table_spine[i])
+      table_spine[i]:removeSelf() -- Optional Display Object Removal
+      table_spine[i] = nil        -- Nil Out Table Instance
     end
     for i=1, #table_platform do 
       Runtime:removeEventListener("enterFrame",  table_platform[i])
@@ -873,7 +873,7 @@ function resetScene( tipo)
     timer.cancel( callingEnemies )
     timer.cancel( callingPlasticbag )
     timer.cancel( timeplayed )
-    timer.cancel( callingPool )
+    timer.cancel( callingSpine )
     timer.cancel( callingPlatform )
     timer.cancel( callingBats )
     --timer.cancel( newTimerOut )
@@ -894,10 +894,10 @@ function resetScene( tipo)
       table_bullets[i]:removeSelf() -- Optional Display Object Removal
       table_bullets[i] = nil        -- Nil Out Table Instance
     end
-    for i=1, #table_pool do 
-      Runtime:removeEventListener("enterFrame",  table_pool[i])
-      table_pool[i]:removeSelf() -- Optional Display Object Removal
-      table_pool[i] = nil        -- Nil Out Table Instance
+    for i=1, #table_spine do 
+      Runtime:removeEventListener("enterFrame",  table_spine[i])
+      table_spine[i]:removeSelf() -- Optional Display Object Removal
+      table_spine[i] = nil        -- Nil Out Table Instance
     end
     for i=1, #table_platform do 
       Runtime:removeEventListener("enterFrame",  table_platform[i])
