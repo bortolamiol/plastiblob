@@ -59,7 +59,7 @@ function scene:show( event )
     physics.start()
     -- Overlays collision outlines on normal display objects
     physics.setGravity( 0,20 )
-    --physics.setDrawMode( "hybrid" )
+    physics.setDrawMode( "hybrid" )
     -- The default Corona renderer, with no collision outlines
     --physics.setDrawMode( "normal" )
     -- Shows collision engine outlines only
@@ -182,7 +182,7 @@ function scene:show( event )
       sprite.gravityScale = 3
       sprite.isFixedRotation = true --rotazione bloccata
       sprite.isJumping = false
-      sprite.mustChangeOutlineToWalk = false --variabile che mi servirà per  cambiare l'outline del personaggio da jumping a walking
+      --sprite.mustChangeOutlineToWalk = false --variabile che mi servirà per  cambiare l'outline del personaggio da jumping a walking
 
       -- PRIMO NEMICO
       local enemyWalkingSheetData = { width=200, height=200, numFrames=6, sheetContentWidth=1200, sheetContentHeight=200 }
@@ -405,6 +405,10 @@ function scene:show( event )
           if(event.other.name ==  "enemy") or (event.other.name ==  "spine") then
             gameOver()
           end
+          if(event.other.name == "ground") or (event.other.name == "platform") then
+              sprite.isJumping = false
+              sprite:setSequence("walking")	
+          end
         end
       end
       sprite:addEventListener("collision")
@@ -415,24 +419,24 @@ function scene:show( event )
         if ( collideObject.collType == "passthru" ) then
           event.contact.isEnabled = false  --disable this specific collision
         end
-        if(event.other.name == "ground") or (event.other.name == "platform") then
-            self.isJumping = false
-        end
       end
       sprite.preCollision = preCollisionEvent
       sprite:addEventListener( "preCollision" )
       ------------------------------------------------
       local function loop( event )
+        if(sprite.isJumping) then
+          print(sprite.isJumping)
+        end
         --qui dentro metteremo tutte le cose che necessitano di un loop all'interno del gioco
         --richiamo le due funzioni per muovere lo sfondo
         moveBackground(bg[1])
         moveBackground(bg[2])
         sprite:play()
         local vx, vy = sprite:getLinearVelocity()
-        print(tostring(vy))  
+        --print(tostring(vy))  
         if(vy < -5) and (sprite.isJumping) then --se sto tornando a terra cambio l'outline e il mio corpo in walking
-          changeOutline("walk") --cambio l'outline del mio personaggio a quella della camminata -> più grossa e tozza
-          sprite.mustChangeOutlineToWalk = false
+          --changeOutline("walk") --cambio l'outline del mio personaggio a quella della camminata -> più grossa e tozza
+          --sprite.mustChangeOutlineToWalk = false
         end
         if(sprite.x < 0) then
           gameOver()
@@ -491,7 +495,7 @@ function scene:show( event )
         end	
       end
       ----------------------------------------------------------
-      function changeOutline(phase)	
+      --[[function changeOutline(phase)	
         if(tostring(phase) == "walk") then	
             sprite:setSequence("walking")	
             physics.removeBody(sprite)	
@@ -503,9 +507,10 @@ function scene:show( event )
             --physics.removeBody(sprite)	
             --physics.addBody(sprite, { outline=outlineSpriteJumping, density=4, bounce=0, friction=1})    --sprite diventa corpo con fisica	
             sprite.gravityScale = 3	
+            --sprite.jumping = true
             sprite.isFixedRotation = true --rotazione bloccata	
             end	
-         end
+         end]]--
 
       -- }
       --bottone per uscire dal livello e tornare al menu del livelli
@@ -598,13 +603,13 @@ function scene:show( event )
 
       function touchListener(event)
         if ( event.phase == "ended" ) then --è finito il processo di touch dello sschermo
-          if(event.x >= 0 ) and (event.x <= display.actualContentWidth/2) and (not sprite.isJumping) then
+          if ((event.x >= 0 ) and (event.x <= display.actualContentWidth/2) and (not sprite.isJumping) )then
+            print("dentrissimo")
             sprite:setLinearVelocity(0,- 1050)
             sprite.isJumping = true -- se ho toccato imposto la variabile isJumping del mio personaggio a true
             sprite:setSequence("jumping") --lo sprite si muove con animazione jumping
             sprite:play()
-            --changeOutline("jump") --cambio l'outline del personaggio in modo da renderlo più 'corto'
-            sprite.mustChangeOutlineToWalk = true
+            --sprite.mustChangeOutlineToWalk = true
             print(sprite.x.."è la posizione del mio sprite")
           elseif (event.x > display.actualContentWidth / 2) and (event.x <= display.contentWidth) then
             --ho cliccato sulla parte destra dello shcermo, devo sparare
@@ -635,8 +640,8 @@ function scene:show( event )
           spine:play()
           group_elements:insert(spine)
           spine.x = display.actualContentWidth + 150
-          spine.y = ground.y - 100
-          local outlineSpine = graphics.newOutline(4, spineSheet, 5)
+          spine.y = ground.y - 150
+          local outlineSpine = graphics.newOutline(9, spineSheet, 5)
           physics.addBody(spine, { outline=outlineSpine, density=1, bounce=0, friction=1})
           spine.isBullet = true
           spine.isSensor = true
@@ -754,12 +759,12 @@ function updateHighScore(scoreCount) --funzione che serve per aggiornare l'high 
   local path = system.pathForFile( "data.db", system.DocumentsDirectory )
   local db = sqlite3.open( path )
   local levels = {} --creo una  tabella per memorizzare i dati che mi servrà per scegliere se il punteggio è un record o no
-  for row in db:nrows( "SELECT level, scoreLevel"..localLevel.." FROM levels" ) do
+  for row in db:nrows( "SELECT level, scoreLevel3 FROM levels" ) do
     levels[#levels+1] =
     {
       --FirstName = row.FirstName,
       level = row.level,
-      scoreLevel = row.scoreLevel2
+      scoreLevel = row.scoreLevel3
     }
     local oldScore= levels[1].scoreLevel --salvo il punteggio che è già presente all'interno del database
     local levelReached = levels[1].level --mi scrivo il livello a cui è arrivato l'utente all'interno del gioco, se è l'1 allora aggiorneremo a 2 e gli permetteremo di fare un nuovo livello
