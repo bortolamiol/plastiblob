@@ -27,7 +27,6 @@ local gameFinished
 local newTimerOut
 local nextScene = "menu-levels"
 local crunchSound = audio.loadSound("MUSIC/crunch.mp3") --carico suono "crunch"
-local audioGameOver = audio.loadSound("MUSIC/PERDENTE.mp3") --carico suono "gameover"
 function scene:create( event )
 
   -- Called when the scene's view does not exist.
@@ -328,8 +327,9 @@ function scene:show( event )
             stop = 1
             print("mi sono scontrato col nemico")
             audio.pause(crunchSound) --blocco l'audio crunch nel caso stesse suonando
+            local audiogameover = audio.loadSound("MUSIC/PERDENTE.mp3") --carico suono "gameover"
             audio.setVolume(0.03)
-            audio.play(audioGameOver) --faccio partire l'audio game over
+            audio.play(audiogameover) --faccio partire l'audio game over
             resetScene("all")
             composer.gotoScene( "levels.gameover", options )
           end
@@ -584,7 +584,6 @@ function resetScene( tipo)
     composer.isAudioPlayingMenu=0; 
     composer.isAudioPlaying=0;
     
-    audio.pause(crunchSound) --blocco l'audio crunch nel caso stesse suonando
     audio.dispose(crunchSound) --lo elimino dalla memoria
     
     timer.cancel( gameLoop )
