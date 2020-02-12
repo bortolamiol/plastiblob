@@ -27,11 +27,11 @@ function scene:show( event )
 		print("entrato")
 		local backgroundImage = self.view
 		local menu = self.view
-		local musicTrack1 = audio.loadStream("MUSIC/THEME.mp3")
-		--se audio non è già avviato, fallo partire
-		--[[composer.isAudioPlaying
-		composer.isAudioPlayingMenu--]]
+		
+		local musicTrack1 = audio.loadStream("MUSIC/THEME.mp3") --carico musica "tema"
 		audio.setVolume(0.2)
+		
+		--controllo se c'è già dell'audio che suona
 		if (composer.isAudioPlayingMenu==1) then
 			print("channel 1 sta già suonando, non fare nulla")
 		elseif (composer.isAudioPlaying==0) then
@@ -39,7 +39,6 @@ function scene:show( event )
 			composer.isAudioPlaying=1
 			print("faccio partire audio da levels nel channel 2!")
 		end
-		--print(_G.isAudioPlayingMenu.." significa lo stato dell'audio nel menu 1")
 		
 		--creo una variabile che contenga i livelli a cui sono arrivato, se non ho passato nessun livello partirà da 1
 		local livellicompletati 
@@ -75,7 +74,7 @@ function scene:show( event )
 					scoreLevel6 = row.scoreLevel6,
 					scoreLevel7 = row.scoreLevel7,
 					scoreLevel8 = row.scoreLevel8,
-					print("Livello: " ..row.level .. "  || 1: " ..row.scoreLevel1 .. " || 2: " ..row.scoreLevel2 .. " || 3: " ..row.scoreLevel3 .. " || 4: " ..row.scoreLevel4 .. " || 5: " ..row.scoreLevel5 .. " || 6: " ..row.scoreLevel6 .. " || 7: " ..row.scoreLevel7 )--" || 8: " ..row.scoreLevel8) 
+					print("Livello: " ..row.level .. "  || 1: " ..row.scoreLevel1 .. " || 2: " ..row.scoreLevel2 .. " || 3: " ..row.scoreLevel3 .. " || 4: " ..row.scoreLevel4 .. " || 5: " ..row.scoreLevel5 .. " || 6: " ..row.scoreLevel6 .. " || 7: " ..row.scoreLevel7 .. " || 8: " ..row.scoreLevel8) 
 				}
 				livellicompletati = levels[1].level		
 			end
@@ -123,7 +122,6 @@ function scene:show( event )
 					composer.gotoScene( leveltargetpath, "fade", 500 )
 					audio.stop();
 					audio.dispose( musicTrack1 )
-					print("audio disposato")
 				end
 				return true
 			end
@@ -198,8 +196,6 @@ function scene:hide( event )
 		-- INSERT code here to pause the scene
 		-- e.g. stop timers, stop animation, unload sounds, etc.)
 		audio.dispose( musicTrack1 )
-		_G.audioPlaying = 0
-		print("ho aggiornato audioPlaying")
 	elseif phase == "did" then
 		-- Called when the scene is now off screen
 		--composer.removeScene( "menu-levels" )
@@ -209,9 +205,6 @@ end
 function scene:destroy( event )
 	local sceneGroup = self.view
 	audio.dispose( musicTrack1 )
-	
-	--_G.audioPlaying = 0
-	--print("ho aggiornato audioPlaying")
 	-- Called prior to the removal of scene's "view" (sceneGroup)
 	-- 
 	-- INSERT code here to cleanup the scene

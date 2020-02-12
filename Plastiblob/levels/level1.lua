@@ -26,7 +26,8 @@ local scoreCount    --variabile conteggio punteggio iniziale
 local gameFinished
 local newTimerOut
 local nextScene = "menu-levels"
-local crunchSound = audio.loadSound("MUSIC/crunch.mp3")
+local crunchSound = audio.loadSound("MUSIC/crunch.mp3") --carico suono "crunch"
+local audioGameOver = audio.loadSound("MUSIC/PERDENTE.mp3") --carico suono "gameover"
 function scene:create( event )
 
   -- Called when the scene's view does not exist.
@@ -314,8 +315,8 @@ function scene:show( event )
           --tutte le informazioni dell'elemento che ho toccato le troviamo dentro event.other
           if(event.other.name ==  "plasticbag") then --mi sono scontrato con il sacchetto
             audio.setVolume(0.03)
-            audio.play(crunchSound)
-            scoreCount = scoreCount+1;
+            audio.play(crunchSound) --fai partire il suono "crunch"
+            scoreCount = scoreCount+1; --aggiorno lo score
             scoreText.text = scoreCount.."/"..plasticToCatch
             Runtime:removeEventListener("enterFrame", event.other) --rimuovo il listener dello scroll, così non si muove più
             local indexToRemove = table.indexOf(table_plasticbag, event.other ) --trovo l'indice che ha all'interno della tabella dei sacchetti di plastica
@@ -326,11 +327,9 @@ function scene:show( event )
           if(event.other.name ==  "enemy") then
             stop = 1
             print("mi sono scontrato col nemico")
-            -- audio
-            audio.pause(crunchSound)
+            audio.pause(crunchSound) --blocco l'audio crunch nel caso stesse suonando
             audio.setVolume(0.03)
-            local audiogameover = audio.loadSound("MUSIC/PERDENTE.mp3")
-            audio.play(audiogameover)
+            audio.play(audioGameOver) --faccio partire l'audio game over
             resetScene("all")
             composer.gotoScene( "levels.gameover", options )
           end
@@ -343,7 +342,7 @@ function scene:show( event )
       function sprite.touch( self,event)
         vx, vy = sprite:getLinearVelocity()
         if( event.phase == "began" and not self.isJumping ) then
-          self:setLinearVelocity(0,- 1650)
+          self:setLinearVelocity(0,- 1650) --salto in y
           self.isJumping = true -- se ho toccato imposto la variabile isJumping del mio personaggio a true
           self:setSequence("jumping") --lo sprite si muove con animazione jumping
           self:play()
@@ -362,7 +361,6 @@ function scene:show( event )
         if(event.other.name == "ground") then
             self.isJumping = false
         end
-        --print("Jumped @ ", system.getTimer())
       end
       sprite.preCollision = preCollisionEvent
       sprite:addEventListener( "preCollision" )
@@ -385,7 +383,7 @@ function scene:show( event )
         print("posizione in x dello sprite: " .. tostring(sprite.x))
         
         local vx, vy = sprite:getLinearVelocity()
-        if(vy > 800) and (sprite.isJumping) then --se sto tornando a terra cambio l'outline e il mio corpo in walking
+        if(vy > 1000) and (sprite.isJumping) then --se sto tornando a terra cambio l'outline e il mio corpo in walking
             print(vy)
             if(sprite.mustChangeOutlineToWalk) then --ci entrà solo 1 volta per salto
                 changeOutline("walk")
@@ -582,11 +580,12 @@ end
 
 function resetScene( tipo)
   if tipo == "gameOver" then
-    
-    composer.isAudioPlayingMenu =0;
+    --resetto le variabili per capire se sta suonando la musica di background nel menu o nel menu levels
+    composer.isAudioPlayingMenu=0; 
     composer.isAudioPlaying=0;
-  
-    audio.dispose(crunchSound)
+    
+    audio.pause(crunchSound) --blocco l'audio crunch nel caso stesse suonando
+    audio.dispose(crunchSound) --lo elimino dalla memoria
     
     timer.cancel( gameLoop )
     timer.cancel( callingEnemies )
@@ -611,9 +610,12 @@ function resetScene( tipo)
       table_plasticbag[i] = nil        -- Nil Out Table Instance
     end
   elseif tipo == "gamefinished" then
-
-    audio.dispose(crunchSound)
-    print("audio disposato nel livello 1")
+    --resetto le variabili per capire se sta suonando la musica di background nel menu o nel menu levels
+    composer.isAudioPlayingMenu=0; 
+    composer.isAudioPlaying=0;
+    
+    audio.pause(crunchSound) --blocco l'audio crunch nel caso stesse suonando
+    audio.dispose(crunchSound) --lo elimino dalla memoria
 
     --ELIMINO I LISTENERS
     Runtime:removeEventListener("enterFrame", spriteScrollToCastle)
