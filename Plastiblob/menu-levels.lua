@@ -75,7 +75,7 @@ function scene:show( event )
 					scoreLevel6 = row.scoreLevel6,
 					scoreLevel7 = row.scoreLevel7,
 					scoreLevel8 = row.scoreLevel8,
-					print("Livello: " ..row.level .. "  || 1: " ..row.scoreLevel1 .. " || 2: " ..row.scoreLevel2 .. " || 3: " ..row.scoreLevel3 .. " || 4: " ..row.scoreLevel4 .. " || 5: " ..row.scoreLevel5 .. " || 6: " ..row.scoreLevel6 .. " || 7: " ..row.scoreLevel7 .. " || 8: " ..row.scoreLevel8) 
+					print("Livello: " ..row.level .. "  || 1: " ..row.scoreLevel1 .. " || 2: " ..row.scoreLevel2 .. " || 3: " ..row.scoreLevel3 .. " || 4: " ..row.scoreLevel4 .. " || 5: " ..row.scoreLevel5 .. " || 6: " ..row.scoreLevel6 .. " || 7: " ..row.scoreLevel7 )--" || 8: " ..row.scoreLevel8) 
 				}
 				livellicompletati = levels[1].level		
 			end

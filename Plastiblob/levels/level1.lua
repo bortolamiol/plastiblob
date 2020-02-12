@@ -583,7 +583,7 @@ end
 function resetScene( tipo)
   if tipo == "gameOver" then
     
-    --composer.isAudioPlayingMenu =0;
+    composer.isAudioPlayingMenu =0;
     composer.isAudioPlaying=0;
   
     audio.dispose(crunchSound)
