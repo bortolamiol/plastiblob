@@ -25,7 +25,7 @@ local castle
 local platform --variabile che conterrà al suo interno l'immagine della piattaforma che sarà visualizzata nel gioco
 local callingPlasticbag
 local timeplayed  --varaiabile che misura da quanti secondi sono all'interno del gioco e farà cambiare la velocità
-local timeToPlay = 70 --variabile che conterrà quanto l'utente dovrà sopravvivere all'interno del gioco
+local timeToPlay = 60 --variabile che conterrà quanto l'utente dovrà sopravvivere all'interno del gioco
 local scoreCount    --variabile conteggio punteggio iniziale
 local gameFinished
 local newTimerOut
@@ -114,13 +114,13 @@ function scene:show( event )
 
       local frame_speed = 20 --questa sarà la velocità dello scorrimento del nostro sfondo, in base a questa velocità alzeremo anche quella del gioco
 
-      local time_speed_min = 30 -- ogni quanti millisecondi verranno chiamate le funzioni di loop (esempio di sfondo group_background)
+      local time_speed_min = 25 -- ogni quanti millisecondi verranno chiamate le funzioni di loop (esempio di sfondo group_background)
       local time_speed_max = 10 --massimo di velocità che time_speed può raggiungere
 
       local spriteFrameSpeed = 800 --velocità del movimento delle gambe dello sprite [250 - 800]
       local spriteFrameSpeed_max = 200 --velocità del movimento delle gambe dello sprite [250 - 800]
 
-      local plasticToCatch = 10
+      local plasticToCatch = 6
       ------------------------------------------------------------
       --}
       --VARIABILI PER GLI ELEMENTI DELLO SCHERMO{
@@ -145,22 +145,22 @@ function scene:show( event )
       --PERSONAGGIO DEL GIOCO
       local spriteWalkingSheetData =
       {
-        width=200,
-        height=200,
+        width=160,
+        height=160,
         numFrames=8,
-        sheetContentWidth=1600,
-        sheetContentHeight=200
+        sheetContentWidth=1280,
+        sheetContentHeight=160
       }
 
       local spriteWalkingSheet = graphics.newImageSheet( "immagini/livello-1/spritewalking.png", spriteWalkingSheetData )
       -- primo sprite per il personaggio che salta
       local spriteJumpingSheetData =
       {
-        width=200,
-        height=200,
+        width=160,
+        height=160,
         numFrames=8,
-        sheetContentWidth=1600,
-        sheetContentHeight=200
+        sheetContentWidth=1280,
+        sheetContentHeight=160
       }
 
       local spriteJumpingSheet = graphics.newImageSheet( "immagini/livello-1/spritejump.png", spriteJumpingSheetData )
@@ -185,13 +185,22 @@ function scene:show( event )
       sprite.mustChangeOutlineToWalk = false --variabile che mi servirà per  cambiare l'outline del personaggio da jumping a walking
 
       -- PRIMO NEMICO
-      local enemyWalkingSheetData = { width=200, height=200, numFrames=3, sheetContentWidth=600, sheetContentHeight=200 }
-      local enemyWalkingSheet = graphics.newImageSheet( "immagini/livello-3/ratto.png", enemyWalkingSheetData )
+      local enemyWalkingSheetData = { width=160, height=160, numFrames=8, sheetContentWidth=1280, sheetContentHeight=160 }
+      local enemyWalkingSheet = graphics.newImageSheet( "immagini/livello-1/zombiewalking.png", enemyWalkingSheetData )
       local enemyData = {
-        { name="walking", sheet=enemyWalkingSheet, start=1, count=3, time=800, loopCount=0 }
+        { name="walking", sheet=enemyWalkingSheet, start=1, count=8, time=800, loopCount=0 }
       }
       local enemyTimeSpawnMin = 6000	
       local enemyTimeSpawnMax  = 6000	
+
+      -- NEMICO PIPISTRELLO
+      local batWalkingSheetData = { width=200, height=200, numFrames=4, sheetContentWidth=800, sheetContentHeight=200 }
+      local batWalkingSheet = graphics.newImageSheet( "immagini/livello-3/bat.png", batWalkingSheetData )
+      local batData = {
+        { name="walking", sheet=batWalkingSheet, start=1, count=4, time=200, loopCount=0 }
+      }
+      local batTimeSpawnMin = 6000	
+      local batTimeSpawnMax  = 6000	
 
       -- SACCHETTO IN PLASTICA
       local plasticbagSheetData = { width=130, height=130, numFrames=4, sheetContentWidth=520, sheetContentHeight=130 }
@@ -250,7 +259,7 @@ function scene:show( event )
       end
 
       ------------------------------------------------
-      -- FUNZIONI PER I NEMICI {
+      -- FUNZIONI PER IL PRIMO NEMICO {
       local function enemyScroll(self, event)
         --fa scorrere il nemico nello schermo
         if stop == 0 then
@@ -258,19 +267,31 @@ function scene:show( event )
         end
       end
       ------------------------------------------------
-      local function createEnemies()
+      local function createEnemies(type)
         --crea un oggetto di un nuovo sprite nemico e lo aggiunge alla tabella enemies[]
         --da implementare meglio, mi faccio passare che tipo di nemico devo inserire
-        local enemy = display.newSprite( enemyWalkingSheet, enemyData )
+        local enemy 
+        if(type == "rat") then
+          enemy = display.newSprite( enemyWalkingSheet, enemyData )
+          enemy.x = display.actualContentWidth  + 80
+          enemy.y = ground.y-150
+          frameIndexNemico = 1;
+          local outlineNemico = graphics.newOutline(5, enemyWalkingSheet, frameIndexNemico)
+          physics.addBody(enemy, { outline=outlineNemico, density=5, bounce=0, friction=1})
+          enemy.bodyType = "dynamic"
+        elseif (type == "bat") then
+          enemy = display.newSprite( batWalkingSheet, batData )
+          enemy.x = display.actualContentWidth  + 10
+          enemy.y = (display.contentHeight / 2) - 90
+          frameIndexNemico = 1;
+          local outlineNemico = graphics.newOutline(5, batWalkingSheet, frameIndexNemico)
+          physics.addBody(enemy, { outline=outlineNemico, density=5, bounce=0, friction=1})
+          enemy.bodyType = "static"
+        end
         enemy.name = "enemy"
         enemy:play()
         group_elements:insert(enemy)
-        enemy.x = display.actualContentWidth  + 10
-        enemy.y = ground.y-150
-        frameIndexNemico = 1;
-        local outlineNemico = graphics.newOutline(5, enemyWalkingSheet, frameIndexNemico)
-        physics.addBody(enemy, { outline=outlineNemico, density=5, bounce=0, friction=1})
-        enemy.bodyType = "dynamic"
+        
         enemy.isFixedRotation = true
         enemy.gravityScale = 5
         table.insert(enemies, enemy)
@@ -279,7 +300,23 @@ function scene:show( event )
       ------------------------------------------------
       local function enemiesLoop()
         if(stopCreatingEnemies == 0) then
-          enemy = createEnemies()
+          enemy = createEnemies("rat")
+          enemy.enterFrame = enemyScroll
+          Runtime:addEventListener("enterFrame",enemy)
+          for i,thisEnemy in ipairs(enemies) do
+            if thisEnemy.x < -200 then
+              Runtime:removeEventListener("enterFrame",thisEnemy)
+              display.remove(thisEnemy)
+              table.remove(enemies,i)
+            end
+          end
+        end
+      end
+      --}
+      ------------------------------------------------
+      local function enemiesBatLoop()
+        if(stopCreatingEnemies == 0) then
+          enemy = createEnemies("bat")
           enemy.enterFrame = enemyScroll
           Runtime:addEventListener("enterFrame",enemy)
           for i,thisEnemy in ipairs(enemies) do
@@ -393,8 +430,9 @@ function scene:show( event )
         sprite:play()
         
         local vx, vy = sprite:getLinearVelocity()
-        if(vy > 200) and (sprite.isJumping) then --se sto tornando a terra cambio l'outline e il mio corpo in walking
-            if(sprite.mustChangeOutlineToWalk) then --ci entrà solo 1 volta per salto
+        if(vy > 5) and (sprite.isJumping) then --se sto tornando a terra cambio l'outline e il mio corpo in walking
+        --print(tostring(vy))  
+          if(sprite.mustChangeOutlineToWalk) then --ci entrà solo 1 volta per salto
                 changeOutline("walk") --cambio l'outline del mio personaggio a quella della camminata -> più grossa e tozza
                 sprite.mustChangeOutlineToWalk = false
             end
@@ -569,6 +607,7 @@ function scene:show( event )
             sprite.isJumping = true -- se ho toccato imposto la variabile isJumping del mio personaggio a true
             sprite:setSequence("jumping") --lo sprite si muove con animazione jumping
             sprite:play()
+            
             changeOutline("jump") --cambio l'outline del personaggio in modo da renderlo più 'corto'
             sprite.mustChangeOutlineToWalk = true
           elseif (event.x > display.actualContentWidth / 2) and (event.x <= display.contentWidth) then
@@ -633,7 +672,6 @@ function scene:show( event )
             --fa scorrere il nemico nello schermo
             if stop == 0 then
               self.x = self.x - (enemySpeed*2)
-              self.y = (display.contentHeight / 2) - 20
             end
           end
           ------------------------------------------------
@@ -644,8 +682,8 @@ function scene:show( event )
             platform.name = "platform"
             group_elements:insert(platform)
             platform.x = display.actualContentWidth + 200
-            platform.y = (display.contentHeight / 2) + 40
-            local outlinePlatform = graphics.newOutline(5, "immagini/livello-3/platform.png")
+            platform.y = (display.contentHeight / 2) + 60
+            local outlinePlatform = graphics.newOutline(6, "immagini/livello-3/platform.png")
             physics.addBody(platform, "static", { outline=outlinePlatform, bounce=0, friction=1 } )
             print("creata una piattaforma")
             return platform
@@ -668,12 +706,11 @@ function scene:show( event )
       --PARTE FINALE: richiamo le funzioni e aggiungo gli elementi allo schermo e ai gruppi
       timeplayed = timer.performWithDelay( 1000, increaseGameSpeed, 0 )
       gameLoop = timer.performWithDelay( time_speed_min, loop, 0 )
-      callingEnemies = timer.performWithDelay( (timeToPlay/6)*1000, enemiesLoop, 0 )
+      callingEnemies = timer.performWithDelay( 5000, enemiesLoop, 0 )
+      callingBats = timer.performWithDelay( 11000, enemiesBatLoop, 0 )
       callingPlasticbag = timer.performWithDelay( (timeToPlay/plasticToCatch)*1000, plasticbagLoop, plasticToCatch)
-
-      -- AGGIUNTO NEL LIVELLO 3 --
-      callingPool = timer.performWithDelay( (timeToPlay/14)*1000, poolLoop, 0)
-      callingPlatform = timer.performWithDelay( platformTimeSpawn, platformLoop, 0)
+      callingPool = timer.performWithDelay( 3800, poolLoop, 0)
+      callingPlatform = timer.performWithDelay( 10000, platformLoop, 0)
     end
   end
 end
@@ -783,6 +820,7 @@ function resetScene( tipo)
     timer.cancel( timeplayed )
     timer.cancel( callingPool )
     timer.cancel( callingPlatform )
+    timer.cancel( callingBats )
     physics.pause()
 
     --ELIMINO I LISTENERS
@@ -837,6 +875,7 @@ function resetScene( tipo)
     timer.cancel( timeplayed )
     timer.cancel( callingPool )
     timer.cancel( callingPlatform )
+    timer.cancel( callingBats )
     --timer.cancel( newTimerOut )
     physics.pause()
 

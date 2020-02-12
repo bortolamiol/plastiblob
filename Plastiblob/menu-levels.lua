@@ -141,6 +141,8 @@ function scene:show( event )
 		local goback = display.newImageRect( "immagini/menu/goback.png", 100, 70 )
 		goback.anchorX = 0
 		goback.anchorY = 0
+		goback.y = 40
+		goback.x = 20
 
 		--funzione per tornare indietro nel menu
 		function goback:touch( event )
