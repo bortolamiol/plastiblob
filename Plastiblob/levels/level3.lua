@@ -25,7 +25,7 @@ local castle
 local platform --variabile che conterrà al suo interno l'immagine della piattaforma che sarà visualizzata nel gioco
 local callingPlasticbag
 local timeplayed  --varaiabile che misura da quanti secondi sono all'interno del gioco e farà cambiare la velocità
-local timeToPlay = 60 --variabile che conterrà quanto l'utente dovrà sopravvivere all'interno del gioco
+local timeToPlay = 70 --variabile che conterrà quanto l'utente dovrà sopravvivere all'interno del gioco
 local scoreCount    --variabile conteggio punteggio iniziale
 local gameFinished
 local newTimerOut
@@ -59,7 +59,7 @@ function scene:show( event )
     physics.start()
     -- Overlays collision outlines on normal display objects
     physics.setGravity( 0,20 )
-    physics.setDrawMode( "hybrid" )
+    --physics.setDrawMode( "hybrid" )
     -- The default Corona renderer, with no collision outlines
     --physics.setDrawMode( "normal" )
     -- Shows collision engine outlines only
@@ -190,8 +190,8 @@ function scene:show( event )
       local enemyData = {
         { name="walking", sheet=enemyWalkingSheet, start=1, count=6, time=800, loopCount=0 }
       }
-      local enemyTimeSpawnMin = 6000	
-      local enemyTimeSpawnMax  = 6000	
+      local enemyTimeSpawnMin = 13000
+      local enemyTimeSpawnMax  = 13500	
 
       -- NEMICO PIPISTRELLO
       local batWalkingSheetData = { width=200, height=200, numFrames=4, sheetContentWidth=800, sheetContentHeight=200 }
@@ -199,8 +199,8 @@ function scene:show( event )
       local batData = {
         { name="walking", sheet=batWalkingSheet, start=1, count=4, time=200, loopCount=0 }
       }
-      local batTimeSpawnMin = 6000	
-      local batTimeSpawnMax  = 6000	
+      local batTimeSpawnMin = 1500	
+      local batTimeSpawnMax  = 15000	
 
       -- SACCHETTO IN PLASTICA
       local plasticbagSheetData = { width=130, height=130, numFrames=4, sheetContentWidth=520, sheetContentHeight=130 }
@@ -208,7 +208,7 @@ function scene:show( event )
       local plasticbagData = {
         { name="plastic", sheet=plasticbagSheet, start=1, count=4, time=500, loopCount=0 }
       }
-      local plasticbagTimeSpawn = 5000
+      local plasticbagTimeSpawn = 9000
 
       --CASTELLO DI SABBIA IN CUI ENTRERO' A FINE LIVELLO
       castle = display.newImageRect( "immagini/livello-2/last-destination.png", 700, 700 )
@@ -239,14 +239,14 @@ function scene:show( event )
       local spineData = {
         { name="spine", sheet=spineSheet, start=1, count=9, time=800, loopCount=0 }
       }
-      local spineTimeSpawn = 7000
+      local spineTimeSpawn = 7500
 
       -- PIATTAFORMA 
      -- platform = display.newImageRect( "immagini/livello-2/platform.png", 320, 225 )
      -- platform.x = display.actualContentWidth + 800
       --platform.y = display.contentHeight / 2
       --group_castle:insert(platform)
-      local platformTimeSpawn = 10000
+      local platformTimeSpawn = 20000
       --FUNZIONI {
 
       local function moveBackground(self)
@@ -710,7 +710,7 @@ function scene:show( event )
       callingBats = timer.performWithDelay( 12000, enemiesBatLoop, 0 )
       callingPlasticbag = timer.performWithDelay( (timeToPlay/plasticToCatch)*1000, plasticbagLoop, plasticToCatch)
       callingSpine = timer.performWithDelay( 5000, spineLoop, 0)
-      callingPlatform = timer.performWithDelay( 11000, platformLoop, 0)
+      callingPlatform = timer.performWithDelay( 10100, platformLoop, 0)
     end
   end
 end
