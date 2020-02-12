@@ -120,7 +120,7 @@ function scene:show( event )
       local spriteFrameSpeed = 800 --velocità del movimento delle gambe dello sprite [250 - 800]
       local spriteFrameSpeed_max = 200 --velocità del movimento delle gambe dello sprite [250 - 800]
 
-      local plasticToCatch = 6
+      local plasticToCatch = 7
       ------------------------------------------------------------
       --}
       --VARIABILI PER GLI ELEMENTI DELLO SCHERMO{
@@ -179,7 +179,7 @@ function scene:show( event )
       local outlineSpriteWalking = graphics.newOutline(2, spriteWalkingSheet, frameIndex)   --outline personaggio
       local outlineSpriteJumping = graphics.newOutline(2, spriteJumpingSheet, 4)   --outline personaggio
       physics.addBody(sprite, { outline=outlineSpriteWalking, density=4, bounce=0, friction=1}) --sprite diventa corpo con fisica
-      sprite.gravityScale = 1
+      sprite.gravityScale = 3
       sprite.isFixedRotation = true --rotazione bloccata
       sprite.isJumping = false
       sprite.mustChangeOutlineToWalk = false --variabile che mi servirà per  cambiare l'outline del personaggio da jumping a walking
@@ -428,14 +428,11 @@ function scene:show( event )
         moveBackground(bg[1])
         moveBackground(bg[2])
         sprite:play()
-        
         local vx, vy = sprite:getLinearVelocity()
-        if(vy > 5) and (sprite.isJumping) then --se sto tornando a terra cambio l'outline e il mio corpo in walking
-        --print(tostring(vy))  
-          if(sprite.mustChangeOutlineToWalk) then --ci entrà solo 1 volta per salto
-                changeOutline("walk") --cambio l'outline del mio personaggio a quella della camminata -> più grossa e tozza
-                sprite.mustChangeOutlineToWalk = false
-            end
+        print(tostring(vy))  
+        if(vy < -5) and (sprite.isJumping) then --se sto tornando a terra cambio l'outline e il mio corpo in walking
+          changeOutline("walk") --cambio l'outline del mio personaggio a quella della camminata -> più grossa e tozza
+          sprite.mustChangeOutlineToWalk = false
         end
         if(sprite.x < 0) then
           gameOver()
@@ -503,8 +500,8 @@ function scene:show( event )
             sprite.isFixedRotation = true --rotazione bloccata	
         elseif (tostring(phase) == "jump") then	
             sprite:setSequence("jumping")	
-            physics.removeBody(sprite)	
-            physics.addBody(sprite, { outline=outlineSpriteJumping, density=4, bounce=0, friction=1})    --sprite diventa corpo con fisica	
+            --physics.removeBody(sprite)	
+            --physics.addBody(sprite, { outline=outlineSpriteJumping, density=4, bounce=0, friction=1})    --sprite diventa corpo con fisica	
             sprite.gravityScale = 3	
             sprite.isFixedRotation = true --rotazione bloccata	
             end	
@@ -602,14 +599,13 @@ function scene:show( event )
       function touchListener(event)
         if ( event.phase == "ended" ) then --è finito il processo di touch dello sschermo
           if(event.x >= 0 ) and (event.x <= display.actualContentWidth/2) and (not sprite.isJumping) then
-            --parte sinistra del display --> devo saltare
-            sprite:setLinearVelocity(0,-1650) -- applico una forza al personaggio per saltare
+            sprite:setLinearVelocity(0,- 1050)
             sprite.isJumping = true -- se ho toccato imposto la variabile isJumping del mio personaggio a true
             sprite:setSequence("jumping") --lo sprite si muove con animazione jumping
             sprite:play()
-            
-            changeOutline("jump") --cambio l'outline del personaggio in modo da renderlo più 'corto'
+            --changeOutline("jump") --cambio l'outline del personaggio in modo da renderlo più 'corto'
             sprite.mustChangeOutlineToWalk = true
+            print(sprite.x.."è la posizione del mio sprite")
           elseif (event.x > display.actualContentWidth / 2) and (event.x <= display.contentWidth) then
             --ho cliccato sulla parte destra dello shcermo, devo sparare
             if(scoreCount > 0) then
@@ -707,10 +703,10 @@ function scene:show( event )
       timeplayed = timer.performWithDelay( 1000, increaseGameSpeed, 0 )
       gameLoop = timer.performWithDelay( time_speed_min, loop, 0 )
       callingEnemies = timer.performWithDelay( 7000, enemiesLoop, 0 )
-      callingBats = timer.performWithDelay( 12000, enemiesBatLoop, 0 )
+      callingBats = timer.performWithDelay( 11000, enemiesBatLoop, 0 )
       callingPlasticbag = timer.performWithDelay( (timeToPlay/plasticToCatch)*1000, plasticbagLoop, plasticToCatch)
-      callingSpine = timer.performWithDelay( 5000, spineLoop, 0)
-      callingPlatform = timer.performWithDelay( 11000, platformLoop, 0)
+      callingSpine = timer.performWithDelay( 4000, spineLoop, 0)
+      callingPlatform = timer.performWithDelay( 10000, platformLoop, 0)
     end
   end
 end
