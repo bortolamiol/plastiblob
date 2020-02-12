@@ -27,6 +27,7 @@ local gameFinished
 local newTimerOut
 local nextScene = "menu-levels"
 local crunchSound = audio.loadSound("MUSIC/crunch.mp3") --carico suono "crunch"
+local musicLevel1
 function scene:create( event )
 
   -- Called when the scene's view does not exist.
@@ -43,6 +44,8 @@ function scene:create( event )
   sceneGroup:insert( group_background ) --inserisco il gruppo group_background dentro la scena
   sceneGroup:insert( group_castle ) --inserisco il gruppo castle sopra la scena e sotto i personaggi
   sceneGroup:insert( group_elements ) --inserisco il gruppo group_elements dentro la scena
+
+  musicLevel1 = audio.loadStream("MUSIC/livello1.mp3")
 end
 
 function scene:show( event )
@@ -62,6 +65,8 @@ function scene:show( event )
     --physics.setDrawMode( "debug" )
 
   elseif phase == "did" then
+    audio.play( musicLevel1, { channel=3, loops=-1 } ) --parte la musica del livello 1
+
     if(tutorial == 0) then
       --[[ DA FARE
 
@@ -508,6 +513,7 @@ function scene:hide( event )
   elseif phase == "did" then
     -- Called when the scene is now off screen
     --cancella tutto il contenuto all'interno di una scena senza salvare i contenuti
+    audio.stop( 3 ) --la musica del livello 1 si ferma
     local sceneToRemove = "levels.level"..localLevel --questo codice prende in modo dinamico la scena su cui siamo ed elimina gli elementi all'interno
     composer.removeScene( sceneToRemove)
   end
@@ -521,7 +527,7 @@ function scene:destroy( event )
   -- INSERT code here to cleanup the scene
   -- e.g. remove display objects, remove touch listeners, save state, etc.
   local sceneGroup = self.view
-
+  audio.dispose( musicLevel1)
 end
 ----------------------------------------------
 --FUNZIONE PER AGGIORNARE L'HIGHSCORE
