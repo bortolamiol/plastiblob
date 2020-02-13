@@ -640,7 +640,7 @@ function scene:show( event )
           group_elements:insert(spine)
           spine.x = display.actualContentWidth + 150
           spine.y = ground.y - 100
-          local outlineSpine = graphics.newOutline(4, spineSheet, 5)
+          local outlineSpine = graphics.newOutline(1, spineSheet, 5)
           physics.addBody(spine, { outline=outlineSpine, density=1, bounce=0, friction=1})
           spine.isBullet = true
           spine.isSensor = true
@@ -685,6 +685,7 @@ function scene:show( event )
             platform.y = (display.contentHeight / 2) + 40
             local outlinePlatform = graphics.newOutline(6, "immagini/livello-3/platform.png")
             physics.addBody(platform, "static", { outline=outlinePlatform, bounce=0, friction=1 } )
+            platform.collType = "passthru"
             print("creata una piattaforma")
             return platform
           end
@@ -702,6 +703,17 @@ function scene:show( event )
               end
             end
           end
+          
+         --[[ local function preCollisionEvent( self, event )
+ 
+            local collideObject = event.other
+            if ( collideObject.collType == "passthru" ) then
+               event.contact.isEnabled = false  --disable this specific collision
+            end
+          end
+          
+          sprite.preCollision = preCollisionEvent
+          sprite:addEventListener( "preCollision" ) --]]
 
       --PARTE FINALE: richiamo le funzioni e aggiungo gli elementi allo schermo e ai gruppi
       timeplayed = timer.performWithDelay( 1000, increaseGameSpeed, 0 )
