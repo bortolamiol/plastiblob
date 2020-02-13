@@ -24,6 +24,7 @@ local callingEnemies
 local castle
 local platform --variabile che conterrà al suo interno l'immagine della piattaforma che sarà visualizzata nel gioco
 local callingPlasticbag
+local callingSpine
 local timeplayed  --varaiabile che misura da quanti secondi sono all'interno del gioco e farà cambiare la velocità
 local timeToPlay = 70 --variabile che conterrà quanto l'utente dovrà sopravvivere all'interno del gioco
 local scoreCount    --variabile conteggio punteggio iniziale
@@ -58,7 +59,7 @@ function scene:show( event )
     local physics = require("physics")
     physics.start()
     -- Overlays collision outlines on normal display objects
-    physics.setGravity( 0,20 )
+    physics.setGravity( 0,41 )
     physics.setDrawMode( "hybrid" )
     -- The default Corona renderer, with no collision outlines
     --physics.setDrawMode( "normal" )
@@ -108,13 +109,13 @@ function scene:show( event )
 
       ------------------------------------------------------------
       -- VARIABILI MOLTO IMPORTANTI PER IL GIOCO: VELOCITA' DI GIOCO
-      local enemySpeed_max = 6.6 -- massima velocità di spostamento del nemico
+      local enemySpeed_max = 8 -- massima velocità di spostamento del nemico
       local enemySpeed_min = 4-- minima velocità di spostamento del nemico
       local enemySpeed = enemySpeed_min --velocità di spostamento del nemico
 
-      local frame_speed = 20 --questa sarà la velocità dello scorrimento del nostro sfondo, in base a questa velocità alzeremo anche quella del gioco
+      local frame_speed = 14 --questa sarà la velocità dello scorrimento del nostro sfondo, in base a questa velocità alzeremo anche quella del gioco
 
-      local time_speed_min = 25 -- ogni quanti millisecondi verranno chiamate le funzioni di loop (esempio di sfondo group_background)
+      local time_speed_min = 20 -- ogni quanti millisecondi verranno chiamate le funzioni di loop (esempio di sfondo group_background)
       local time_speed_max = 10 --massimo di velocità che time_speed può raggiungere
 
       local spriteFrameSpeed = 800 --velocità del movimento delle gambe dello sprite [250 - 800]
@@ -206,7 +207,7 @@ function scene:show( event )
       local plasticbagSheetData = { width=130, height=130, numFrames=4, sheetContentWidth=520, sheetContentHeight=130 }
       local plasticbagSheet = graphics.newImageSheet( "immagini/livello-1/sacchetto.png", plasticbagSheetData )
       local plasticbagData = {
-        { name="plastic", sheet=plasticbagSheet, start=1, count=4, time=500, loopCount=0 }
+        { name="plastic", sheet=plasticbagSheet, start=1, count=4, time=460, loopCount=0 }
       }
       local plasticbagTimeSpawn = 9000
 
@@ -235,7 +236,7 @@ function scene:show( event )
       
       -- POZZA D'ACQUA ASSASSINA --
       local spineSheetData = { width=200, height=200, numFrames=9, sheetContentWidth=1800, sheetContentHeight=200 }
-      local spineSheet = graphics.newImageSheet( "immagini/livello-3/spine.png", spineSheetData )
+      local spineSheet = graphics.newImageSheet( "immagini/livello-3/spine2.png", spineSheetData )
       local spineData = {
         { name="spine", sheet=spineSheet, start=1, count=9, time=800, loopCount=0 }
       }
@@ -264,6 +265,9 @@ function scene:show( event )
         --fa scorrere il nemico nello schermo
         if stop == 0 then
           self.x = self.x - (enemySpeed*2)
+          if(self.id == 1) then --se sono il pipistrello allora mantengo l'altezza in y
+            self.y = (display.contentHeight / 2) - 90
+          end
         end
       end
       ------------------------------------------------
@@ -276,17 +280,19 @@ function scene:show( event )
           enemy.x = display.actualContentWidth  + 200
           enemy.y = ground.y-150
           frameIndexNemico = 1;
-          local outlineNemico = graphics.newOutline(5, enemyWalkingSheet, frameIndexNemico)
+          enemy.id = 0
+          local outlineNemico = graphics.newOutline(6, enemyWalkingSheet, frameIndexNemico)
           physics.addBody(enemy, { outline=outlineNemico, density=5, bounce=0, friction=1})
           enemy.bodyType = "dynamic"
         elseif (type == "bat") then
           enemy = display.newSprite( batWalkingSheet, batData )
+          enemy.id = 1
           enemy.x = display.actualContentWidth  + 50
           enemy.y = (display.contentHeight / 2) - 90
           frameIndexNemico = 1;
           local outlineNemico = graphics.newOutline(5, batWalkingSheet, frameIndexNemico)
           physics.addBody(enemy, { outline=outlineNemico, density=5, bounce=0, friction=1})
-          enemy.bodyType = "static"
+          enemy.bodyType = "dynamic"
         end
         enemy.name = "enemy"
         enemy:play()
@@ -424,12 +430,10 @@ function scene:show( event )
       sprite:addEventListener( "preCollision" )
       ------------------------------------------------
       local function loop( event )
-        if(sprite.isJumping) then
-          print(sprite.isJumping)
-        end
         --qui dentro metteremo tutte le cose che necessitano di un loop all'interno del gioco
         --richiamo le due funzioni per muovere lo sfondo
         moveBackground(bg[1])
+        --print(bg[1].x)
         moveBackground(bg[2])
         sprite:play()
         local vx, vy = sprite:getLinearVelocity()
@@ -550,6 +554,7 @@ function scene:show( event )
         ------------------------------------------------
         -- Global collision handling
         function onBulletCollision( event )
+          print(tostring(event.other.name))
           if(tostring(event.other.name) == "enemy") then --se il proiettile si è scontrato contro un nemico allora..
             enemyKilled = event.other --salvo dentro enemyKilled l'indirizzo che mi porta al nemico ucciso
             --Riproduco l'animazione dell'esplosione nelle stesse coordinate in cui si trova il nemico nel momento della collisione
@@ -602,10 +607,10 @@ function scene:show( event )
         end
 
       function touchListener(event)
-        if ( event.phase == "ended" ) then --è finito il processo di touch dello sschermo
+        if ( event.phase == "began" ) then --è finito il processo di touch dello sschermo
           if ((event.x >= 0 ) and (event.x <= display.actualContentWidth/2) and (not sprite.isJumping) )then
             print("dentrissimo")
-            sprite:setLinearVelocity(0,- 1050)
+            sprite:setLinearVelocity(0,- 1650)
             sprite.isJumping = true -- se ho toccato imposto la variabile isJumping del mio personaggio a true
             sprite:setSequence("jumping") --lo sprite si muove con animazione jumping
             sprite:play()
@@ -613,7 +618,7 @@ function scene:show( event )
             print(sprite.x.."è la posizione del mio sprite")
           elseif (event.x > display.actualContentWidth / 2) and (event.x <= display.contentWidth) then
             --ho cliccato sulla parte destra dello shcermo, devo sparare
-            if(scoreCount > 0) then
+            if(scoreCount >= 0) then
               bulletsLoop()
               scoreCount = scoreCount - 1
               scoreText.text = scoreCount.."/"..plasticToCatch
@@ -628,7 +633,7 @@ function scene:show( event )
           --fa scorrere il nemico nello schermo
           if stop == 0 then
             self.x = self.x - (enemySpeed*2)
-            self.y = ground.y - 100
+            self.y = ground.y - 150
           end
         end
         ------------------------------------------------
@@ -641,7 +646,7 @@ function scene:show( event )
           group_elements:insert(spine)
           spine.x = display.actualContentWidth + 150
           spine.y = ground.y - 150
-          local outlineSpine = graphics.newOutline(9, spineSheet, 5)
+          local outlineSpine = graphics.newOutline(4, spineSheet, 3)
           physics.addBody(spine, { outline=outlineSpine, density=1, bounce=0, friction=1})
           spine.isBullet = true
           spine.isSensor = true
@@ -687,20 +692,22 @@ function scene:show( event )
             local outlinePlatform = graphics.newOutline(2, "immagini/livello-3/platform.png")
             physics.addBody(platform, "static", { outline=outlinePlatform, bounce=0, friction=1 } )
             platform.collType = "passthru"
-            print("creata una piattaforma")
+            --print("creata una piattaforma")
             return platform
           end
           ------------------------------------------------
           local function platformLoop()
-            platform = createPlatform()
-            platform.enterFrame = platformScroll
-            table.insert(table_platform, platform)
-            Runtime:addEventListener("enterFrame",platform)
-            for i,thisPlatform in ipairs(table_platform) do
-              if thisPlatform.x < -300 then
-                Runtime:removeEventListener("enterFrame",thisPlatform)
-                display.remove(thisPlatform)
-                table.remove(table_platform,i)
+            if(stopCreatingEnemies == 0 ) then
+              platform = createPlatform()
+              platform.enterFrame = platformScroll
+              table.insert(table_platform, platform)
+              Runtime:addEventListener("enterFrame",platform)
+              for i,thisPlatform in ipairs(table_platform) do
+                if thisPlatform.x < -300 then
+                  Runtime:removeEventListener("enterFrame",thisPlatform)
+                  display.remove(thisPlatform)
+                  table.remove(table_platform,i)
+                end
               end
             end
           end
@@ -719,11 +726,40 @@ function scene:show( event )
       --PARTE FINALE: richiamo le funzioni e aggiungo gli elementi allo schermo e ai gruppi
       timeplayed = timer.performWithDelay( 1000, increaseGameSpeed, 0 )
       gameLoop = timer.performWithDelay( time_speed_min, loop, 0 )
-      callingEnemies = timer.performWithDelay( 7000, enemiesLoop, 0 )
-      callingBats = timer.performWithDelay( 6500, enemiesBatLoop, 0 )
-      callingPlasticbag = timer.performWithDelay( (timeToPlay/plasticToCatch)*1000, plasticbagLoop, plasticToCatch)
-      callingSpine = timer.performWithDelay( 5000, spineLoop, 0)
-      callingPlatform = timer.performWithDelay( 10100, platformLoop, 0)
+
+      callingEnemies = {}
+      callingBats = {}
+      callingPlasticbag = {}
+      callingSpine = {}
+      callingPlatform = {}
+
+      --ratti 
+      callingEnemies[1] = timer.performWithDelay( 7000, enemiesLoop, 1 )
+      callingEnemies[2] = timer.performWithDelay( 32000, enemiesLoop, 0 )
+      callingEnemies[3] = timer.performWithDelay( 3000, enemiesLoop, 1 )
+      callingEnemies[4] = timer.performWithDelay( 18000, enemiesLoop, 1 )
+      callingEnemies[5] = timer.performWithDelay( 28000, enemiesLoop, 1 )
+
+      --pipistrelli
+      callingBats[1] = timer.performWithDelay( 6000, enemiesBatLoop, 0 )
+      callingBats[2] = timer.performWithDelay( 21800, enemiesBatLoop, 1 )
+      callingBats[3] = timer.performWithDelay( 12800, enemiesBatLoop, 1 )
+
+      --piattaforme 
+      callingPlatform[1] = timer.performWithDelay( 1000, platformLoop, 1) 
+      callingPlatform[2] = timer.performWithDelay( 25000, platformLoop, 1 )
+      callingPlatform[3] = timer.performWithDelay( 17000, platformLoop, 0)
+
+      --spine
+      callingSpine[1] = timer.performWithDelay( 5000, spineLoop, 0)
+      callingSpine[2] = timer.performWithDelay( 38000, spineLoop, 1)
+      callingSpine[3] = timer.performWithDelay( 11000, spineLoop, 0)
+      callingSpine[4] = timer.performWithDelay( 23000, spineLoop, 1)
+
+      --plastiche
+      callingPlasticbag[1] = timer.performWithDelay( (timeToPlay/plasticToCatch)*1000, plasticbagLoop, plasticToCatch)
+      
+      -- aggiungere 29, 36, 43, 44
     end
   end
 end
@@ -828,12 +864,12 @@ function resetScene( tipo)
   	
     audio.dispose(crunchSound)
     timer.cancel( gameLoop )
-    timer.cancel( callingEnemies )
-    timer.cancel( callingPlasticbag )
+    --timer.cancel( callingEnemies )
+    --timer.cancel( callingPlasticbag )
     timer.cancel( timeplayed )
-    timer.cancel( callingSpine )
-    timer.cancel( callingPlatform )
-    timer.cancel( callingBats )
+    --timer.cancel( callingSpine )
+   -- timer.cancel( callingPlatform )
+    --timer.cancel( callingBats )
     physics.pause()
 
     --ELIMINO I LISTENERS
@@ -845,6 +881,30 @@ function resetScene( tipo)
     Runtime:removeEventListener("enterFrame", bullet)
 
     --SVUOTO LE TABELLE
+    for i=1, #callingEnemies do
+      timer.cancel( callingEnemies[i] )
+      callingEnemies[i] = nil        -- Nil Out Table Instance
+    end
+    for i=1, #callingBats do
+      timer.cancel( callingBats[i] )
+      callingBats[i] = nil        -- Nil Out Table Instance
+    end
+    for i=1, #callingPlasticbag do
+      timer.cancel( callingPlasticbag[i] )
+      callingPlasticbag[i] = nil        -- Nil Out Table Instance
+    end
+    for i=1, #callingSpine do
+      timer.cancel( callingSpine[i] )
+      callingSpine[i] = nil        -- Nil Out Table Instance
+    end
+    for i=1, #callingPlatform do
+      timer.cancel( callingPlatform[i] )
+      callingPlatform[i] = nil        -- Nil Out Table Instance
+    end
+    for i=1, #callingBats do
+      timer.cancel( callingBats[i] )
+      callingBats[i] = nil        -- Nil Out Table Instance
+    end
     for i=1, #enemies do
       enemies[i]:removeSelf() -- Optional Display Object Removal
       enemies[i] = nil        -- Nil Out Table Instance
@@ -871,7 +931,7 @@ function resetScene( tipo)
     end
   elseif tipo == "gamefinished" then
     audio.dispose(crunchSound)	
-    print("audio disposato nel livello 1")
+    --print("audio disposato nel livello 1")
     --ELIMINO I LISTENERS
     Runtime:removeEventListener( "collision", onBulletCollision )
     Runtime:removeEventListener( "touch", touchListener )
@@ -883,16 +943,40 @@ function resetScene( tipo)
     Runtime:removeEventListener("enterFrame", bullet)
 
     timer.cancel( gameLoop )
-    timer.cancel( callingEnemies )
-    timer.cancel( callingPlasticbag )
+    --timer.cancel( callingEnemies )
+    --timer.cancel( callingPlasticbag )
     timer.cancel( timeplayed )
-    timer.cancel( callingSpine )
-    timer.cancel( callingPlatform )
-    timer.cancel( callingBats )
+    --timer.cancel( callingSpine )
+    --timer.cancel( callingPlatform )
+    --timer.cancel( callingBats )
     --timer.cancel( newTimerOut )
     physics.pause()
 
     --SVUOTO LE TABELLE
+    for i=1, #callingEnemies do
+      timer.cancel( callingEnemies[i] )
+      callingEnemies[i] = nil        -- Nil Out Table Instance
+    end
+    for i=1, #callingBats do
+      timer.cancel( callingBats[i] )
+      callingBats[i] = nil        -- Nil Out Table Instance
+    end
+    for i=1, #callingPlasticbag do
+      timer.cancel( callingPlasticbag[i] )
+      callingPlasticbag[i] = nil        -- Nil Out Table Instance
+    end
+    for i=1, #callingSpine do
+      timer.cancel( callingSpine[i] )
+      callingSpine[i] = nil        -- Nil Out Table Instance
+    end
+    for i=1, #callingPlatform do
+      timer.cancel( callingPlatform[i] )
+      callingPlatform[i] = nil        -- Nil Out Table Instance
+    end
+    for i=1, #callingBats do
+      timer.cancel( callingBats[i] )
+      callingBats[i] = nil        -- Nil Out Table Instance
+    end
     for i=1, #enemies do
       enemies[i]:removeSelf() -- Optional Display Object Removal
       enemies[i] = nil        -- Nil Out Table Instance
