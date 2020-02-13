@@ -40,25 +40,25 @@ function scene:show( event )
         --funzione per cambiare immagine
         function continua:touch( event )
             if event.phase == "ended" then
+                imagesToShow()
                 --grazie al nome dell'oggetto riesco a capire su quale immagine ho cliccato
                 print("uoooooo")
             end
         end
         continua:addEventListener( "touch", continua )
-
-        local imagesToShow = {}
-
-        for n=1 , 5 do
-            local imgpath
-			if n <= 5 then
-				imgpath = "immagini/livello-1/storia1"..n..".png"
-                n = n + 1
-            else
-                local leveltargetpath = "levels.level" .. nlevel;
-					composer.gotoScene( leveltargetpath, "fade", 500 )
-            end
-        end   
-
+        
+        function imagesToShow:touch( event )
+            if event.phase == "began" then
+                local imgpath
+			    if n <= 5 then
+				    imgpath = "immagini/livello-1/storia1"..n..".png"
+                    n = n + 1
+                else 
+				    local leveltargetpath = "levels.level" .. nlevel;
+                        composer.gotoScene( leveltargetpath, "fade", 500 )
+                end
+			end
+		end
     end
 end
  
