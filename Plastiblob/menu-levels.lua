@@ -118,7 +118,7 @@ function scene:show( event )
 				local nlevel = tostring(event.target.name)
 				--controllo se ho accesso al livello in quanto devo aver superato quello prima
 				if(tonumber(livellicompletati) >= tonumber(nlevel)) then
-					local leveltargetpath = "levels.level" .. nlevel;
+					local leveltargetpath = "levels.storylevel" .. nlevel;
 					composer.gotoScene( leveltargetpath, "fade", 500 )
 					audio.stop();
 					audio.dispose( musicTrack1 )
