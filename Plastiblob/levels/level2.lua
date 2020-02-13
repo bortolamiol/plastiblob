@@ -210,16 +210,16 @@ function scene:show( event )
       -- AGGIUNTO NEL LIVELLO 2 ---
 
       --PROIETTILE
-      local bulletSheetData = { width=160, height=160, numFrames=4, sheetContentWidth=640, sheetContentHeight=160 }
-      local bulletSheet = graphics.newImageSheet( "immagini/livello-1/plastic-bottle.png", bulletSheetData )
+      local bulletSheetData = { width=200, height=200, numFrames=3, sheetContentWidth=600, sheetContentHeight=200 }
+      local bulletSheet = graphics.newImageSheet( "immagini/livello-2/ecoproiettile.png", bulletSheetData )
       local bulletData = {
-        { name="plastic-bottle", sheet=plasticbagSheet, start=1, count=4, time=400, loopCount=0 }
+        { name="ecoproiettile", sheet=bulletSheet, start=1, count=3, time=400, loopCount=0 }
       }
       --ESPLOSIONE QUANDO SI COLPISCE IL NEMICO CON IL PROIETTILE
-      local explosionSheetData = { width=200, height=200, numFrames=20, sheetContentWidth=1000, sheetContentHeight=800 }
-      local explosionSheet = graphics.newImageSheet( "immagini/livello-2/explosion.png", explosionSheetData )
+      local explosionSheetData = { width=200, height=200, numFrames=12, sheetContentWidth=2400, sheetContentHeight=200 }
+      local explosionSheet = graphics.newImageSheet( "immagini/livello-1/explosion1.png", explosionSheetData )
       local explosionData = {
-        { name="explosion", sheet=explosionSheet, start=1, count=20, time=400, loopCount=1}
+        { name="explosion", sheet=explosionSheet, start=1, count=12, time=800, loopCount=1}
       }
 
       -- AGGIUNTO NEL LIVELLO 3 --
@@ -510,6 +510,7 @@ function scene:show( event )
         ------------------------------------------------
         -- Global collision handling
         function onBulletCollision( event )
+          print(event.other.name)
           if(tostring(event.other.name) == "enemy") then --se il proiettile si è scontrato contro un nemico allora..
             enemyKilled = event.other --salvo dentro enemyKilled l'indirizzo che mi porta al nemico ucciso
             --Riproduco l'animazione dell'esplosione nelle stesse coordinate in cui si trova il nemico nel momento della collisione
