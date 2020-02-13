@@ -1,9 +1,7 @@
 local composer = require( "composer" )
  
 local scene = composer.newScene()
-
-local imagesToShow = 5
-local n = 1
+local n
 
 
 -- -----------------------------------------------------------------------------------
@@ -16,7 +14,11 @@ function scene:create( event )
  
     local sceneGroup = self.view
     -- Code here runs when the scene is first created but has not yet appeared on screen
+    group_background = display.newGroup() --group_background conterrà la foto di sfondo che scrollerà
+    group_buttons = display.newGroup() --group_elements conterrà tutti gli altri elementi dello schermo: sprite del personaggio, nemici e bottoni per uscire dal gioco
     
+    sceneGroup:insert( group_background ) --inserisco il gruppo group_background dentro la scena
+    sceneGroup:insert( group_buttons ) 
 end
  
  
@@ -31,37 +33,39 @@ function scene:show( event )
  
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
-        
-        print(event.params.level)
-        print(event.params.imagetoshow)
-        local continua = display.newImageRect( "immagini/livello-1/storia1/continua.png", 100, 70 )
+        n=1
+        local leveltarget = event.params.level
+        local numImgs = tostring(event.params.imagetoshow)
+        local continua = display.newImageRect( group_buttons, "immagini/livello-1/storia/continua.png", 100, 70 )
         continua.anchorX = 0
         continua.anchorY = 0
         continua.y = 40
         continua.x = 20
     
+         
+        
         --funzione per cambiare immagine
         function continua:touch( event )
             if event.phase == "ended" then
-                imagesToShow()
-                --grazie al nome dell'oggetto riesco a capire su quale immagine ho cliccato
-                print("uoooooo")
+                n = n + 1
+                imagesToShow(n)
             end
         end
         continua:addEventListener( "touch", continua )
         
-        function imagesToShow:touch( event )
-            if event.phase == "began" then
-                local imgpath
-			    if n <= 5 then
-				    imgpath = "immagini/livello-1/storia1"..n..".png"
-                    n = n + 1
-                else 
-				    local leveltargetpath = "levels.level" .. nlevel;
-                        composer.gotoScene( leveltargetpath, "fade", 500 )
-                end
-			end
-		end
+        function imagesToShow( n )
+            local imgpath
+			if tonumber(n) <= tonumber(numImgs) then
+				imgpath = "immagini/livello-"..leveltarget.."/storia/"..n..".png"
+                local immagine = display.newImageRect(group_background,imgpath,1280,720)
+                immagine.anchorX = 0
+                immagine.anchorY = 0 
+            else 
+				local leveltargetpath = "levels.level" .. leveltarget;
+                composer.gotoScene( leveltargetpath, "fade", 500 )
+            end
+        end
+        imagesToShow( n )
     end
 end
  
