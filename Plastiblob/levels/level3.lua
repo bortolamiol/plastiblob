@@ -417,7 +417,7 @@ function scene:show( event )
       local function preCollisionEvent( self, event )
         local collideObject = event.other
         if ( collideObject.collType == "passthru" ) then
-          event.contact.isEnabled = false  --disable this specific collision
+          --event.contact.isEnabled = false  --disable this specific collision
         end
       end
       sprite.preCollision = preCollisionEvent
