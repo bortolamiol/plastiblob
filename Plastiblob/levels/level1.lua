@@ -77,8 +77,6 @@ function scene:show( event )
       ]]--
     elseif(tutorial == 1) then
       --VARIABILE CHE CONTIENE TUTTE LE INFORMAZIONI DEL LIVELLO
-      print(event.params.level)
-      print(event.params.imagetoshow)
       local options = {
         effect = "fade",
         time = 1000,
