@@ -123,7 +123,7 @@ function scene:show( event )
 					params = { level=nlevel, imagetoshow = "5"}
 				  }
 				if(tonumber(livellicompletati) >= tonumber(nlevel)) then
-					local leveltargetpath = "levels.level" .. nlevel;
+					local leveltargetpath = "levels.storylevel" .. nlevel;
 					composer.gotoScene( leveltargetpath, "fade", 500 )
 					audio.stop();
 					audio.dispose( musicTrack1 )
