@@ -117,6 +117,11 @@ function scene:show( event )
 				--grazie al nome dell'oggetto riesco a capire su quale immagine ho cliccato
 				local nlevel = tostring(event.target.name)
 				--controllo se ho accesso al livello in quanto devo aver superato quello prima
+				local options = {
+					effect = "fade",
+					time = 500,
+					params = { level=nlevel, imagetoshow = "5"}
+				  }
 				if(tonumber(livellicompletati) >= tonumber(nlevel)) then
 					local leveltargetpath = "levels.level" .. nlevel;
 					composer.gotoScene( leveltargetpath, "fade", 500 )
