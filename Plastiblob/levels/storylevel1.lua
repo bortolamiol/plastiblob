@@ -16,7 +16,7 @@ function scene:create( event )
  
     local sceneGroup = self.view
     -- Code here runs when the scene is first created but has not yet appeared on screen
- 
+    
 end
  
  
@@ -31,6 +31,9 @@ function scene:show( event )
  
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
+        
+        print(event.params.level)
+        print(event.params.imagetoshow)
         local continua = display.newImageRect( "immagini/livello-1/storia1/continua.png", 100, 70 )
         continua.anchorX = 0
         continua.anchorY = 0
