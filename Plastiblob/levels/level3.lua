@@ -684,8 +684,9 @@ function scene:show( event )
             group_elements:insert(platform)
             platform.x = display.actualContentWidth + 200
             platform.y = (display.contentHeight / 2) + 40
-            local outlinePlatform = graphics.newOutline(6, "immagini/livello-3/platform.png")
+            local outlinePlatform = graphics.newOutline(2, "immagini/livello-3/platform.png")
             physics.addBody(platform, "static", { outline=outlinePlatform, bounce=0, friction=1 } )
+            platform.collType = "passthru"
             print("creata una piattaforma")
             return platform
           end
@@ -703,6 +704,17 @@ function scene:show( event )
               end
             end
           end
+          
+         --[[ local function preCollisionEvent( self, event )
+ 
+            local collideObject = event.other
+            if ( collideObject.collType == "passthru" ) then
+               event.contact.isEnabled = false  --disable this specific collision
+            end
+          end
+          
+          sprite.preCollision = preCollisionEvent
+          sprite:addEventListener( "preCollision" ) --]]
 
       --PARTE FINALE: richiamo le funzioni e aggiungo gli elementi allo schermo e ai gruppi
       timeplayed = timer.performWithDelay( 1000, increaseGameSpeed, 0 )
