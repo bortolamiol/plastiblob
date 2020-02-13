@@ -239,14 +239,14 @@ function scene:show( event )
       local spineData = {
         { name="spine", sheet=spineSheet, start=1, count=9, time=800, loopCount=0 }
       }
-      local spineTimeSpawn = 7500
+      local spineTimeSpawn = 5000
 
       -- PIATTAFORMA 
      -- platform = display.newImageRect( "immagini/livello-2/platform.png", 320, 225 )
      -- platform.x = display.actualContentWidth + 800
       --platform.y = display.contentHeight / 2
       --group_castle:insert(platform)
-      local platformTimeSpawn = 20000
+      local platformTimeSpawn = 10100
       --FUNZIONI {
 
       local function moveBackground(self)
@@ -708,7 +708,7 @@ function scene:show( event )
       timeplayed = timer.performWithDelay( 1000, increaseGameSpeed, 0 )
       gameLoop = timer.performWithDelay( time_speed_min, loop, 0 )
       callingEnemies = timer.performWithDelay( 7000, enemiesLoop, 0 )
-      callingBats = timer.performWithDelay( 11000, enemiesBatLoop, 0 )
+      callingBats = timer.performWithDelay( 6500, enemiesBatLoop, 0 )
       callingPlasticbag = timer.performWithDelay( (timeToPlay/plasticToCatch)*1000, plasticbagLoop, plasticToCatch)
       callingSpine = timer.performWithDelay( 5000, spineLoop, 0)
       callingPlatform = timer.performWithDelay( 10100, platformLoop, 0)
