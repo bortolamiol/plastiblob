@@ -59,7 +59,7 @@ function scene:show( event )
     physics.start()
     -- Overlays collision outlines on normal display objects
     physics.setGravity( 0,20 )
-    --physics.setDrawMode( "hybrid" )
+    physics.setDrawMode( "hybrid" )
     -- The default Corona renderer, with no collision outlines
     --physics.setDrawMode( "normal" )
     -- Shows collision engine outlines only
@@ -210,7 +210,7 @@ function scene:show( event )
       -- AGGIUNTO NEL LIVELLO 2 ---
 
       --PROIETTILE
-      local bulletSheetData = { width=200, height=200, numFrames=3, sheetContentWidth=600, sheetContentHeight=200 }
+      local bulletSheetData = { width=200, height=84, numFrames=3, sheetContentWidth=600, sheetContentHeight=84 }
       local bulletSheet = graphics.newImageSheet( "immagini/livello-2/ecoproiettile.png", bulletSheetData )
       local bulletData = {
         { name="ecoproiettile", sheet=bulletSheet, start=1, count=3, time=400, loopCount=0 }
@@ -546,7 +546,7 @@ function scene:show( event )
           group_elements:insert(bullet)
           bullet.x = sprite.x + 80
           bullet.y = sprite.y
-          local outlineBullet= graphics.newOutline(20, bulletSheet, 1)
+          local outlineBullet = graphics.newOutline(6, bulletSheet, 2)
           physics.addBody(bullet, { outline=outlineBullet, density=1, bounce=0, friction=1})
           bullet.isBullet = true
           bullet.isSensor = true
