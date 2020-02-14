@@ -6,9 +6,11 @@ local scene = composer.newScene()
 -- Code outside of the scene event functions below will only be executed ONCE unless
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
 -- -----------------------------------------------------------------------------------
- local gameLoop
+ local gameLoop --timer per le animazioni del gioco
  local life
  local totalLife
+ local timerBullet --timer per richiamare l'attacco del nemico
+ local table_bullets = {}
  
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
@@ -140,6 +142,18 @@ function scene:show( event )
         life.anchorX = (display.actualContentWidth - 150)
         group_elements:insert(life)
         
+         --PROIETTILE
+         local bulletSheetData = { width=160, height=160, numFrames=4, sheetContentWidth=640, sheetContentHeight=160 }
+         local bulletSheet = graphics.newImageSheet( "immagini/livello-1/plastic-bottle.png", bulletSheetData )
+         local bulletData = {
+           { name="plastic-bottle", sheet=plasticbagSheet, start=1, count=4, time=400, loopCount=0 }
+        }
+        --ESPLOSIONE QUANDO SI COLPISCE IL NEMICO CON IL PROIETTILE
+        local explosionSheetData = { width=200, height=200, numFrames=12, sheetContentWidth=2400, sheetContentHeight=200 }
+        local explosionSheet = graphics.newImageSheet( "immagini/livello-1/explosion1.png", explosionSheetData )
+        local explosionData = {
+            { name="explosion", sheet=explosionSheet, start=1, count=12, time=800, loopCount=1}
+        }
         local function loop( event )
             --qui dentro metteremo tutte le cose che necessitano di un loop all'interno del gioco
             --richiamo le due funzioni per muovere lo sfondo
@@ -147,8 +161,78 @@ function scene:show( event )
             enemy:play()
         end
           ------------------------------------------------
+        
+      -- FUNZIONI PER IL PROIETTILE 'LATTINA DI PLASTICA'
+      local function bulletScroll(self, event)
+        --fa scorrere il sacchetto nello schermo
+        if stop == 0 then
+          self.x = self.x -  10 --fa andare  avanti il proiettile in x senza spostarsi in y
+          print(self.x)
+          if self.x > display.actualContentWidth - 30 then --se c'è un sacchetto di plastica che ha superato il limite di -200, lo togliamo!
+            self:removeEventListener( "collision", onBulletCollision ) --rimuovo l'ascoltatore per la collisione di quel sprite
+            Runtime:removeEventListener("enterFrame",self) --rimuovo l'ascoltatore che lo fa scrollare 
+            group_elements:remove(self)
+            display.remove(self) --rimuove QUEL sacchetto di plastica dal display display
+            local res = table.remove(table_bullets, table.indexOf( table_bullets, self )) --lo rimuove anche dalla tabella dei proeittili
+          end
+        end
+      end
+      ------------------------------------------------
+      -- Global collision handling
+      function onBulletCollision( event )
+        print(event.other.name)
+        --[[if(tostring(event.other.name) == "enemy") then --se il proiettile si è scontrato contro un nemico allora..
+          enemyKilled = event.other --salvo dentro enemyKilled l'indirizzo che mi porta al nemico ucciso
+          --Riproduco l'animazione dell'esplosione nelle stesse coordinate in cui si trova il nemico nel momento della collisione
+          local explosion = display.newSprite( explosionSheet, explosionData ) --salvo dentro explosion l'animazione dell'esplosione
+          explosion.name = "explosion"
+          group_elements:insert(explosion)
+          explosion.x = enemyKilled.x
+          explosion.y = enemyKilled.y
+          explosion:play()
 
+          --rimuovo il nemico dallo schermo
+          Runtime:removeEventListener("enterFrame", enemyKilled) --non faccio più muovere il nemico
+          display.remove(enemyKilled) --rimuovo dal display il nemico
+          local position = table.indexOf(enemies, enemyKilled) --carico dentro la variabile position la posizione del nemico colpito dentro la tabella dei nemici 
+          table.remove(enemies,position) --rimuovo dalla tabella enemies il nemico colpito
+
+          --rimuovo la bottiglia appena lanciata
+          group_elements:remove(event.target)
+          event.target:removeEventListener( "collision", onBulletCollision ) --rimuovo l'ascoltatore per la collisione di quel sprite
+          Runtime:removeEventListener("enterFrame",event.target) --rimuovo l'ascoltatore che lo fa scrollare 
+          display.remove(event.target) --rimuove QUELLA bottiglia di plastica dal display 
+          local res = table.remove(table_bullets, table.indexOf( table_bullets, event.target )) --lo rimuove anche dalla tabella dei proeittili
+          end
+          ]]--
+      end
+      ---------------------------------------------------
+      local function createBullet()
+        --crea un oggetto di un nuovo sprite del sacchetto e lo aggiunge alla tabella table_plasticbag[]
+        --da implementare meglio, mi faccio passare che tipo di nemico devo inserire
+        local bullet = display.newSprite( bulletSheet, bulletData )
+        bullet.name = "bullet"
+        bullet:play()
+        group_elements:insert(bullet)
+        bullet.x = enemy.x - 190
+        bullet.y = sprite.y
+        local outlineBullet = graphics.newOutline(6, bulletSheet, 2)
+        physics.addBody(bullet, { outline=outlineBullet, density=1, bounce=0, friction=1})
+        bullet.isBullet = true
+        bullet.isSensor = true
+        bullet.bodyType = "static"
+        return bullet
+      end
+      ------------------------------------------------
+      local function bulletsLoop()
+        bullet = createBullet() --creo un'istanza di un oggetto sprite plastic bag         
+        table.insert(table_bullets, bullet)
+        bullet:addEventListener( "collision", onBulletCollision )
+        bullet.enterFrame = bulletScroll --lo faccio scrollare, grazie alla funzione plasticbagScroll
+        Runtime:addEventListener("enterFrame", bullet) --assegno all'evento enterframe lo scroll
+      end
         gameLoop = timer.performWithDelay( 500, loop, 0 )
+        timerBullet = timer.performWithDelay( 2000, bulletsLoop, 0 )
     end
 end
  
