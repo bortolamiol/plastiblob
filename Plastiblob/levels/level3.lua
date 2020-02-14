@@ -739,11 +739,13 @@ function scene:show( event )
       callingEnemies[3] = timer.performWithDelay( 3000, enemiesLoop, 1 )
       callingEnemies[4] = timer.performWithDelay( 18000, enemiesLoop, 1 )
       callingEnemies[5] = timer.performWithDelay( 28000, enemiesLoop, 1 )
+      callingEnemies[6] = timer.performWithDelay( 42000, enemiesLoop, 1 )
+      callingEnemies[7] = timer.performWithDelay( 57000, enemiesLoop, 1 )
 
       --pipistrelli
-      callingBats[1] = timer.performWithDelay( 6000, enemiesBatLoop, 0 )
+      callingBats[1] = timer.performWithDelay( 6500, enemiesBatLoop, 9 )
       callingBats[2] = timer.performWithDelay( 21800, enemiesBatLoop, 1 )
-      callingBats[3] = timer.performWithDelay( 12800, enemiesBatLoop, 1 )
+      callingBats[3] = timer.performWithDelay( 12000, enemiesBatLoop, 1 )
 
       --piattaforme 
       callingPlatform[1] = timer.performWithDelay( 1000, platformLoop, 1) 
@@ -755,6 +757,10 @@ function scene:show( event )
       callingSpine[2] = timer.performWithDelay( 38000, spineLoop, 1)
       callingSpine[3] = timer.performWithDelay( 11000, spineLoop, 0)
       callingSpine[4] = timer.performWithDelay( 23000, spineLoop, 1)
+      callingSpine[5] = timer.performWithDelay( 34000, spineLoop, 1)
+      callingSpine[6] = timer.performWithDelay( 53000, spineLoop, 1)
+
+
 
       --plastiche
       callingPlasticbag[1] = timer.performWithDelay( (timeToPlay/plasticToCatch)*1000, plasticbagLoop, plasticToCatch)
