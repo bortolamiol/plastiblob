@@ -195,10 +195,10 @@ function scene:show( event )
       local enemyTimeSpawnMax  = 13500	
 
       -- NEMICO PIPISTRELLO
-      local batWalkingSheetData = { width=200, height=200, numFrames=4, sheetContentWidth=800, sheetContentHeight=200 }
+      local batWalkingSheetData = { width=200, height=200, numFrames=8, sheetContentWidth=1600, sheetContentHeight=200 }
       local batWalkingSheet = graphics.newImageSheet( "immagini/livello-3/bat.png", batWalkingSheetData )
       local batData = {
-        { name="walking", sheet=batWalkingSheet, start=1, count=4, time=200, loopCount=0 }
+        { name="walking", sheet=batWalkingSheet, start=1, count=8, time=600, loopCount=0 }
       }
       local batTimeSpawnMin = 1500	
       local batTimeSpawnMax  = 15000	
