@@ -120,11 +120,9 @@ function scene:show( event )
 		-- 
 		-- INSERT code here to make the scene come alive
 		-- e.g. start timers, begin animation, play audio, etc.
-		--composer.isAudioPlaying = 0;
+		
+		--INIZIALIZZO AUDIO
 		composer.isAudioPlayingMenu = 0;
-		-- Start the music!
-		local checkChannel1 = audio.isChannelActive(1)
-		local checkChannel2 = audio.isChannelActive(2)
 		audio.setVolume(0.2)
 		if (composer.isAudioPlaying==1) then
 			print("channel 2 sta già suonando, non fare nulla")
