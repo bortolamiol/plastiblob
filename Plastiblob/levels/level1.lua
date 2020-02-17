@@ -57,7 +57,7 @@ function scene:show( event )
     local physics = require("physics")
     physics.start()
     -- Overlays collision outlines on normal display objects
-    physics.setGravity( 0,20 )
+    physics.setGravity( 0,41 )
     --physics.setDrawMode( "hybrid" )
     -- The default Corona renderer, with no collision outlines
     --physics.setDrawMode( "normal" )
@@ -180,8 +180,8 @@ function scene:show( event )
       local frameIndex = 1
       local outlineSpriteWalking = graphics.newOutline(2, spriteWalkingSheet, frameIndex)   --outline personaggio
       local outlineSpriteJumping = graphics.newOutline(2, spriteJumpingSheet, 4)   --outline personaggio
-      physics.addBody(sprite, { outline=outlineSpriteWalking, density=4, bounce=0, friction=1})    --sprite diventa corpo con fisica
-      sprite.gravityScale = 1
+      physics.addBody(sprite, { outline=outlineSpriteWalking, density=4, bounce=0, friction=1}) --sprite diventa corpo con fisica
+      sprite.gravityScale = 3
       sprite.isFixedRotation = true --rotazione bloccata
       sprite.isJumping = false
       sprite.mustChangeOutlineToWalk = false --variabile che mi servirà per  cambiare l'outline del personaggio da jumping a walking
@@ -347,13 +347,12 @@ function scene:show( event )
       function sprite.touch( self,event)
         vx, vy = sprite:getLinearVelocity()
         if( event.phase == "began" and not self.isJumping ) then
-          self:setLinearVelocity(0,- 1650) --salto in y
+          self:setLinearVelocity(0,-2550) 
           self.isJumping = true -- se ho toccato imposto la variabile isJumping del mio personaggio a true
           self:setSequence("jumping") --lo sprite si muove con animazione jumping
           self:play()
           changeOutline("jump") --cambio l'outline del personaggio in modo da renderlo più 'corto'
           sprite.mustChangeOutlineToWalk = true
-          print(sprite.x.."è la posizione del mio sprite")
         end
       end
       Runtime:addEventListener( "touch", sprite )
