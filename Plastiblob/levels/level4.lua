@@ -634,7 +634,7 @@ function scene:show( event )
           --fa scorrere il nemico nello schermo
           if stop == 0 then
             self.x = self.x - (enemySpeed*2)
-            self.y = ground.y - 150
+            self.y = ground.y - 145
           end
         end
         ------------------------------------------------
@@ -646,7 +646,7 @@ function scene:show( event )
           spine:play()
           group_elements:insert(spine)
           spine.x = display.actualContentWidth + 150
-          spine.y = ground.y - 150
+          spine.y = ground.y - 125
           local outlineSpine = graphics.newOutline(4, spineSheet, 1)
           physics.addBody(spine, { outline=outlineSpine, density=1, bounce=0, friction=1})
           spine.isBullet = true
@@ -737,7 +737,7 @@ function scene:show( event )
       --mutanti
       callingEnemies[1] = timer.performWithDelay( 3000, enemiesLoop, 0 )
       --callingEnemies[2] = timer.performWithDelay( 7600, enemiesLoop, 0 )
-      --callingEnemies[3] = timer.performWithDelay( 25500, enemiesLoop, 1 )
+      callingEnemies[3] = timer.performWithDelay( 25500, enemiesLoop, 1 )
       callingEnemies[4] = timer.performWithDelay( 55000, enemiesLoop, 1 )
 
       --pipistrelli
@@ -749,7 +749,7 @@ function scene:show( event )
       callingBats[6] = timer.performWithDelay( 32500, enemiesBatLoop, 1 )
       callingBats[7] = timer.performWithDelay( 34500, enemiesBatLoop, 1 )
       callingBats[8] = timer.performWithDelay( 38500, enemiesBatLoop, 1 )
-      callingBats[9] = timer.performWithDelay( 42500, enemiesBatLoop, 1 )
+      callingBats[9] = timer.performWithDelay( 42600, enemiesBatLoop, 1 )
       callingBats[10] = timer.performWithDelay( 48500, enemiesBatLoop, 1 )
       callingBats[11] = timer.performWithDelay( 55500, enemiesBatLoop, 1 )
       callingBats[12] = timer.performWithDelay( 57500, enemiesBatLoop, 1 )
@@ -776,7 +776,8 @@ function scene:show( event )
       callingSpine[11] = timer.performWithDelay( 49000, spineLoop, 1)
       callingSpine[12] = timer.performWithDelay( 53000, spineLoop, 1)
       callingSpine[13] = timer.performWithDelay( 58000, spineLoop, 1)
-
+      callingSpine[14] = timer.performWithDelay( 16000, spineLoop, 1)
+      callingSpine[15] = timer.performWithDelay( 30900, spineLoop, 1)
 
 
       --plastiche
