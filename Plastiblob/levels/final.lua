@@ -62,6 +62,7 @@ function scene:show( event )
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
         --VARIABILI PER GLI ELEMENTI DELLO SCHERMO{
+        local stop = 0
         local groundHeight = 100
         local ground = display.newRect( 0, 0,99999, groundHeight )
         ground:setFillColor(0,0,0,0)
@@ -164,6 +165,7 @@ function scene:show( event )
         
       -- FUNZIONI PER IL PROIETTILE 'LATTINA DI PLASTICA'
       local function bulletScroll(self, event)
+        print("ooo")
         --fa scorrere il sacchetto nello schermo
         if stop == 0 then
           self.x = self.x -  10 --fa andare  avanti il proiettile in x senza spostarsi in y
