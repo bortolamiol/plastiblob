@@ -58,7 +58,7 @@ function scene:show( event )
     local physics = require("physics")
     physics.start()
     -- Overlays collision outlines on normal display objects
-    physics.setGravity( 0,20 )
+    physics.setGravity( 0,41 )
     physics.setDrawMode( "hybrid" )
     -- The default Corona renderer, with no collision outlines
     --physics.setDrawMode( "normal" )
@@ -108,8 +108,8 @@ function scene:show( event )
 
       ------------------------------------------------------------
       -- VARIABILI MOLTO IMPORTANTI PER IL GIOCO: VELOCITA' DI GIOCO
-      local enemySpeed_max = 6.6 -- massima velocità di spostamento del nemico
-      local enemySpeed_min = 4-- minima velocità di spostamento del nemico
+      local enemySpeed_max = 7.4 -- massima velocità di spostamento del nemico
+      local enemySpeed_min = 5-- minima velocità di spostamento del nemico
       local enemySpeed = enemySpeed_min --velocità di spostamento del nemico
 
       local frame_speed = 20 --questa sarà la velocità dello scorrimento del nostro sfondo, in base a questa velocità alzeremo anche quella del gioco
@@ -179,9 +179,10 @@ function scene:show( event )
       local outlineSpriteWalking = graphics.newOutline(2, spriteWalkingSheet, frameIndex)   --outline personaggio
       local outlineSpriteJumping = graphics.newOutline(2, spriteJumpingSheet, 4)   --outline personaggio
       physics.addBody(sprite, { outline=outlineSpriteWalking, density=4, bounce=0, friction=1}) --sprite diventa corpo con fisica
-      sprite.gravityScale = 1
+      sprite.gravityScale = 3
       sprite.isFixedRotation = true --rotazione bloccata
       sprite.isJumping = false
+      sprite.bodyType = "dynamic"
       sprite.mustChangeOutlineToWalk = false --variabile che mi servirà per  cambiare l'outline del personaggio da jumping a walking
 
       -- PRIMO NEMICO
@@ -225,7 +226,7 @@ function scene:show( event )
       -- AGGIUNTO NEL LIVELLO 3 --
       
       -- POZZA D'ACQUA ASSASSINA --
-      local poolSheetData = { width=350, height=175, numFrames=16, sheetContentWidth=1400, sheetContentHeight=700 }
+      local poolSheetData = { width=350, height=176, numFrames=16, sheetContentWidth=1400, sheetContentHeight=704 }
       local poolSheet = graphics.newImageSheet( "immagini/livello-2/pool.png", poolSheetData )
       local poolData = {
         { name="pool", sheet=poolSheet, start=1, count=16, time=800, loopCount=0 }
@@ -368,22 +369,23 @@ function scene:show( event )
           if(event.other.name ==  "enemy") or (event.other.name ==  "pool") then
             gameOver()
           end
+          if(event.other.name == "ground") or (event.other.name == "platform") then
+              sprite.isJumping = false
+              sprite:setSequence("walking")	
+          end
         end
       end
       sprite:addEventListener("collision")
 
         -----------------------------------------------
-      local function preCollisionEvent( self, event )
-        local collideObject = event.other
-        if ( collideObject.collType == "passthru" ) then
-          event.contact.isEnabled = false  --disable this specific collision
+        local function preCollisionEvent( self, event )
+          local collideObject = event.other
+          if ( collideObject.collType == "passthru" ) then
+            --event.contact.isEnabled = false  --disable this specific collision
+          end
         end
-        if(event.other.name == "ground") or (event.other.name == "platform") then
-            self.isJumping = false
-        end
-      end
-      sprite.preCollision = preCollisionEvent
-      sprite:addEventListener( "preCollision" )
+        sprite.preCollision = preCollisionEvent
+        sprite:addEventListener( "preCollision" )
       ------------------------------------------------
       local function loop( event )
         --qui dentro metteremo tutte le cose che necessitano di un loop all'interno del gioco
@@ -392,13 +394,6 @@ function scene:show( event )
         moveBackground(bg[2])
         sprite:play()
         
-        local vx, vy = sprite:getLinearVelocity()
-        if(vy > 800) and (sprite.isJumping) then --se sto tornando a terra cambio l'outline e il mio corpo in walking
-            if(sprite.mustChangeOutlineToWalk) then --ci entrà solo 1 volta per salto
-                changeOutline("walk") --cambio l'outline del mio personaggio a quella della camminata -> più grossa e tozza
-                sprite.mustChangeOutlineToWalk = false
-            end
-        end
         if(sprite.x < 0) then
           gameOver()
         end
@@ -455,23 +450,7 @@ function scene:show( event )
           end	
         end	
       end
-      ----------------------------------------------------------
-      function changeOutline(phase)	
-        if(tostring(phase) == "walk") then	
-            sprite:setSequence("walking")	
-            physics.removeBody(sprite)	
-            physics.addBody(sprite, { outline=outlineSpriteWalking, density=4, bounce=0, friction=1})    --sprite diventa corpo con fisica	
-            sprite.gravityScale = 3	
-            sprite.isFixedRotation = true --rotazione bloccata	
-        elseif (tostring(phase) == "jump") then	
-            sprite:setSequence("jumping")	
-            physics.removeBody(sprite)	
-            physics.addBody(sprite, { outline=outlineSpriteJumping, density=4, bounce=0, friction=1})    --sprite diventa corpo con fisica	
-            sprite.gravityScale = 3	
-            sprite.isFixedRotation = true --rotazione bloccata	
-            end	
-         end
-
+     
       -- }
       --bottone per uscire dal livello e tornare al menu del livelli
       button_home = display.newImageRect( "immagini/menu/home.png", 100, 100 )
@@ -563,15 +542,13 @@ function scene:show( event )
         end
 
       function touchListener(event)
-        if ( event.phase == "ended" ) then --è finito il processo di touch dello sschermo
-          if(event.x >= 0 ) and (event.x <= display.actualContentWidth/2) and (not sprite.isJumping) then
-            --parte sinistra del display --> devo saltare
-            sprite:setLinearVelocity(0,-1650) -- applico una forza al personaggio per saltare
+        if ( event.phase == "began" ) then --è finito il processo di touch dello sschermo
+          if ((event.x >= 0 ) and (event.x <= display.actualContentWidth/2) and (not sprite.isJumping) )then
+            print("dentrissimo")
+            sprite:setLinearVelocity(0,- 1750)
             sprite.isJumping = true -- se ho toccato imposto la variabile isJumping del mio personaggio a true
             sprite:setSequence("jumping") --lo sprite si muove con animazione jumping
             sprite:play()
-            changeOutline("jump") --cambio l'outline del personaggio in modo da renderlo più 'corto'
-            sprite.mustChangeOutlineToWalk = true
           elseif (event.x > display.actualContentWidth / 2) and (event.x <= display.contentWidth) then
             --ho cliccato sulla parte destra dello shcermo, devo sparare
             if(scoreCount > 0) then

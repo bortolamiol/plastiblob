@@ -70,20 +70,16 @@ function scene:show( event )
 					scoreLevel2 = row.scoreLevel2,
 					scoreLevel3 = row.scoreLevel3,
 					scoreLevel4 = row.scoreLevel4,
-					scoreLevel5 = row.scoreLevel5,
-					scoreLevel6 = row.scoreLevel6,
-					scoreLevel7 = row.scoreLevel7,
-					scoreLevel8 = row.scoreLevel8,
-					print("Livello: " ..row.level .. "  || 1: " ..row.scoreLevel1 .. " || 2: " ..row.scoreLevel2 .. " || 3: " ..row.scoreLevel3 .. " || 4: " ..row.scoreLevel4 .. " || 5: " ..row.scoreLevel5 .. " || 6: " ..row.scoreLevel6 .. " || 7: " ..row.scoreLevel7 .. " || 8: " ..row.scoreLevel8) 
+					print("Livello: " ..row.level .. "  || 1: " ..row.scoreLevel1 .. " || 2: " ..row.scoreLevel2 .. " || 3: " ..row.scoreLevel3 .. " || 4: " ..row.scoreLevel4 ) 
 				}
 				livellicompletati = levels[1].level		
 			end
 		else
 		--Se dbexists ritorna 1 allora la tabella non esiste, vuol dire perciò che dovrà essere creata
-			local tableSetup = [[CREATE TABLE levels ( ID INTEGER PRIMARY KEY autoincrement, level, scoreLevel1, scoreLevel2, scoreLevel3, scoreLevel4, scoreLevel5, scoreLevel6, scoreLevel7, scoreLevel8);]]
+			local tableSetup = [[CREATE TABLE levels ( ID INTEGER PRIMARY KEY autoincrement, level, scoreLevel1, scoreLevel2, scoreLevel3, scoreLevel4);]]
 			db:exec( tableSetup )
 			--inserisco la riga di default nel database, se l'ho appena creato andrò al livello 1
-			local insertQuery = [[INSERT INTO levels VALUES ( null, "1", 0, 0, 0, 0, 0, 0, 0, 0);]]
+			local insertQuery = [[INSERT INTO levels VALUES ( null, "1", 0, 0, 0, 0);]]
 			db:exec( insertQuery )
 			--dato che la tabella non esisteva vuol dire che è la prima volta che l'utente gioca, perciò lo faccio iniziare dal livello 1
 			livellicompletati = 1
@@ -92,7 +88,7 @@ function scene:show( event )
 		--inserisco le immagini dei livelli dentro un vettore/tabella
 		--per iniziare useremo 8 livelli, creerò quindi un for da 1 a 8 e ogni livello avrà un identificativo dentro i 
 		local levels={}
-		for i=1, 8 do
+		for i=1, 4 do
 			local impath
 			--controllo se ho già passato il livello nell'identificativo su cui è posizionata 1
 			if tonumber(livellicompletati) >= tonumber(i) then
@@ -108,7 +104,7 @@ function scene:show( event )
 			levels[i].anchorX = 0
 			levels[i].anchorY = 0
 			levels[i].x = checkImagePositionX(i)
-			levels[i].y = checkImagePositionY(i)
+			levels[i].y = 310 --dispongo le immagini a metà dello shcermo
 		end
 
 		--questa funzione serve per capire quando ho cliccato su un'immagine per andare sul livello cliccato
@@ -158,7 +154,7 @@ function scene:show( event )
 		goback:addEventListener( "touch", goback )
 		menu:insert(goback)
 
-		for i=1, 8 do
+		for i=1, 4 do
 			--inserisco dentro la scena del gruppo le foto dei miei livelli e assegno un listener per ognuno degli oggetti
 			levels[i]:addEventListener( "touch", levels )
 			menu:insert(levels[i])
@@ -168,30 +164,19 @@ end
 function checkImagePositionX(i)
 	local x
 	--questa funzione serve per ritornare il valore di x in cui posizionare una determinata immagine, la funzione si svolgerà per ogni elemento del vettore/tabella
-	if(i == 1 or i==5) then
+	if(i == 1) then
 		x = 100
 	end
-	if(i == 2 or i==6) then
+	if(i == 2) then
 		x = 400
 	end
-	if(i == 3 or i==7) then
+	if(i == 3) then
 		x = 700
 	end
-	if(i == 4 or i==8) then
+	if(i == 4) then
 		x = 1000
 	end
 	return x
-end
-function checkImagePositionY(i)
-	local y
-	--questa funzione serve per ritornare il valore di x in cui posizionare una determinata immagine, la funzione si svolgerà per ogni elemento del vettore/tabella
-	if(i == 1 or i == 2 or i == 3 or i == 4) then
-		y= 200
-	end
-	if(i == 5 or i == 6 or i == 7 or i == 8) then
-		y= 500
-	end
-	return y
 end
 function scene:hide( event )
 	local sceneGroup = self.view

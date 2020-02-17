@@ -62,7 +62,7 @@ function scene:show( event )
     physics.start()
     -- Overlays collision outlines on normal display objects
     physics.setGravity( 0,41 )
-    physics.setDrawMode( "hybrid" )
+    --physics.setDrawMode( "hybrid" )
     -- The default Corona renderer, with no collision outlines
     --physics.setDrawMode( "normal" )
     -- Shows collision engine outlines only
