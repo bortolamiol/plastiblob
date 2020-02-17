@@ -686,7 +686,7 @@ function scene:show( event )
             platform.y = (display.contentHeight / 2) + 40
             local outlinePlatform = graphics.newOutline(2, "immagini/livello-3/platform.png")
             physics.addBody(platform, "static", { outline=outlinePlatform, bounce=0, friction=1 } )
-            platform.collType = "passthru"
+            --platform.collType = "passthru"
             print("creata una piattaforma")
             return platform
           end
@@ -871,7 +871,7 @@ function resetScene( tipo)
     end
   elseif tipo == "gamefinished" then
     audio.dispose(crunchSound)	
-    print("audio disposato nel livello 1")
+
     --ELIMINO I LISTENERS
     Runtime:removeEventListener( "collision", onBulletCollision )
     Runtime:removeEventListener( "touch", touchListener )
