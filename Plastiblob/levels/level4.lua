@@ -647,7 +647,7 @@ function scene:show( event )
           group_elements:insert(spine)
           spine.x = display.actualContentWidth + 150
           spine.y = ground.y - 150
-          local outlineSpine = graphics.newOutline(4, spineSheet, 3)
+          local outlineSpine = graphics.newOutline(4, spineSheet, 1)
           physics.addBody(spine, { outline=outlineSpine, density=1, bounce=0, friction=1})
           spine.isBullet = true
           spine.isSensor = true
@@ -734,39 +734,64 @@ function scene:show( event )
       callingSpine = {}
       callingPlatform = {}
 
-      --ratti 
-      callingEnemies[1] = timer.performWithDelay( 7000, enemiesLoop, 1 )
-      callingEnemies[2] = timer.performWithDelay( 32000, enemiesLoop, 0 )
-      callingEnemies[3] = timer.performWithDelay( 3000, enemiesLoop, 1 )
-      callingEnemies[4] = timer.performWithDelay( 18000, enemiesLoop, 1 )
-      callingEnemies[5] = timer.performWithDelay( 28000, enemiesLoop, 1 )
-      callingEnemies[6] = timer.performWithDelay( 42000, enemiesLoop, 1 )
-      callingEnemies[7] = timer.performWithDelay( 57000, enemiesLoop, 1 )
+      --mutanti
+      callingEnemies[1] = timer.performWithDelay( 3000, enemiesLoop, 0 )
+      callingEnemies[2] = timer.performWithDelay( 7600, enemiesLoop, 0 )
+      callingEnemies[3] = timer.performWithDelay( 25500, enemiesLoop, 1 )
+      callingEnemies[4] = timer.performWithDelay( 55000, enemiesLoop, 1 )
 
       --pipistrelli
-      callingBats[1] = timer.performWithDelay( 6500, enemiesBatLoop, 9 )
-      callingBats[2] = timer.performWithDelay( 21800, enemiesBatLoop, 1 )
-      callingBats[3] = timer.performWithDelay( 12000, enemiesBatLoop, 1 )
+      callingBats[1] = timer.performWithDelay( 4000, enemiesBatLoop, 1 )
+      callingBats[2] = timer.performWithDelay( 7000, enemiesBatLoop, 1 )
+      callingBats[3] = timer.performWithDelay( 11000, enemiesBatLoop, 1 )
+      callingBats[4] = timer.performWithDelay( 14500, enemiesBatLoop, 1 )
+      callingBats[5] = timer.performWithDelay( 20500, enemiesBatLoop, 1 )
+      callingBats[6] = timer.performWithDelay( 32500, enemiesBatLoop, 1 )
+      callingBats[7] = timer.performWithDelay( 34500, enemiesBatLoop, 1 )
+      callingBats[8] = timer.performWithDelay( 38500, enemiesBatLoop, 1 )
+      callingBats[9] = timer.performWithDelay( 42500, enemiesBatLoop, 1 )
+      callingBats[10] = timer.performWithDelay( 48500, enemiesBatLoop, 1 )
+      callingBats[11] = timer.performWithDelay( 55500, enemiesBatLoop, 1 )
+      callingBats[12] = timer.performWithDelay( 57500, enemiesBatLoop, 1 )
 
       --piattaforme 
-      callingPlatform[1] = timer.performWithDelay( 1000, platformLoop, 1) 
-      callingPlatform[2] = timer.performWithDelay( 25000, platformLoop, 1 )
-      callingPlatform[3] = timer.performWithDelay( 17000, platformLoop, 0)
+      callingPlatform[1] = timer.performWithDelay( 8000, platformLoop, 1) 
+      callingPlatform[2] = timer.performWithDelay( 20000, platformLoop, 1 )
+      callingPlatform[3] = timer.performWithDelay( 28000, platformLoop, 1)
+      callingPlatform[4] = timer.performWithDelay( 31500, platformLoop, 1)
+      callingPlatform[5] = timer.performWithDelay( 36500, platformLoop, 1)
+      callingPlatform[6] = timer.performWithDelay( 53500, platformLoop, 1)
 
       --spine
-      callingSpine[1] = timer.performWithDelay( 5000, spineLoop, 0)
-      callingSpine[2] = timer.performWithDelay( 38000, spineLoop, 1)
-      callingSpine[3] = timer.performWithDelay( 11000, spineLoop, 0)
-      callingSpine[4] = timer.performWithDelay( 23000, spineLoop, 1)
-      callingSpine[5] = timer.performWithDelay( 34000, spineLoop, 1)
-      callingSpine[6] = timer.performWithDelay( 53000, spineLoop, 1)
+      callingSpine[1] = timer.performWithDelay( 1000, spineLoop, 1)
+      callingSpine[2] = timer.performWithDelay( 5000, spineLoop, 1)
+      callingSpine[3] = timer.performWithDelay( 10000, spineLoop, 1)
+      callingSpine[4] = timer.performWithDelay( 13500, spineLoop, 1)
+      callingSpine[5] = timer.performWithDelay( 17000, spineLoop, 1)
+      callingSpine[6] = timer.performWithDelay( 22500, spineLoop, 1)
+      callingSpine[7] = timer.performWithDelay( 25000, spineLoop, 1)
+      callingSpine[8] = timer.performWithDelay( 35000, spineLoop, 1)
+      callingSpine[9] = timer.performWithDelay( 37000, spineLoop, 1)
+      callingSpine[10] = timer.performWithDelay( 46000, spineLoop, 1)
+      callingSpine[11] = timer.performWithDelay( 49000, spineLoop, 1)
+      callingSpine[12] = timer.performWithDelay( 53000, spineLoop, 1)
+      callingSpine[13] = timer.performWithDelay( 58000, spineLoop, 1)
 
 
 
       --plastiche
-      callingPlasticbag[1] = timer.performWithDelay( (timeToPlay/plasticToCatch)*1000, plasticbagLoop, plasticToCatch)
-      
-      -- aggiungere 29, 36, 43, 44
+      --callingPlasticbag[1] = timer.performWithDelay( (timeToPlay/plasticToCatch)*1000, plasticbagLoop, plasticToCatch)
+      callingPlasticbag[1] = timer.performWithDelay( 3000, plasticbagLoop, 1)
+      callingPlasticbag[2] = timer.performWithDelay( 12000, plasticbagLoop, 1)
+      callingPlasticbag[3] = timer.performWithDelay( 20000, plasticbagLoop, 1)
+      callingPlasticbag[4] = timer.performWithDelay( 25000, plasticbagLoop, 1)
+      callingPlasticbag[5] = timer.performWithDelay( 31500, plasticbagLoop, 1)
+      callingPlasticbag[6] = timer.performWithDelay( 36000, plasticbagLoop, 1)
+      callingPlasticbag[7] = timer.performWithDelay( 42000, plasticbagLoop, 1)
+      callingPlasticbag[8] = timer.performWithDelay( 48000, plasticbagLoop, 1)
+      callingPlasticbag[9] = timer.performWithDelay( 53500, plasticbagLoop, 1)
+      callingPlasticbag[10] = timer.performWithDelay( 60000, plasticbagLoop, 1)
+
     end
   end
 end
