@@ -1,13 +1,20 @@
+--[[ ---------------------------------------------------------------------------------
+Questo codice serve per riprodurre la storia. Quando si sceglie il livello, prima del gameplay partirà la storia 
+legata a ogni livello. La storia va segue una trama con un prologo (livello 1), uno svolgimento (livelli 2,3,4) e 
+un epilogo (sconfitto il boss del livello 4). 
+
+Per evitare di fare un file per ogni livello, abbiamo pensato di fare un unico file per tutti. Ciò ci è stato possibile
+grazie a
+
+        local leveltarget = event.params.level
+        local numImgs = tostring(event.params.imagetoshow)
+
+che prende le immagini della storia da mostrare contenute nella cartella "storia" di ciascun livello 
+]]-- ---------------------------------------------------------------------------------
+
 local composer = require( "composer" )
- 
 local scene = composer.newScene()
-local n
-
-
--- -----------------------------------------------------------------------------------
--- Code outside of the scene event functions below will only be executed ONCE unless
--- the scene is removed entirely (not recycled) via "composer.removeScene()"
--- -----------------------------------------------------------------------------------
+local n -- numero di immagini che sono contenute nella cartella 
 
 -- create()
 function scene:create( event )
@@ -32,8 +39,7 @@ function scene:show( event )
         -- Code here runs when the scene is still off screen (but is about to come on screen)
  
     elseif ( phase == "did" ) then
-        -- Code here runs when the scene is entirely on screen
-        n=1
+        n=1 --parto dalla prima immagine nominata 1 
         local leveltarget = event.params.level
         local numImgs = tostring(event.params.imagetoshow)
         local continua = display.newImageRect( group_buttons, "immagini/livello-1/storia/continua.png", 100, 70 )
@@ -55,12 +61,15 @@ function scene:show( event )
         
         function imagesToShow( n )
             local imgpath
-			if tonumber(n) <= tonumber(numImgs) then
+            if tonumber(n) <= tonumber(numImgs) then
+                -- se n è minore  uguale al numero di immagini contenute nella cartella del livello scelto
+                -- continuo a sovrapporle una sopra l'altra
 				imgpath = "immagini/livello-"..leveltarget.."/storia/"..n..".png"
                 local immagine = display.newImageRect(group_background,imgpath,1280,720)
                 immagine.anchorX = 0
                 immagine.anchorY = 0 
             else 
+                -- dopo l'ultima immagine disponibile, cliccando su "continua" il gioco di consentirà di iniziare il gameplay
 				local leveltargetpath = "levels.level" .. leveltarget;
                 composer.gotoScene( leveltargetpath, "fade", 500 )
             end
@@ -81,7 +90,7 @@ function scene:hide( event )
         
     elseif ( phase == "did" ) then
         -- Code here runs immediately after the scene goes entirely off screen
- 
+        composer.removeScene("levels.storylevel")
     end
 end
  
