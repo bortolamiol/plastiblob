@@ -42,6 +42,7 @@ function scene:show( event )
         tutorialSprite.y = display.actualContentHeight/2
         tutorialSprite:play();
         
+        sceneGroup:insert(tutorialSprite)
         local goToLevelBtn = display.newImageRect("immagini/livello-1/storia/continua.png", 100, 70)
         goToLevelBtn.x = display.actualContentWidth/2
         goToLevelBtn.y = display.actualContentWidth/2
@@ -50,8 +51,9 @@ function scene:show( event )
             effect = "fade",
             time = 400
         }
+        sceneGroup:insert(goToLevelBtn)
         function goToLevel (touch)
-             composer.goToScene("levels.level1",options)
+             composer.gotoScene("levels.level1",options)
         end
         goToLevelBtn:addEventListener("touch", goToLevel)
              
@@ -70,7 +72,7 @@ function scene:hide( event )
  
     elseif ( phase == "did" ) then
         -- Code here runs immediately after the scene goes entirely off screen
- 
+        composer.removeScene("tutorial")
     end
 end
  
