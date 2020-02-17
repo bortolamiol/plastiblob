@@ -45,7 +45,7 @@ function scene:create( event )
   sceneGroup:insert( group_castle ) --inserisco il gruppo castle sopra la scena e sotto i personaggi
   sceneGroup:insert( group_elements ) --inserisco il gruppo group_elements dentro la scena
 
-  musicLevel1 = audio.loadStream("MUSIC/livello1.mp3")
+  musicLevel1 = audio.loadStream("MUSIC/level1.mp3")
 end
 
 function scene:show( event )
