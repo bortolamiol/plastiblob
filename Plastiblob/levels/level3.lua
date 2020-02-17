@@ -235,7 +235,7 @@ function scene:show( event )
       -- AGGIUNTO NEL LIVELLO 3 --
       
       -- POZZA D'ACQUA ASSASSINA --
-      local spineSheetData = { width=200, height=200, numFrames=9, sheetContentWidth=1800, sheetContentHeight=200 }
+      local spineSheetData = { width=190, height=190, numFrames=9, sheetContentWidth=1710, sheetContentHeight=190 }
       local spineSheet = graphics.newImageSheet( "immagini/livello-3/spine2.png", spineSheetData )
       local spineData = {
         { name="spine", sheet=spineSheet, start=1, count=9, time=800, loopCount=0 }
@@ -646,7 +646,7 @@ function scene:show( event )
           group_elements:insert(spine)
           spine.x = display.actualContentWidth + 150
           spine.y = ground.y - 150
-          local outlineSpine = graphics.newOutline(4, spineSheet, 3)
+          local outlineSpine = graphics.newOutline(1, spineSheet, 3)
           physics.addBody(spine, { outline=outlineSpine, density=1, bounce=0, friction=1})
           spine.isBullet = true
           spine.isSensor = true
@@ -744,7 +744,7 @@ function scene:show( event )
 
       --pipistrelli
       callingBats[1] = timer.performWithDelay( 6500, enemiesBatLoop, 9 )
-      callingBats[2] = timer.performWithDelay( 21800, enemiesBatLoop, 1 )
+      callingBats[2] = timer.performWithDelay( 21700, enemiesBatLoop, 1 )
       callingBats[3] = timer.performWithDelay( 12000, enemiesBatLoop, 1 )
 
       --piattaforme 
