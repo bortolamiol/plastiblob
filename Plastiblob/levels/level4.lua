@@ -736,8 +736,8 @@ function scene:show( event )
 
       --mutanti
       callingEnemies[1] = timer.performWithDelay( 3000, enemiesLoop, 0 )
-      callingEnemies[2] = timer.performWithDelay( 7600, enemiesLoop, 0 )
-      callingEnemies[3] = timer.performWithDelay( 25500, enemiesLoop, 1 )
+      --callingEnemies[2] = timer.performWithDelay( 7600, enemiesLoop, 0 )
+      --callingEnemies[3] = timer.performWithDelay( 25500, enemiesLoop, 1 )
       callingEnemies[4] = timer.performWithDelay( 55000, enemiesLoop, 1 )
 
       --pipistrelli
