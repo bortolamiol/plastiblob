@@ -749,9 +749,9 @@ function scene:show( event )
       callingBats[3] = timer.performWithDelay( 12000, enemiesBatLoop, 1 )
 
       --piattaforme 
-      --callingPlatform[1] = timer.performWithDelay( 1000, platformLoop, 1) 
-      --callingPlatform[2] = timer.performWithDelay( 25000, platformLoop, 1 )
-      --callingPlatform[3] = timer.performWithDelay( 17000, platformLoop, 0)
+      callingPlatform[1] = timer.performWithDelay( 1000, platformLoop, 1) 
+      callingPlatform[2] = timer.performWithDelay( 25000, platformLoop, 1 )
+      callingPlatform[3] = timer.performWithDelay( 17000, platformLoop, 0)
 
       --spine
       callingSpine[1] = timer.performWithDelay( 5000, spineLoop, 0)
