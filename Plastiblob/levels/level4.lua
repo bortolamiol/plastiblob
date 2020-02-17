@@ -5,7 +5,7 @@
 -----------------------------------------------------------------------------------------
 
 -- dichiaro delle variabili che andrò a usare in varie scene del livello
-local localLevel = 3 --VARIABILE CHE CONTIENE IL NUMERO DI LIVELLO A CUI APPARTIENE IL FILE LUA: IN QUESTO CASO SIAMO AL LIVELLO 1
+local localLevel = 4 --VARIABILE CHE CONTIENE IL NUMERO DI LIVELLO A CUI APPARTIENE IL FILE LUA: IN QUESTO CASO SIAMO AL LIVELLO 1
 local composer = require( "composer" ) --richiedo la libreria composer
 local scene = composer.newScene() --nuova scena composer
 local tutorial = 1 --ho completato il tutorial? se è 0 devo ancora farlo!
@@ -13,6 +13,8 @@ local bg --variabile che durante lo show conterrà le due immagini di sfondo che
 local punteggio --variabile che conterrà il mio punteggio del livello
 local sprite --sprite del personaggio
 local enemies = {} --sprite dei nemici
+local table_enemies_bullets = {} 
+local table_enemies_timer = {} 
 local table_plasticbag = {} --tabella che conterrà al suo interno i sacchetti di plastica che sono sullo schermo
 local table_bullets = {} --tabella che conterrà al suo interno i proiettili che sono sullo schermo
 local table_spine = {} --tabella che conterrà al suo interno le pozze d'acqua che sono sullo schermo
@@ -26,7 +28,7 @@ local platform --variabile che conterrà al suo interno l'immagine della piattaf
 local callingPlasticbag
 local callingSpine
 local timeplayed  --varaiabile che misura da quanti secondi sono all'interno del gioco e farà cambiare la velocità
-local timeToPlay = 70 --variabile che conterrà quanto l'utente dovrà sopravvivere all'interno del gioco
+local timeToPlay = 60 --variabile che conterrà quanto l'utente dovrà sopravvivere all'interno del gioco
 local scoreCount    --variabile conteggio punteggio iniziale
 local gameFinished
 local newTimerOut
@@ -80,7 +82,7 @@ function scene:show( event )
       local options = {
         effect = "fade",
         time = 1000,
-        params = { level="level3"}
+        params = { level="level4"}
       }
       --ELIMINARE IL GRUPPO DEL TUTORIAL
       -- INIZIALIZZO LE VARIABILI CHE VERRANNO USATE NEL GIOCO
@@ -92,7 +94,6 @@ function scene:show( event )
       local _h = display.actualContentHeight  -- Height of screen
       local _x = 0  -- Horizontal centre of screen
       local _y = 0  -- Vertical centre of screen
-
       bg={} -- 'vettore' che conterrà i due sfondi del gioco
       bg[1] = display.newImageRect("immagini/livello-4/background.png", _w, _h)
       bg[1].anchorY = 0
@@ -121,7 +122,7 @@ function scene:show( event )
       local spriteFrameSpeed = 800 --velocità del movimento delle gambe dello sprite [250 - 800]
       local spriteFrameSpeed_max = 200 --velocità del movimento delle gambe dello sprite [250 - 800]
 
-      local plasticToCatch = 7
+      local plasticToCatch = 10
       ------------------------------------------------------------
       --}
       --VARIABILI PER GLI ELEMENTI DELLO SCHERMO{
@@ -186,10 +187,10 @@ function scene:show( event )
       --sprite.mustChangeOutlineToWalk = false --variabile che mi servirà per  cambiare l'outline del personaggio da jumping a walking
 
       -- PRIMO NEMICO
-      local enemyWalkingSheetData = { width=200, height=200, numFrames=6, sheetContentWidth=1200, sheetContentHeight=200 }
-      local enemyWalkingSheet = graphics.newImageSheet( "immagini/livello-3/ratto.png", enemyWalkingSheetData )
+      local enemyWalkingSheetData = { width=250, height=250, numFrames=10, sheetContentWidth=2500, sheetContentHeight=250 }
+      local enemyWalkingSheet = graphics.newImageSheet( "immagini/livello-4/scienziato.png", enemyWalkingSheetData )
       local enemyData = {
-        { name="walking", sheet=enemyWalkingSheet, start=1, count=6, time=800, loopCount=0 }
+        { name="walking", sheet=enemyWalkingSheet, start=1, count=10, time=800, loopCount=0 }
       }
       local enemyTimeSpawnMin = 13000
       local enemyTimeSpawnMax  = 13500	
@@ -280,7 +281,7 @@ function scene:show( event )
           enemy.x = display.actualContentWidth  + 200
           enemy.y = ground.y-150
           frameIndexNemico = 1;
-          enemy.id = 0
+          enemy.id = 0     
           local outlineNemico = graphics.newOutline(6, enemyWalkingSheet, frameIndexNemico)
           physics.addBody(enemy, { outline=outlineNemico, density=5, bounce=0, friction=1})
           enemy.bodyType = "dynamic"
@@ -303,12 +304,14 @@ function scene:show( event )
         table.insert(enemies, enemy)
         return enemy
       end
-      ------------------------------------------------
+      
+     -----------------------------------------------------------
       local function enemiesLoop()
         if(stopCreatingEnemies == 0) then
           enemy = createEnemies("rat")
           enemy.enterFrame = enemyScroll
           Runtime:addEventListener("enterFrame",enemy)
+          table.insert(table_enemies_timer, timerBullett)
           for i,thisEnemy in ipairs(enemies) do
             if thisEnemy.x < -200 then
               Runtime:removeEventListener("enterFrame",thisEnemy)
@@ -446,8 +449,6 @@ function scene:show( event )
           gameOver()
         end
       end
-      ------------------------------------------------
-
       ------------------------------------------------
       function castleScroll() --funzione per far apparire nello schermo un castello in cui il blob entrerà
         --in modo molto ignorante sposta il castello verso il nostro personaggio e ci vado incontro
@@ -748,9 +749,9 @@ function scene:show( event )
       callingBats[3] = timer.performWithDelay( 12000, enemiesBatLoop, 1 )
 
       --piattaforme 
-      callingPlatform[1] = timer.performWithDelay( 1000, platformLoop, 1) 
-      callingPlatform[2] = timer.performWithDelay( 25000, platformLoop, 1 )
-      callingPlatform[3] = timer.performWithDelay( 17000, platformLoop, 0)
+      --callingPlatform[1] = timer.performWithDelay( 1000, platformLoop, 1) 
+      --callingPlatform[2] = timer.performWithDelay( 25000, platformLoop, 1 )
+      --callingPlatform[3] = timer.performWithDelay( 17000, platformLoop, 0)
 
       --spine
       callingSpine[1] = timer.performWithDelay( 5000, spineLoop, 0)

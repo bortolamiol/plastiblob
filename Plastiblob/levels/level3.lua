@@ -576,8 +576,7 @@ function scene:show( event )
             event.target:removeEventListener( "collision", onBulletCollision ) --rimuovo l'ascoltatore per la collisione di quel sprite
             Runtime:removeEventListener("enterFrame",event.target) --rimuovo l'ascoltatore che lo fa scrollare 
             display.remove(event.target) --rimuove QUELLA bottiglia di plastica dal display 
-            local res = table.remove(table_bullets, table.indexOf( table_bullets, event.target )) --lo rimuove anche dalla tabella dei proeittili
-            
+            local res = table.remove(table_bullets, table.indexOf( table_bullets, event.target )) --lo rimuove anche dalla tabella dei proeittili        
           end
         end
         ---------------------------------------------------
@@ -764,7 +763,7 @@ function scene:show( event )
 
       --plastiche
       callingPlasticbag[1] = timer.performWithDelay( (timeToPlay/plasticToCatch)*1000, plasticbagLoop, plasticToCatch)
-      
+      callingPlasticbag[2] = timer.performWithDelay( 1040, plasticbagLoop, 1)
       -- aggiungere 29, 36, 43, 44
     end
   end
