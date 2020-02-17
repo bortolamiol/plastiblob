@@ -367,7 +367,7 @@ function scene:show( event )
       ------------------------------------------------
       local function plasticbagLoop()
         if(stopCreatingEnemies == 0) then
-          plasticbag = createPlasticbag() --creo un'istanza di un oggetto sprite plastic bag
+          plasticbag = createPlasticbag(plasticType) --creo un'istanza di un oggetto sprite plastic bag
           plasticbag.enterFrame = plasticbagScroll --lo faccio scrollare, grazie alla funzione plasticbagScroll
           Runtime:addEventListener("enterFrame", plasticbag) --assegno all'evento enterframe lo scroll
           for i,thisPlasticbag in ipairs(table_plasticbag) do  --ipairs ritorna: an iteration Function, a Table, and 0. (?? trovata online)
@@ -383,6 +383,7 @@ function scene:show( event )
       ------------------------------------------------
       function gameOver() 
         stop = 1 -- grazie a questo le animazioni personagggi non scrolleranno più
+        stopCreatingEnemies = 1
         -- audio
         audio.pause(crunchSound)	
         audio.setMaxVolume(0.03)	
@@ -490,8 +491,6 @@ function scene:show( event )
             if (castleAppared == 0 ) then --se non ho già fatto apparire il castello, lo faccio apparire	
               print("dovrebbe apparire il castello")	
               castleAppared = 1 --non lo faccio più riapparire	
-              timer.cancel( callingEnemies ) --non chiamo più nemici	
-              timer.cancel( callingPlasticbag ) --non chiamo più sacchetti di plastica	
               sprite:removeEventListener("collision")	
               Runtime:addEventListener("enterFrame", castleScroll) --chiamo la funzione castleScroll per spostare il castello	
             end	
@@ -745,11 +744,13 @@ function scene:show( event )
       callingBats[1] = timer.performWithDelay( 6500, enemiesBatLoop, 9 )
       callingBats[2] = timer.performWithDelay( 21700, enemiesBatLoop, 1 )
       callingBats[3] = timer.performWithDelay( 12000, enemiesBatLoop, 1 )
+      callingBats[4] = timer.performWithDelay( 51000, enemiesBatLoop, 1 )
 
       --piattaforme 
       callingPlatform[1] = timer.performWithDelay( 1000, platformLoop, 1) 
       callingPlatform[2] = timer.performWithDelay( 25000, platformLoop, 1 )
       callingPlatform[3] = timer.performWithDelay( 17000, platformLoop, 0)
+      callingPlatform[5] = timer.performWithDelay( 49000, platformLoop, 0)
 
       --spine
       callingSpine[1] = timer.performWithDelay( 5000, spineLoop, 0)
@@ -758,12 +759,16 @@ function scene:show( event )
       callingSpine[4] = timer.performWithDelay( 23000, spineLoop, 1)
       callingSpine[5] = timer.performWithDelay( 34000, spineLoop, 1)
       callingSpine[6] = timer.performWithDelay( 53000, spineLoop, 1)
+      callingSpine[7] = timer.performWithDelay( 44000, spineLoop, 1)
 
 
 
       --plastiche
-      callingPlasticbag[1] = timer.performWithDelay( (timeToPlay/plasticToCatch)*1000, plasticbagLoop, plasticToCatch)
-      callingPlasticbag[2] = timer.performWithDelay( 1040, plasticbagLoop, 1)
+      callingPlasticbag[1] = timer.performWithDelay( 1140, plasticbagLoop, 1)
+      callingPlasticbag[2] = timer.performWithDelay( 17140, plasticbagLoop, 1)
+      callingPlasticbag[3] = timer.performWithDelay( 47040, plasticbagLoop, 1)
+      callingPlasticbag[4] = timer.performWithDelay( 49040, plasticbagLoop, 1)
+      callingPlasticbag[25] = timer.performWithDelay( (timeToPlay/plasticToCatch)*1000, plasticbagLoop, plasticToCatch)
       -- aggiungere 29, 36, 43, 44
     end
   end
