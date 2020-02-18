@@ -72,7 +72,7 @@ function scene:show( event )
     local secondsPlayed = 0 -- conteggio dei secondi in cui sono all'interno del gioco, più secondi passo più è difficile
     enemySpeed = 12 --velocità iniziale di scorrimento dei proiettili del nemico
     local enemySpeed_min = 12 --velocità iniziale di scorrimento dei proiettili del nemico
-    local enemySpeed_max = 20 --velocità massima di scorrimento dei proiettili del nemico
+    local enemySpeed_max = 18 --velocità massima di scorrimento dei proiettili del nemico
     local stop = 0
 
     local groundHeight = 100
@@ -126,10 +126,10 @@ function scene:show( event )
     sprite.isJumping = false
 
     --Mostro nemico
-    local enemyWalkingSheetData = { width=600, height=600, numFrames=9, sheetContentWidth=5400, sheetContentHeight=3600 }
+    local enemyWalkingSheetData = { width=600, height=600, numFrames=4, sheetContentWidth=2400, sheetContentHeight=600 }
     local enemyWalkingSheet = graphics.newImageSheet( "immagini/final/monster.png", enemyWalkingSheetData )
     local enemyData = {
-      { name="walking", sheet=enemyWalkingSheet, start=1, count=9, time=800, loopCount=0 }
+      { name="walking", sheet=enemyWalkingSheet, start=1, count=4, time=700, loopCount=0 }
     }
     local enemy = display.newSprite( enemyWalkingSheet, enemyData )
     enemy.name = "enemy"
@@ -155,18 +155,19 @@ function scene:show( event )
     life.anchorX = (display.actualContentWidth - 150)
     group_elements:insert(life)
 
-    --PROIETTILE
-    local bulletSheetData = { width=160, height=160, numFrames=4, sheetContentWidth=640, sheetContentHeight=160 }
-    local bulletSheet = graphics.newImageSheet( "immagini/livello-1/plastic-bottle.png", bulletSheetData )
+    --PROIETTILE NEMICO
+    local enemyBulletSheetData = { width=160, height=160, numFrames=6, sheetContentWidth=960, sheetContentHeight=160 }
+    local enemyBulletSheet = graphics.newImageSheet( "immagini/final/proiettile.png", enemyBulletSheetData )
+    local enemyBulletData = {
+      { name="plastic-bottle", sheet=enemyBulletSheet, start=1, count=6, time=400, loopCount=0 }
+    }
+
+    --IL NOSTRO PROIETTILE
+    local bulletSheetData = { width=100, height=100, numFrames=3, sheetContentWidth=300, sheetContentHeight=100 }
+    local bulletSheet = graphics.newImageSheet( "immagini/final/ecoproiettile.png", bulletSheetData )
     local bulletData = {
-      { name="plastic-bottle", sheet=plasticbagSheet, start=1, count=4, time=400, loopCount=0 }
-    }
-    --ESPLOSIONE QUANDO SI COLPISCE IL NEMICO CON IL PROIETTILE
-    local explosionSheetData = { width=200, height=200, numFrames=12, sheetContentWidth=2400, sheetContentHeight=200 }
-    local explosionSheet = graphics.newImageSheet( "immagini/livello-1/explosion1.png", explosionSheetData )
-    local explosionData = {
-      { name="explosion", sheet=explosionSheet, start=1, count=12, time=800, loopCount=1}
-    }
+        { name="ecoproiettile", sheet=bulletSheet, start=1, count=3, time=400, loopCount=0 }
+      }
 
 
 
@@ -201,7 +202,12 @@ function scene:show( event )
       audio.play(audiogameover)
       composer.gotoScene( "levels.gameover", options )
     end
+    --------------------------------------------------------------------------
 
+    function win() --quando entro qui devo mandare alla scena del gameover e resettare la scena
+      stop = 1 -- grazie a questo le animazioni personagggi non scrolleranno più
+      composer.gotoScene( "levels.victory", options )
+    end
     --------------------------------------------------------------------------
     -- Global collision handling
     function onEnemyBulletCollision( event ) --funzione che controlla se il proiettile nemico tocca il nostro sprite
@@ -221,21 +227,21 @@ function scene:show( event )
           Runtime:removeEventListener("enterFrame",self) --rimuovo l'ascoltatore che lo fa scrollare
           group_elements:remove(self)
           display.remove(self) --rimuove QUEL sacchetto di plastica dal display display
-          local res = table.remove(table_bullets, table.indexOf( table_bullets, self )) --lo rimuove anche dalla tabella dei proeittili
+          local res = table.remove(table_enemy_bullets, table.indexOf( table_enemy_bullets, self )) --lo rimuove anche dalla tabella dei proeittili
         end
       end
     end
     ---------------------------------------------------
-    local function createBullet()
+    local function createEnemyBullet()
       --crea un oggetto di un nuovo sprite del sacchetto e lo aggiunge alla tabella table_plasticbag[]
       --da implementare meglio, mi faccio passare che tipo di nemico devo inserire
-      local enemybullet = display.newSprite( bulletSheet, bulletData )
+      local enemybullet = display.newSprite( enemyBulletSheet, enemyBulletData )
       enemybullet.name = "bullet"
       enemybullet:play()
       group_elements:insert(enemybullet)
       enemybullet.x = enemy.x - 190
-      enemybullet.y = math.random( 200, 600)
-      local outlineBullet = graphics.newOutline(6, bulletSheet, 2)
+      enemybullet.y = math.random( 400, 600)
+      local outlineBullet = graphics.newOutline(6, enemyBulletSheet, 2)
       physics.addBody(enemybullet, { outline=outlineBullet, density=1, bounce=0, friction=1})
       enemybullet.isBullet = true
       enemybullet.isSensor = true
@@ -245,7 +251,7 @@ function scene:show( event )
     ------------------------------------------------
     local function enemyBulletsLoop()
       if(stop == 0) then --se il gioco non è finito allora continuo a creare
-        Enemybullet = createBullet() --creo un'istanza di un oggetto sprite plastic bag
+        Enemybullet = createEnemyBullet() --creo un'istanza di un oggetto sprite plastic bag
         table.insert(table_enemy_bullets, Enemybullet)
         Enemybullet:addEventListener( "collision", onEnemyBulletCollision )
         Enemybullet.enterFrame = enemyBulletScroll --lo faccio scrollare, grazie alla funzione plasticbagScroll
@@ -279,7 +285,7 @@ function scene:show( event )
         display.remove(event.target) --rimuove QUELLA bottiglia di plastica dal display
         local res = table.remove(table_bullets, table.indexOf( table_bullets, event.target )) --lo rimuove anche dalla tabella dei proeittili
         if(enemyLife <= 0) then
-          --abbiamo vinto
+          win()
         end
       end
     end
@@ -293,7 +299,7 @@ function scene:show( event )
       group_elements:insert(bullet)
       bullet.x = sprite.x + 80
       bullet.y = sprite.y
-      local outlineBullet= graphics.newOutline(20, bulletSheet, 1)
+      local outlineBullet = graphics.newOutline(6, bulletSheet, 2)
       physics.addBody(bullet, { outline=outlineBullet, density=1, bounce=0, friction=1})
       bullet.isBullet = true
       bullet.isSensor = true
@@ -329,7 +335,7 @@ function scene:show( event )
     --------------------------------------------------------------------------
     --funzione che serve per aumentare la velocità del gioco
     local function increaseGameSpeed(event)
-      if(secondsPlayed <= 20) then
+      if(secondsPlayed <= 16) then
         secondsPlayed = secondsPlayed + 1 --ogni secondo che passa aumento questa variabile che tiene conto di quanto tempo è passato
         local x_enemySpeed = ((enemySpeed_max * secondsPlayed)/40)
         enemySpeed = enemySpeed_min + x_enemySpeed --la velocità è data dalla velocità minima (2) + il risultato della proporzione
