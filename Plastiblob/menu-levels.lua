@@ -125,13 +125,15 @@ function scene:show( event )
 			if tonumber(livellicompletati) >= tonumber(i) then
 				--assegno al percorso dell'immagine l'immagine corrispondente al livello in modalità SBLOCCATA
 				impath = "immagini/menu/livelli/"..i..".png"
-				local numberOfStars = checkStars(scores[i]) --quante stelle ha fatto l'utente
-				local starsPath = "immagini/menu/livelli/star"..numberOfStars..".png"
-				local starImage = display.newImageRect( scene_stars, starsPath, 200, 200 )
-				starImage.anchorX = 0
-				starImage.anchorY = 0
-				starImage.x = checkImagePositionX(i)
-				starImage.y = 250
+				if(tonumber(livellicompletati) > 1) then
+					local numberOfStars = checkStars(scores[i]) --quante stelle ha fatto l'utente
+					local starsPath = "immagini/menu/livelli/star"..numberOfStars..".png"
+					local starImage = display.newImageRect( scene_stars, starsPath, 200, 200 )
+					starImage.anchorX = 0
+					starImage.anchorY = 0
+					starImage.x = checkImagePositionX(i)
+					starImage.y = 250
+				end
 			else
 				--assegno al percorso dell'immagine l'immagine corrispondente al livello in modalità BLOCCATA
 				impath = "immagini/menu/livelli/locked"..i..".png"
