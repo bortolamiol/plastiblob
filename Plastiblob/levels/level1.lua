@@ -110,7 +110,7 @@ function scene:show( event )
       ------------------------------------------------------------
       -- VARIABILI MOLTO IMPORTANTI PER IL GIOCO: VELOCITA' DI GIOCO
       local enemySpeed_max = 7.5 -- massima velocità di spostamento del nemico
-      local enemySpeed_min = 4-- minima velocità di spostamento del nemico
+      local enemySpeed_min = 4.5-- minima velocità di spostamento del nemico
       local enemySpeed = enemySpeed_min --velocità di spostamento del nemico
 
       local frame_speed = 20 --questa sarà la velocità dello scorrimento del nostro sfondo, in base a questa velocità alzeremo anche quella del gioco

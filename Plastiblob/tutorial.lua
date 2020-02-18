@@ -35,15 +35,15 @@ function scene:show( event )
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
         local tutorialSheetData = { width=1280, height=720, numFrames=3, sheetContentWidth=3840, sheetContentHeight=720 }
-        local tutorialSheet = graphics.newImageSheet( "Tutorial/jumptutorial.png", tutorialSheetData )
-        local tutorialData = {{ name="tutorial", sheet=tutorialSheet, start=1, count=3, time=5000, loopCount=0 }}
+        local tutorialSheet = graphics.newImageSheet( "immagini/tutorial/jumptutorial.png", tutorialSheetData )
+        local tutorialData = {{ name="tutorial", sheet=tutorialSheet, start=1, count=3, time=4000, loopCount=0 }}
         local tutorialSprite = display.newSprite (tutorialSheet, tutorialData)
         tutorialSprite.x = display.actualContentWidth/2
         tutorialSprite.y = display.actualContentHeight/2
         tutorialSprite:play();
         
         sceneGroup:insert(tutorialSprite)
-        local goToLevelBtn = display.newImageRect("immagini/livello-1/storia/continua.png", 100, 70)
+        local goToLevelBtn = display.newImageRect("immagini/tutorial/continua.png", 150, 105)
         goToLevelBtn.x = display.actualContentWidth/2
         goToLevelBtn.y = display.actualContentWidth/2
         local options =

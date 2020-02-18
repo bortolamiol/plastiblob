@@ -8,7 +8,9 @@
 local composer = require( "composer" )
 local scene = composer.newScene()
 
-
+local backgroundImage
+local menu
+local stars
 -- include Corona's "widget" library
 local widget = require "widget"
 
@@ -24,10 +26,16 @@ function scene:show( event )
 		-- Called when the scene is still off screen and is about to move on screen
 		
 	elseif phase == "did" then
-		print("entrato")
-		local backgroundImage = self.view
-		local menu = self.view
+
+		backgroundImage = display.newGroup() --group_elements conterrà tutti gli altri elementi dello schermo: sprite del personaggio, nemici e bottoni per uscire dal gioco
+		menu = display.newGroup() --group_elements conterrà tutti gli altri elementi dello schermo: sprite del personaggio, nemici e bottoni per uscire dal gioco
+		scene_stars = display.newGroup() --group_elements conterrà tutti gli altri elementi dello schermo: sprite del personaggio, nemici e bottoni per uscire dal gioco
 		
+		sceneGroup:insert( backgroundImage )
+		sceneGroup:insert( menu )
+		sceneGroup:insert( scene_stars )
+
+
 		local musicTrack1 = audio.loadStream("MUSIC/THEME.mp3") --carico musica "tema"
 		audio.setVolume(0.2)
 		
@@ -42,6 +50,7 @@ function scene:show( event )
 		
 		--creo una variabile che contenga i livelli a cui sono arrivato, se non ho passato nessun livello partirà da 1
 		local livellicompletati 
+		local scores = {}
 		--CREAZIONE DI UN DATABASE PER CONTENERE I LIVELLI
 		-- Require the SQLite library
 		local sqlite3 = require( "sqlite3" )	
@@ -62,17 +71,20 @@ function scene:show( event )
 			for row in db:nrows( "SELECT * FROM levels" ) do
 				--print( "Row:", row.level )
 				--Crea una tabella dove inserire i dati che troviamo dentro la tabella dei livelli
-				levels[#levels+1] =
-				{
+				levels[#levels+1] = {
 					FirstName = row.FirstName,
 					level = row.level,
-					scoreLevel1 = row.scoreLevel1,
+					scoreLevel1 = row.scoreLevel1 ,
 					scoreLevel2 = row.scoreLevel2,
 					scoreLevel3 = row.scoreLevel3,
 					scoreLevel4 = row.scoreLevel4,
 					print("Livello: " ..row.level .. "  || 1: " ..row.scoreLevel1 .. " || 2: " ..row.scoreLevel2 .. " || 3: " ..row.scoreLevel3 .. " || 4: " ..row.scoreLevel4 ) 
 				}
 				livellicompletati = levels[1].level		
+				scores[1] = levels[1].scoreLevel1
+				scores[2] = levels[1].scoreLevel2
+				scores[3] = levels[1].scoreLevel3
+				scores[4] = levels[1].scoreLevel4
 			end
 		else
 		--Se dbexists ritorna 1 allora la tabella non esiste, vuol dire perciò che dovrà essere creata
@@ -83,8 +95,27 @@ function scene:show( event )
 			db:exec( insertQuery )
 			--dato che la tabella non esisteva vuol dire che è la prima volta che l'utente gioca, perciò lo faccio iniziare dal livello 1
 			livellicompletati = 1
+			scores[1] = 0
+			scores[2] = 0
+			scores[3] = 0
+			scores[4] = 0
 		end
-		
+
+		local function checkStars(score) --funzione che ritorna quante stelle ho raggiunto sul livello
+			local stars
+			if(tonumber(score) <= 3) then --se ho preso meno di 4 plastiche...
+				--ritorno una stella
+				stars = 1 
+			elseif(tonumber(score) >= 4 and tonumber(score) <= 7) then
+				--ritorno due stelle
+				stars = 2
+			elseif(tonumber(score) >= 8) then
+				--ritorno tre stelle
+				stars = 3
+			end 
+			print("ritorno: " ..  stars)
+			return stars
+		end
 		--inserisco le immagini dei livelli dentro un vettore/tabella
 		--per iniziare useremo 8 livelli, creerò quindi un for da 1 a 8 e ogni livello avrà un identificativo dentro i 
 		local levels={}
@@ -94,6 +125,13 @@ function scene:show( event )
 			if tonumber(livellicompletati) >= tonumber(i) then
 				--assegno al percorso dell'immagine l'immagine corrispondente al livello in modalità SBLOCCATA
 				impath = "immagini/menu/livelli/"..i..".png"
+				local numberOfStars = checkStars(scores[i]) --quante stelle ha fatto l'utente
+				local starsPath = "immagini/menu/livelli/star"..numberOfStars..".png"
+				local starImage = display.newImageRect( scene_stars, starsPath, 200, 200 )
+				starImage.anchorX = 0
+				starImage.anchorY = 0
+				starImage.x = checkImagePositionX(i)
+				starImage.y = 250
 			else
 				--assegno al percorso dell'immagine l'immagine corrispondente al livello in modalità BLOCCATA
 				impath = "immagini/menu/livelli/locked"..i..".png"
@@ -106,7 +144,7 @@ function scene:show( event )
 			levels[i].x = checkImagePositionX(i)
 			levels[i].y = 310 --dispongo le immagini a metà dello shcermo
 		end
-
+		
 		--questa funzione serve per capire quando ho cliccato su un'immagine per andare sul livello cliccato
 		function levels:touch( event )
 			if event.phase == "began" then
