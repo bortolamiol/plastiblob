@@ -98,11 +98,21 @@ function scene:show( event )
     local plasticToCatch = 7 --numero di oggetti di plastica che l'utente dovrà raccogliere
 
     ----------------PROIETTILE
-    local nameSheetData = { width=400, height=300, numFrames=2, sheetContentWidth=800, sheetContentHeight=300 }
-    local nameSheet = graphics.newImageSheet( "immagini/finale/aleborto.png", nameSheetData )
-    local nameData = {
-        { name="borto", sheet=sex, start=1, count=2, time=1400, loopCount=0 }
+    local nameSheetData = { width=400, height=300, numFrames=8, sheetContentWidth=3200, sheetContentHeight=300 }
+    local nameSheet = graphics.newImageSheet( "immagini/finale/nomi.png", nameSheetData )
+    local borto = {
+        { name="borto", sheet=nameSheet, start=1, count=2, time=1400, loopCount=0 }
     }
+    local gabri = {
+      { name="borto", sheet=nameSheet, start=3, count=2, time=1400, loopCount=0 }
+    }
+    local mc = {
+      { name="borto", sheet=nameSheet, start=5, count=2, time=1400, loopCount=0 }
+    }
+    local laston = {
+      { name="borto", sheet=nameSheet, start=7, count=2, time=1400, loopCount=0 }
+    }
+
 
     table_names = {} --conterrà tutti i nomi passati sullo schermo
 
@@ -120,10 +130,8 @@ function scene:show( event )
     local function nameScroll(self, event)
         --fa scorrere il sacchetto nello schermo
         if stop == 0 then
-          print(self.x)
-          self.x = self.x  - 5 --fa andare  avanti il proiettile in x senza spostarsi in y
-          if self.x < - 30 then --se c'è un sacchetto di plastica che ha superato il limite di -200, lo togliamo!
-            print("ooo")
+          self.x = self.x  - 4 --fa andare  avanti il proiettile in x senza spostarsi in y
+          if self.x < - 500 then --se c'è un sacchetto di plastica che ha superato il limite di -200, lo togliamo!
             Runtime:removeEventListener("enterFrame",self) --rimuovo l'ascoltatore che lo fa scrollare
             group_elements:remove(self)
             display.remove(self) --rimuove QUEL sacchetto di plastica dal display display
@@ -134,10 +142,19 @@ function scene:show( event )
   
      
       ---------------------------------------------------
-      local function createNames()
+      local function createNames(nametoshow)
+        local name
+        if(nametoshow == 1) then
+          name = display.newSprite( nameSheet, borto )
+        elseif(nametoshow == 2) then
+          name = display.newSprite( nameSheet, gabri )
+        elseif(nametoshow == 3) then
+          name = display.newSprite( nameSheet, mc )
+        elseif(nametoshow == 4) then
+           name = display.newSprite( nameSheet, laston )
+        end
         --crea un oggetto di un nuovo sprite del sacchetto e lo aggiunge alla tabella table_plasticbag[]
         --da implementare meglio, mi faccio passare che tipo di nemico devo inserire
-        local name = display.newSprite( nameSheet, nameData )
         name:play()
         group_elements:insert(name)
         name.x  = display.actualContentWidth + 200
@@ -146,8 +163,8 @@ function scene:show( event )
       end
   
       ------------------------------------------------
-      local function namesLoop()
-        name = createNames() --creo un'istanza di un oggetto sprite plastic bag
+      local function namesLoop(name)
+        name = createNames(name) --creo un'istanza di un oggetto sprite plastic bag
         table.insert(table_names, name)
         name.enterFrame = nameScroll --lo faccio scrollare, grazie alla funzione plasticbagScroll
         Runtime:addEventListener("enterFrame", name) --assegno all'evento enterframe lo scroll
@@ -181,6 +198,14 @@ function scene:show( event )
     local function increaseGameSpeed(event)
       secondsPlayed = secondsPlayed + 1 --ogni secondo che passa aumento questa variabile che tiene conto di quanto tempo è passato
       print("seconds played: " ..secondsPlayed)
+      if(secondsPlayed == 4) then
+        print("ooo")
+        namesLoop(2)
+      elseif(secondsPlayed == 8) then
+        namesLoop(3)
+      elseif(secondsPlayed == 12) then
+        namesLoop(4)
+      end
         if(secondsPlayed >= 50 ) then --se è ora di far finire il gioco, vado al passo successivo
           goToTheNewScene()
         end
@@ -196,7 +221,8 @@ function scene:show( event )
     loops = {}
     loops[1] = timer.performWithDelay( 1000, increaseGameSpeed, 0 )
     loops[2] = timer.performWithDelay( time_speed_min, loop, 0 )
-    loops[3] = timer.performWithDelay( 2000, namesLoop, 1 )
+    loops[3] = timer.performWithDelay( 2000, namesLoop(1), 0 )
+    
     
   end
 end
@@ -233,8 +259,10 @@ end
 function resetScene()
     composer.isAudioPlaying=0
     audio.dispose(crunchSound)
-    timer.cancel( gameLoop )
-    timer.cancel( timeplayed )
+    for i=1, #loops do
+      timer.cancel( loops[i] )
+      loops[i] = nil        -- Nil Out Table Instance
+    end
 end
 
 ---------------------------------------------------------------------------------
