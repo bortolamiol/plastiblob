@@ -900,7 +900,7 @@ function resetScene( tipo)
   --resetto le variabili per capire se sta suonando la musica di background nel menu o nel menu levels
 
   if tipo == "gameOver" then
-    --composer.isAudioPlayingMenu =0;
+    composer.isAudioPlayingMenu =0;
     composer.isAudioPlaying=0;
 
     audio.dispose(crunchSound)
