@@ -16,9 +16,9 @@ audio.reserveChannels( 1 )
 audio.reserveChannels( 2 )
 audio.reserveChannels( 3 )
 -- Reduce the overall volume of the channel
-audio.setVolume( 0.5, { channel=1 } )
-audio.setVolume( 0.5, { channel=2 } )
-audio.setVolume( 0.5, { channel=3 } )
+audio.setMaxVolume( 0.5, { channel=1 } )
+audio.setMaxVolume( 0.5, { channel=2 } )
+audio.setMaxVolume( 0.5, { channel=3 } )
 
 -- load menu screen
 --NON CANCELLARE LA PROSSIMA RIGA

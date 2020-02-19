@@ -389,7 +389,7 @@ function scene:show( event )
         stopCreatingEnemies = 1
         -- audio
         audio.pause(crunchSound)	
-        audio.setMaxVolume(0.03)	
+        --audio.setMaxVolume(0.03)	
         local audiogameover = audio.loadSound("MUSIC/PERDENTE.mp3")	
         audio.play(audiogameover)
         --audio.play(audiogameover)
@@ -402,7 +402,7 @@ function scene:show( event )
         if( event.phase == "began" ) then
           --tutte le informazioni dell'elemento che ho toccato le troviamo dentro event.other
           if(event.other.name ==  "plasticbag") then --mi sono scontrato con il sacchetto
-            audio.setMaxVolume(0.03)	
+           -- audio.setMaxVolume(0.03)	
             audio.play(crunchSound)
             scoreCount = scoreCount+1;
             scoreText.text = scoreCount.."/"..plasticToCatch
