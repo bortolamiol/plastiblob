@@ -67,7 +67,7 @@ function scene:show( event )
     physics.setGravity( 0,41 )
 
   elseif phase == "did" then
-    audio.play( musicLevel1, { channel=3, loops=-1 } ) --parte la musica del livello 1
+    audio.play( musicLevel3, { channel=3, loops=-1 } ) --parte la musica del livello 3
 
 
     ----------------------------------------------------------------------------
@@ -848,7 +848,6 @@ function scene:destroy( event )
   -- e.g. remove display objects, remove touch listeners, save state, etc.
   audio.dispose( musicLevel3) --elimino la musica del livello
   local sceneGroup = self.view
-  audio.dispose( musicLevel1)
 
 end
 ----------------------------------------------
