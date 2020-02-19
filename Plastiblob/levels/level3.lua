@@ -78,7 +78,7 @@ function scene:show( event )
     local options = {
       effect = "fade",
       time = 1000,
-      params = { level="level1"} -- questa variabile verrà utilizzata dal gameover pper capire a che livello tornare
+      params = { level="level3"} -- questa variabile verrà utilizzata dal gameover pper capire a che livello tornare
     }
 
     ----------------------------------------------------------------------------
