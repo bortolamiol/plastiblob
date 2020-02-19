@@ -57,7 +57,12 @@ function scene:show( event )
             if tonumber(n) <= tonumber(numImgs) then --se non sono ancora arrivato all'ultima immagine da mostrare, vado avanti
                 -- se n è minore  uguale al numero di immagini contenute nella cartella del livello scelto
                 -- continuo a sovrapporle una sopra l'altra
-				imgpath = "immagini/livello-"..leveltarget.."/storia/"..n..".png" --creo il percorso dell'immagine
+                if(leveltarget == 6) then
+                    imgpath = "immagini/finale/"..n..".png" --creo il percorso dell'immagine
+                else
+                    imgpath = "immagini/livello-"..leveltarget.."/storia/"..n..".png" --creo il percorso dell'immagine
+                end
+				
                 local immagine = display.newImageRect(group_background,imgpath,1280,720)
                 immagine.anchorX = 0
                 immagine.anchorY = 0 
@@ -75,6 +80,8 @@ function scene:show( event )
                     leveltargetpath = "levels.level4" --vado al livello 4
                 elseif(tonumber(leveltarget) == 5)  then
                     leveltargetpath = "levels.final" --vado al livello finale
+                elseif(tonumber(leveltarget) == 6) then
+                    leveltargetpath = "levels.victory" --vado ai credits
                 end
                 composer.gotoScene( leveltargetpath, options)
             end

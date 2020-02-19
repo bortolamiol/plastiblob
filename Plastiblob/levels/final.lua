@@ -201,7 +201,12 @@ function scene:show( event )
 
     function win() --quando entro qui devo mandare alla scena del gameover e resettare la scena
       stop = 1 -- grazie a questo le animazioni personagggi non scrolleranno più
-      composer.gotoScene( "levels.victory", options ) --vado alla schermata di vittoria
+      local options = { 
+        effect = "crossFade",
+        time = 1000,
+        params = {level= 6, imagetoshow = 4} --opzioni che mi serviranno per tornare dal game over
+      }
+      composer.gotoScene( "levels.storylevel", options ) --vado alla schermata di vittoria
     end
     --------------------------------------------------------------------------
 
@@ -273,7 +278,7 @@ function scene:show( event )
     -- Global collision handling
     function onBulletCollision( event )
       if(tostring(event.other.name) == "enemy") then --un nostro proiettile ha colpito il nemico
-        enemyLife = enemyLife - 4 --faccio perdere al nemico 4 punti vita
+        enemyLife = enemyLife - 400 --faccio perdere al nemico 4 punti vita
         lifeRect.width = enemyLife --aggiorno il rettangolo BIANCO della vita del nemico
         group_elements:remove(event.target) --rimuovo l'elemento proiettile che ha appena colpito il nemico
         event.target:removeEventListener( "collision", onBulletCollision ) --rimuovo l'ascoltatore per la collisione di quel sprite
