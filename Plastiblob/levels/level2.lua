@@ -31,6 +31,7 @@ local newTimerOut
 local nextScene = "menu-levels"
 local crunchSound = audio.loadSound("MUSIC/crunch.mp3")
 local musicLevel2
+local explosionSound = audio.loadSound("MUSIC/explosion.mp3") --carico suono esplosione
 function scene:create( event )
 
   -- Called when the scene's view does not exist.
@@ -587,6 +588,7 @@ function scene:show( event )
         explosion.x = enemyKilled.x - 75
         explosion.y = enemyKilled.y
         explosion:play()
+        audio.play( explosionSound ) --faccio partire audio esplosione
 
         --rimuovo il nemico dallo schermo
         Runtime:removeEventListener("enterFrame", enemyKilled) --non faccio più muovere il nemico
@@ -810,7 +812,6 @@ function resetScene( tipo)
     composer.isAudioPlayingMenu =0;
     composer.isAudioPlaying=0;
 
-    audio.dispose(crunchSound)
     timer.cancel( gameLoop )
     timer.cancel( timeplayed )
     physics.pause()
