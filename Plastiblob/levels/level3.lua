@@ -121,7 +121,7 @@ function scene:show( event )
     local enemySpeed_min = 4 -- minima velocità di spostamento del nemico
     local enemySpeed = enemySpeed_min --velocità iniziale di spostamento del nemico, parte dal valore minimo
 
-    local frame_speed = 14 --questa sarà la velocità dello scorrimento del nostro sfondo, si sposta di 20 pixel in 20
+    local frame_speed = 16 --questa sarà la velocità dello scorrimento del nostro sfondo, si sposta di 20 pixel in 20
 
     local time_speed_min = 20 -- ogni quanti millisecondi verranno chiamate le funzioni di loop (esempio di sfondo group_background)
     local time_speed_max = 10 -- massimo di velocità che time_speed può raggiungere
