@@ -127,7 +127,7 @@ function scene:show( event )
 			if tonumber(livellicompletati) >= tonumber(i) then
 				--assegno al percorso dell'immagine l'immagine corrispondente al livello in modalità SBLOCCATA
 				impath = "immagini/menu/livelli/"..i..".png" --grazie al ciclo for, riuscirò a valorizzare impath in maniera sempre differente, prima con 1.png, 2.png, 3 ecc
-				if(tonumber(livellicompletati) > 1) then
+				if(tonumber(livellicompletati) > i) then
 					local numberOfStars = checkStars(scores[i]) --quante stelle ha fatto l'utente
 					local starsPath = "immagini/menu/livelli/star"..numberOfStars..".png" --in base al numero tornato cerco l'immagine giusta (1 o 2 o 3)
 					local starImage = display.newImageRect( scene_stars, starsPath, 200, 200 )

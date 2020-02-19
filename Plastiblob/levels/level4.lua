@@ -898,17 +898,9 @@ function updateHighScore(scoreCount) --funzione che serve per aggiornare l'high 
       level = row.level,
       scoreLevel = row.scoreLevel4
     }
+    --dato che sono all'ultimo livello andrò solo ad aggiornare il punteggio dell'utente nel livello 4 
     local oldScore= levels[1].scoreLevel --salvo il punteggio che è già presente all'interno del database
     local levelReached = levels[1].level --mi scrivo il livello a cui è arrivato l'utente all'interno del gioco, se è l'1 allora aggiorneremo a 2 e gli permetteremo di fare un nuovo livello
-    if(tonumber(levelReached) == tonumber(localLevel)) then --se sono al livello 1, devo aumentare il livello
-      if (tonumber(oldScore)<scoreCount) then --se il nuovo è punteggio è maggiore di quello già presente nel db entro nell'if
-        local query =("UPDATE levels SET level ='" .. (levelReached+1) .. "' ,scoreLevel4 = '" ..scoreCount .. "' WHERE ID = 1")
-        local pushQuery = db:exec (query)
-      elseif (tonumber(oldScore) >= scoreCount) then --devo solamente aumentare solo il livello"
-        local query =("UPDATE levels SET level ='" .. (levelReached+1) .. "' WHERE ID = 1")
-        local pushQuery = db:exec (query)
-      end
-    else
       if((tonumber(oldScore) < scoreCount)) then
         local query =("UPDATE levels SET scoreLevel4 = '" ..scoreCount .. "' WHERE ID = 1")
         local pushQuery = db:exec (query)
