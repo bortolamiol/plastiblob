@@ -222,8 +222,18 @@ function scene:show( event )
     }
     local plasticbagTimeSpawn = 9000
 
+<<<<<<< HEAD
+<<<<<<< HEAD
+    --porta  in cui entrerò a fine livello, in questo livello è la porta che porta ai laboratori
+    castle = display.newImageRect( "immagini/livello-2/last-destination.png", 700, 700 )
+=======
     --porta  in cui entrerò a fine livello, in questo livello sono l'entrata delle fogne
     castle = display.newImageRect( "immagini/livello-4/last-destination.png", 500, 500 )
+>>>>>>> f68bb041eaa5a58ad71430ae61b41d4168f0f7e2
+=======
+    --porta  in cui entrerò a fine livello, in questo livello sono l'entrata delle fogne
+    castle = display.newImageRect( "immagini/livello-4/last-destination.png", 500, 500 )
+>>>>>>> f68bb041eaa5a58ad71430ae61b41d4168f0f7e2
     castle.x = display.actualContentWidth + 800
     castle.y = ground.y - castle.height/2 - groundHeight/2
     group_castle:insert(castle)

@@ -222,7 +222,7 @@ function scene:show( event )
       { name="plastic", sheet=plasticbagSheet, start=1, count=4, time=500, loopCount=0 }
     }
 
-    --porta  in cui entrerò a fine livello, in questo livello sono l'entrata delle fogne
+    --porta  in cui entrerò a fine livello, in questo livello il tubo che porta ai laboratori
     castle = display.newImageRect( "immagini/livello-3/last-destination.png", 700, 700 )
     castle.x = display.actualContentWidth + 800
     castle.y = ground.y - castle.height/2 - groundHeight/2
@@ -530,9 +530,9 @@ function scene:show( event )
     ------- FUNZIONI PER LO SCROLL DEL CASTELLO FINALE DOVE ENTRERO'  ----------
     ----------------------------------------------------------------------------
     ----------------------------------------------------------------------------
-    function castleScroll() --funzione per far apparire nello schermo un castello in cui il blob entrerà
-      --in modo molto ignorante sposta il castello verso il nostro personaggio e ci vado incontro
-      if(castle.x > (display.actualContentWidth- (display.actualContentWidth / 4))) then --mando avanti il castello di sabbia fino ad un certo punto
+    function castleScroll() --funzione per far apparire nello schermo il tubo in cui il blob entrerà
+      --in modo molto semplice sposta il tubo verso il nostro personaggio e lui ci va incontro
+      if(castle.x > (display.actualContentWidth- (display.actualContentWidth / 4))) then --mando avanti il tubo fino ad un certo punto
         castle.x = castle.x - 20 --sposto il castello di 20 pixel
       else
         Runtime:removeEventListener("enterFrame", castleScroll) -- rimuovo l'evento event scroll
@@ -546,7 +546,7 @@ function scene:show( event )
 
     function spriteScrollToCastle() --avvicina lo sprite al castello
       local CastlePosition = castle.x - 20 --piglio la posizione del castello
-      if(sprite.x <= CastlePosition) then --se la posizione dello sprite è dietro a quella del castello, vado ancora avanti
+      if(sprite.x <= CastlePosition) then --se la posizione dello sprite è dietro a quella del tubo, vado ancora avanti
         sprite.x = sprite. x + 3 --lo sposto in avanti di 3
       else
         goToTheNewScene()
