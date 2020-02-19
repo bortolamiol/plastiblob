@@ -205,6 +205,7 @@ function scene:show( event )
 
     function win() --quando entro qui devo mandare alla scena del gameover e resettare la scena
       stop = 1 -- grazie a questo le animazioni personagggi non scrolleranno più
+      audio.stop( 4 ) 
       local options = {
         effect = "crossFade",
         time = 1000,
