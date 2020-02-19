@@ -219,6 +219,7 @@ function scene:show( event )
     function onEnemyBulletCollision( event ) --funzione che controlla se il proiettile nemico tocca il nostro sprite
       if(event.other.name == "sprite") then
         --ci ha presi
+        Runtime:removeEventListener( "touch", touchListener )
         gameOver() --richiamo la funzione di GameOver dove si resetteranno le scene e si andrà alla schermata di gameOver
       end
     end
@@ -362,41 +363,39 @@ function scene:hide( event )
   local phase = event.phase
 
   if ( phase == "will" ) then
-    
-  elseif ( phase == "did" ) then
-    -- Code here runs immediately after the scene goes entirely off screen
+     -- Code here runs immediately after the scene goes entirely off screen
     -- Code here runs when the scene is on screen (but is about to go off screen)
-    physics.pause()
-    --timer.cancel(gameLoop)
-    --timer.cancel(timeplayed)
-   -- timer.cancel(timerBullet)
+  
+  physics.pause()
+  --timer.cancel(gameLoop)
+  --timer.cancel(timeplayed)
+ -- timer.cancel(timerBullet)
 
-    --ELIMINO I LISTENERS
-    sprite:removeEventListener("collision")
-    Runtime:removeEventListener( "touch", touchListener )
+  --ELIMINO I LISTENERS
+  sprite:removeEventListener("collision")
 
-    -- RIMUOVO TUTTI GLI ELEMENTI DALLE TABELLE, CHE POSSOONO COMPRENDERE OGGETTI, EVENTI, LISTENERS E TIMER
-    for i=1, #table_bullets do 
-      Runtime:removeEventListener("enterFrame",  table_bullets[i])
-      table_bullets[i]:removeEventListener( "collision", onBulletCollision )
-      table_bullets[i]:removeSelf() -- Optional Display Object Removal
-      table_bullets[i] = nil        -- Nil Out Table Instance
-    end
-
-    for i=1, #table_enemy_bullets do 
-      Runtime:removeEventListener("enterFrame",  table_enemy_bullets[i])
-      table_enemy_bullets[i]:removeEventListener( "collision", onEnemyBulletCollision )
-      table_enemy_bullets[i]:removeSelf() -- Optional Display Object Removal
-      table_enemy_bullets[i] = nil        -- Nil Out Table Instance
-    end
-    for i=1, #table_loop do
-      timer.cancel( table_loop[i] )
-      table_loop[i] = nil        -- Nil Out Table Instance
-    end
-
-    audio.stop( 3 ) --la musica del livello 1 si ferma
-    composer.removeScene("levels.final") -- ELIMINO TUTTO CIO' CHE C'E' ALL'INTERNO DELLA SCENA
+  -- RIMUOVO TUTTI GLI ELEMENTI DALLE TABELLE, CHE POSSOONO COMPRENDERE OGGETTI, EVENTI, LISTENERS E TIMER
+  for i=1, #table_bullets do 
+    Runtime:removeEventListener("enterFrame",  table_bullets[i])
+    table_bullets[i]:removeEventListener( "collision", onBulletCollision )
+    table_bullets[i]:removeSelf() -- Optional Display Object Removal
+    table_bullets[i] = nil        -- Nil Out Table Instance
   end
+
+  for i=1, #table_enemy_bullets do 
+    Runtime:removeEventListener("enterFrame",  table_enemy_bullets[i])
+    table_enemy_bullets[i]:removeEventListener( "collision", onEnemyBulletCollision )
+    table_enemy_bullets[i]:removeSelf() -- Optional Display Object Removal
+    table_enemy_bullets[i] = nil        -- Nil Out Table Instance
+  end
+  for i=1, #table_loop do
+    timer.cancel( table_loop[i] )
+    table_loop[i] = nil        -- Nil Out Table Instance
+  end  
+
+  elseif ( phase == "did" ) then
+    composer.removeScene( "levels.final") -- ELIMINO TUTTO CIO' CHE C'E' ALL'INTERNO DELLA SCENA
+end
 end
 
 
@@ -405,8 +404,7 @@ function scene:destroy( event )
   audio.stop(musicFinal)
   audio.dispose( musicFinal)
   local sceneGroup = self.view
-  -- Code here runs prior to the removal of scene's view
-
+  
 end
 
 
