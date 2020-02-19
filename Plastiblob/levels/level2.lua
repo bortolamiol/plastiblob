@@ -218,7 +218,7 @@ function scene:show( event )
       }
       --ESPLOSIONE QUANDO SI COLPISCE IL NEMICO CON IL PROIETTILE
       local explosionSheetData = { width=200, height=200, numFrames=12, sheetContentWidth=2400, sheetContentHeight=200 }
-      local explosionSheet = graphics.newImageSheet( "immagini/livello-1/explosion1.png", explosionSheetData )
+      local explosionSheet = graphics.newImageSheet( "immagini/livello-1/explosion.png", explosionSheetData )
       local explosionData = {
         { name="explosion", sheet=explosionSheet, start=1, count=12, time=800, loopCount=1}
       }

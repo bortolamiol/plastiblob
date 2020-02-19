@@ -62,7 +62,7 @@ function scene:show( event )
     physics.start()
     -- Overlays collision outlines on normal display objects
     physics.setGravity( 0,41 )
-    --physics.setDrawMode( "hybrid" )
+    physics.setDrawMode( "hybrid" )
     -- The default Corona renderer, with no collision outlines
     --physics.setDrawMode( "normal" )
     -- Shows collision engine outlines only
@@ -221,18 +221,18 @@ function scene:show( event )
       -- AGGIUNTO NEL LIVELLO 2 ---
 
       --PROIETTILE
-      local bulletSheetData = { width=160, height=160, numFrames=4, sheetContentWidth=640, sheetContentHeight=160 }
-      local bulletSheet = graphics.newImageSheet( "immagini/livello-1/plastic-bottle.png", bulletSheetData )
+      local bulletSheetData = { width=200, height=84, numFrames=3, sheetContentWidth=600, sheetContentHeight=84 }
+      local bulletSheet = graphics.newImageSheet( "immagini/livello-2/ecoproiettile.png", bulletSheetData )
       local bulletData = {
-        { name="plastic-bottle", sheet=plasticbagSheet, start=1, count=4, time=400, loopCount=0 }
-      }
-      --ESPLOSIONE QUANDO SI COLPISCE IL NEMICO CON IL PROIETTILE
-      local explosionSheetData = { width=200, height=200, numFrames=20, sheetContentWidth=1000, sheetContentHeight=800 }
-      local explosionSheet = graphics.newImageSheet( "immagini/livello-2/explosion.png", explosionSheetData )
-      local explosionData = {
-        { name="explosion", sheet=explosionSheet, start=1, count=20, time=400, loopCount=1}
+        { name="ecoproiettile", sheet=bulletSheet, start=1, count=3, time=400, loopCount=0 }
       }
 
+      --ESPLOSIONE QUANDO SI COLPISCE IL NEMICO CON IL PROIETTILE
+      local explosionSheetData = { width=200, height=200, numFrames=12, sheetContentWidth=2400, sheetContentHeight=200 }
+      local explosionSheet = graphics.newImageSheet( "immagini/livello-1/explosion.png", explosionSheetData )
+      local explosionData = {
+        { name="explosion", sheet=explosionSheet, start=1, count=12, time=800, loopCount=1}
+      }
       -- AGGIUNTO NEL LIVELLO 3 --
       
       -- POZZA D'ACQUA ASSASSINA --
@@ -591,7 +591,7 @@ function scene:show( event )
           group_elements:insert(bullet)
           bullet.x = sprite.x + 80
           bullet.y = sprite.y
-          local outlineBullet= graphics.newOutline(20, bulletSheet, 1)
+          local outlineBullet = graphics.newOutline(6, bulletSheet, 2)
           physics.addBody(bullet, { outline=outlineBullet, density=1, bounce=0, friction=1})
           bullet.isBullet = true
           bullet.isSensor = true
@@ -619,7 +619,7 @@ function scene:show( event )
             print(sprite.x.."è la posizione del mio sprite")
           elseif (event.x > display.actualContentWidth / 2) and (event.x <= display.contentWidth) then
             --ho cliccato sulla parte destra dello shcermo, devo sparare
-            if(scoreCount >= 0) then
+            if(scoreCount > 0) then
               bulletsLoop()
               scoreCount = scoreCount - 1
               scoreText.text = scoreCount.."/"..plasticToCatch
@@ -634,7 +634,7 @@ function scene:show( event )
           --fa scorrere il nemico nello schermo
           if stop == 0 then
             self.x = self.x - (enemySpeed*2)
-            self.y = ground.y - 145
+            self.y = ground.y - 135
           end
         end
         ------------------------------------------------
@@ -646,7 +646,7 @@ function scene:show( event )
           spine:play()
           group_elements:insert(spine)
           spine.x = display.actualContentWidth + 150
-          spine.y = ground.y - 125
+          spine.y = ground.y - 135
           local outlineSpine = graphics.newOutline(4, spineSheet, 1)
           physics.addBody(spine, { outline=outlineSpine, density=1, bounce=0, friction=1})
           spine.isBullet = true
