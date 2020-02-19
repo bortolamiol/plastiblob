@@ -40,31 +40,41 @@ function scene:show( event )
  
     elseif ( phase == "did" ) then
         n=1 --parto dalla prima immagine nominata 1 
-        local leveltarget = event.params.level
-        local numImgs = tostring(event.params.imagetoshow)
-        print(numImgs)
+        local leveltarget = event.params.level --il livello a cui andrò dopo me lo passa la scena 'menu-levels' ed è dentro la variabile level dei parametri
+        local numImgs = tostring(event.params.imagetoshow) --numero di immagini che andrò a  mostrare all'utente, uso questo parametro perchè oogni sttoria ha un numero differente di immagini da mostrare
+        
         --funzione per cambiare immagine
-        function continua( event )
+        function continua( event ) -- questa funzione viene richiamata ogni volta che l'utente clicca sullo schermo per continuare la storia
             if event.phase == "ended" then
-                n = n + 1
-                imagesToShow(n)
+                n = n + 1 --aumento questa variabile che mi servrà per mostrare le immagini in ordine, la prima volta che si entra n = 1 quindi si mostrerà immgine '1.png'
+                imagesToShow(n) --richiamo la funzione per mostrare le immagini, passandogli il numero dell'immagine da mostrare
             end
         end
-        Runtime:addEventListener( "touch", continua )
+        Runtime:addEventListener( "touch", continua ) --ascoltatore che rileva quando si clicca sullo schermo
         
-        function imagesToShow( n )
-            local imgpath
-            if tonumber(n) <= tonumber(numImgs) then
+        function imagesToShow( n ) --prendo in pasto la variabile n
+            local imgpath --dichiaro una variabile che andrò a valorizzare con il percorso dell'immagine
+            if tonumber(n) <= tonumber(numImgs) then --se non sono ancora arrivato all'ultima immagine da mostrare, vado avanti
                 -- se n è minore  uguale al numero di immagini contenute nella cartella del livello scelto
                 -- continuo a sovrapporle una sopra l'altra
-				imgpath = "immagini/livello-"..leveltarget.."/storia/"..n..".png"
+				imgpath = "immagini/livello-"..leveltarget.."/storia/"..n..".png" --creo il percorso dell'immagine
                 local immagine = display.newImageRect(group_background,imgpath,1280,720)
                 immagine.anchorX = 0
                 immagine.anchorY = 0 
             else 
                 -- dopo l'ultima immagine disponibile, cliccando su "continua" il gioco di consentirà di iniziare il gameplay
-				local leveltargetpath = "levels.level" .. leveltarget;
-                composer.gotoScene( leveltargetpath, "fade", 500 )
+                local options = { --parametri che passerò alla prossima schermara
+					effect = "fade", --animazione
+					time = 500, --tempo che durerà l'animazione
+					params = { level = leveltarget } --parametri che gli passo: il numero del livello a cui andare dopo la storia e il numero di immagini da mostrare
+                  }
+                local leveltargetpath --dichiaro una variabile per il percoso a cui puntare
+                if(tonumber(leveltarget) == 1 or tonumber(leveltarget) ==2 or tonumber(leveltarget) == 3 ) then --se devo andare al livello 1, 2 o 3 devo mostrare anche un piccolo tutorial, al livello 4 ci vado direttamente senza tutorial
+                    leveltargetpath = "tutorial" --vado alla pagina di tutorial
+                elseif(tonumber(leveltarget) == 4)  then
+                    leveltargetpath = "levels.level4" --vado al livello 4
+                end
+                composer.gotoScene( leveltargetpath, options)
             end
         end
         imagesToShow( n )
