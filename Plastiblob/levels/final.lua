@@ -162,8 +162,8 @@ function scene:show( event )
     }
 
     --IL NOSTRO PROIETTILE
-    local bulletSheetData = { width=100, height=100, numFrames=3, sheetContentWidth=300, sheetContentHeight=100 }
-    local bulletSheet = graphics.newImageSheet( "immagini/livello-5/ecoproiettile.png", bulletSheetData )
+    local bulletSheetData = { width=150, height=150, numFrames=3, sheetContentWidth=450, sheetContentHeight=150 }
+    local bulletSheet = graphics.newImageSheet( "immagini/finale/ecoproiettile.png", bulletSheetData )
     local bulletData = {
       { name="ecoproiettile", sheet=bulletSheet, start=1, count=3, time=400, loopCount=0 }
     }

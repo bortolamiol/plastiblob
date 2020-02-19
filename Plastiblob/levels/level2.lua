@@ -230,8 +230,9 @@ function scene:show( event )
     -- AGGIUNTO NEL LIVELLO 2 ---
 
     --PROIETTILE
+    --IL NOSTRO PROIETTILE
     local bulletSheetData = { width=150, height=150, numFrames=3, sheetContentWidth=450, sheetContentHeight=150 }
-    local bulletSheet = graphics.newImageSheet( "immagini/livello-2/ecoproiettile.png", bulletSheetData )
+    local bulletSheet = graphics.newImageSheet( "immagini/finale/ecoproiettile.png", bulletSheetData )
     local bulletData = {
       { name="ecoproiettile", sheet=bulletSheet, start=1, count=3, time=400, loopCount=0 }
     }
@@ -612,7 +613,7 @@ function scene:show( event )
       group_elements:insert(bullet)
       bullet.x = sprite.x + 80
       bullet.y = sprite.y - 25
-      local outlineBullet = graphics.newOutline(1, bulletSheet, 1)
+      local outlineBullet = graphics.newOutline(5, bulletSheet, 2  ) --outline dello sprite
       physics.addBody(bullet, { outline=outlineBullet, density=1, bounce=0, friction=1})
       bullet.isBullet = true
       bullet.isSensor = true
