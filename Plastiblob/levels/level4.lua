@@ -918,7 +918,6 @@ function resetScene( tipo)
   --ELIMINO PRIMA LE COSE IN COMUNE
   --resetto le variabili per capire se sta suonando la musica di background nel menu o nel menu levels
     timer.cancel( timeplayed ) --non faccio più andare il  conteggio dei secondi
-    audio.dispose(crunchSound)
     composer.isAudioPlaying=0
     physics.pause()
 
