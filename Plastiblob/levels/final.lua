@@ -14,6 +14,8 @@ local table_bullets = {} --tabella per contenere al suo interno i vari proiettil
 local table_enemy_bullets = {} --tabella per contenere al suo interno i vari proiettili sparati dal nemico
 local enemyLife = 400 --variabile che conterrà la vita del nemico (numero che andrà da 400 a 0)
 local enemySpeed --velocità di scorrimento dei proiettili dei nemici
+local table_loop
+local musicFinal
 
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
@@ -23,6 +25,7 @@ local enemySpeed --velocità di scorrimento dei proiettili dei nemici
 function scene:create( event )
 
   local sceneGroup = self.view
+  musicFinal = audio.loadStream("MUSIC/finalBoss.mp3") --carico la musica finalBoss
   -- Code here runs when the scene is first created but has not yet appeared on screen
   group_background = display.newGroup() --group_background conterrà la foto di sfondo
   group_elements = display.newGroup() --group_elements conterrà tutti gli altri elementi dello schermo: sprite del personaggio, nemici e bottoni per uscire dal gioco
@@ -60,6 +63,8 @@ function scene:show( event )
     -- Code here runs when the scene is still off screen (but is about to come on screen)
 
   elseif ( phase == "did" ) then
+    audio.play( musicFinal, { channel=3, loops=-1 } ) --parte la musica del boss finale
+    
     -- Questa tabella OPTIONS la passerò alla schermata di GameOver quando morirò, la schermata di GameOver prenderà in pasto questi parametri e grazie alla variabile 'level' saprà a che livello tornare (ovvero il livello che ha chiamato tale schermata di GameOver)
     local options = { 
       effect = "fade",
@@ -214,6 +219,7 @@ function scene:show( event )
     function onEnemyBulletCollision( event ) --funzione che controlla se il proiettile nemico tocca il nostro sprite
       if(event.other.name == "sprite") then
         --ci ha presi
+        Runtime:removeEventListener( "touch", touchListener )
         gameOver() --richiamo la funzione di GameOver dove si resetteranno le scene e si andrà alla schermata di gameOver
       end
     end
@@ -338,13 +344,14 @@ function scene:show( event )
         secondsPlayed = secondsPlayed + 1 --ogni secondo che passa aumento questa variabile che tiene conto di quanto tempo è passato
         local x_enemySpeed = ((enemySpeed_max * secondsPlayed)/40) --aggiungo un incremento alla velocità di gioco facendo una proporzione sul tempo di gioco passato
         enemySpeed = enemySpeed_min + x_enemySpeed --la velocità è data dalla velocità minima (2) + il risultato della proporzione
-        timerBullet._delay = timerBullet._delay - secondsPlayed * 3 --aggiorno la velcoità di chiamata del timer dei proiettili del nemico, faccio sparare più velocemetne
+        table_loop[3]._delay =  table_loop[3]._delay - secondsPlayed * 3 --aggiorno la velcoità di chiamata del timer dei proiettili del nemico, faccio sparare più velocemetne
       end
     end
-
-    gameLoop = timer.performWithDelay( 500, loop, 0 ) --richiamo le animazioni di gioco ogni 500 millisecondi
-    timeplayed = timer.performWithDelay( 1000, increaseGameSpeed, 0 ) --funzione che serve per aumentare la velocità di gioco ogni secondo
-    timerBullet = timer.performWithDelay( 1500, enemyBulletsLoop, 0 ) --richiamo lo sparo del nemico
+    print("arriv")
+    table_loop = {}
+    table_loop[1] = timer.performWithDelay( 500, loop, 0 ) --richiamo le animazioni di gioco ogni 500 millisecondi
+    table_loop[2] = timer.performWithDelay( 1000, increaseGameSpeed, 0 ) --funzione che serve per aumentare la velocità di gioco ogni secondo
+    table_loop[3] = timer.performWithDelay( 1500, enemyBulletsLoop, 0 ) --richiamo lo sparo del nemico
   end
 end
 
@@ -356,44 +363,48 @@ function scene:hide( event )
   local phase = event.phase
 
   if ( phase == "will" ) then
+     -- Code here runs immediately after the scene goes entirely off screen
     -- Code here runs when the scene is on screen (but is about to go off screen)
-    physics.pause()
-    timer.cancel(gameLoop)
-    timer.cancel(timeplayed)
-    timer.cancel(timerBullet)
+  
+  physics.pause()
+  --timer.cancel(gameLoop)
+  --timer.cancel(timeplayed)
+ -- timer.cancel(timerBullet)
 
-    --ELIMINO I LISTENERS
-    sprite:removeEventListener("collision")
-    Runtime:removeEventListener( "touch", touchListener )
+  --ELIMINO I LISTENERS
+  sprite:removeEventListener("collision")
 
-    -- RIMUOVO TUTTI GLI ELEMENTI DALLE TABELLE, CHE POSSOONO COMPRENDERE OGGETTI, EVENTI, LISTENERS E TIMER
-    for i=1, #table_bullets do 
-      Runtime:removeEventListener("enterFrame",  table_bullets[i])
-      table_bullets[i]:removeEventListener( "collision", onBulletCollision )
-      table_bullets[i]:removeSelf() -- Optional Display Object Removal
-      table_bullets[i] = nil        -- Nil Out Table Instance
-    end
+  -- RIMUOVO TUTTI GLI ELEMENTI DALLE TABELLE, CHE POSSOONO COMPRENDERE OGGETTI, EVENTI, LISTENERS E TIMER
+  for i=1, #table_bullets do 
+    Runtime:removeEventListener("enterFrame",  table_bullets[i])
+    table_bullets[i]:removeEventListener( "collision", onBulletCollision )
+    table_bullets[i]:removeSelf() -- Optional Display Object Removal
+    table_bullets[i] = nil        -- Nil Out Table Instance
+  end
 
-    for i=1, #table_enemy_bullets do 
-      Runtime:removeEventListener("enterFrame",  table_enemy_bullets[i])
-      table_enemy_bullets[i]:removeEventListener( "collision", onEnemyBulletCollision )
-      table_enemy_bullets[i]:removeSelf() -- Optional Display Object Removal
-      table_enemy_bullets[i] = nil        -- Nil Out Table Instance
-    end
+  for i=1, #table_enemy_bullets do 
+    Runtime:removeEventListener("enterFrame",  table_enemy_bullets[i])
+    table_enemy_bullets[i]:removeEventListener( "collision", onEnemyBulletCollision )
+    table_enemy_bullets[i]:removeSelf() -- Optional Display Object Removal
+    table_enemy_bullets[i] = nil        -- Nil Out Table Instance
+  end
+  for i=1, #table_loop do
+    timer.cancel( table_loop[i] )
+    table_loop[i] = nil        -- Nil Out Table Instance
+  end  
 
   elseif ( phase == "did" ) then
-    -- Code here runs immediately after the scene goes entirely off screen
-    composer.removeScene("levels.final") -- ELIMINO TUTTO CIO' CHE C'E' ALL'INTERNO DELLA SCENA
-  end
+    composer.removeScene( "levels.final") -- ELIMINO TUTTO CIO' CHE C'E' ALL'INTERNO DELLA SCENA
+end
 end
 
 
 -- destroy()
 function scene:destroy( event )
-
+  audio.stop(musicFinal)
+  audio.dispose( musicFinal)
   local sceneGroup = self.view
-  -- Code here runs prior to the removal of scene's view
-
+  
 end
 
 

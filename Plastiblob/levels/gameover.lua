@@ -22,6 +22,7 @@ function scene:show( event )
         -- Code here runs when the scene is still off screen (but is about to come on screen)
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
+        local retryAttempt = 0 --variabile che serviràà per poter farc cliccare solo una volta l'utente sul bottone retry
         local levelTarget = "levels."..event.params.level --Event.params contiene i parametri che si passano alla scena dal chiamante, in questo caso noi prendiamo la variabile level che conterrà il livello in cui dovremmo tornare in fase di 'retry'
         local button_home  --variabile per il bottone di home
         local button_retry --variabile per il bottone di retry
@@ -54,9 +55,12 @@ function scene:show( event )
         group_buttons:insert(button_retry)
 
         function button_retry:touch( event )
-        if event.phase == "began" then
-            timer.performWithDelay( 500, function() composer.gotoScene( levelTarget, "fade", 200 ) end)  --ricomicio il livello puntando al percorso 'levelTarget' valorizzato sopra
-        end
+            if retryAttempt == 0 then
+                retryAttempt = 1
+                if event.phase == "began" then
+                    timer.performWithDelay( 500, function() composer.gotoScene( levelTarget, "fade", 200 ) end)  --ricomicio il livello puntando al percorso 'levelTarget' valorizzato sopra
+                end
+            end
     end
     button_retry:addEventListener( "touch", touch )
     end
