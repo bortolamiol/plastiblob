@@ -487,7 +487,7 @@ function scene:show( event )
           -- audio.setMaxVolume(0.03)
           audio.play(crunchSound)
           scoreCount = scoreCount+1;
-          scoreText.text = scoreCount.."/"..plasticToCatch
+          scoreText.text = scoreCount.."/10"
           Runtime:removeEventListener("enterFrame", event.other) --rimuovo il listener dello scroll, così non si muove più
           local indexToRemove = table.indexOf(table_plasticbag, event.other ) --trovo l'indice che ha all'interno della tabella dei sacchetti di plastica
           table.remove(table_plasticbag, indexToRemove) --lo rimuovo dalla tabella, utilizzando l'indice 'indexToRemove'
@@ -580,8 +580,6 @@ function scene:show( event )
           stop = 1 --blocco l'animazione dello scorrimento di sfondo
           if (castleAppared == 0 ) then --se non ho già fatto apparire il castello, lo faccio apparire
             castleAppared = 1 --non lo faccio più riapparire
-            timer.cancel( callingEnemies ) --non chiamo più nemici
-            timer.cancel( callingPlasticbag ) --non chiamo più sacchetti di plastica
             sprite:removeEventListener("collision") --rimuove l'ascoltatore delle collisioni con i nemici
             Runtime:addEventListener("enterFrame", castleScroll) --chiamo la funzione castleScroll per spostare il castello
           end
@@ -648,7 +646,7 @@ function scene:show( event )
       group_elements:insert(bullet)
       bullet.x = sprite.x + 80
       bullet.y = sprite.y
-      local outlineBullet = graphics.newOutline(6, bulletSheet, 2)
+      local outlineBullet = graphics.newOutline(1, bulletSheet, 2)
       physics.addBody(bullet, { outline=outlineBullet, density=1, bounce=0, friction=1})
       bullet.isBullet = true
       bullet.isSensor = true

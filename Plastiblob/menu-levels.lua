@@ -167,7 +167,7 @@ function scene:show( event )
 				elseif(tonumber(nlevel) == 3) then
 					imagetoshowParam = 2
 				elseif(tonumber(nlevel) == 4) then
-					imagetoshowParam = 5
+					imagetoshowParam = 1
 				end
 				local options = {
 					effect = "fade", --animazione

@@ -547,8 +547,6 @@ function scene:show( event )
           stop = 1 --blocco l'animazione dello scorrimento di sfondo
           if (castleAppared == 0 ) then --se non ho già fatto apparire il castello, lo faccio apparire
             castleAppared = 1 --non lo faccio più riapparire
-            timer.cancel( callingEnemies ) --non chiamo più nemici
-            timer.cancel( callingPlasticbag ) --non chiamo più sacchetti di plastica
             sprite:removeEventListener("collision") --rimuove l'ascoltatore delle collisioni con i nemici
             Runtime:addEventListener("enterFrame", castleScroll) --chiamo la funzione castleScroll per spostare il castello
           end
@@ -611,7 +609,7 @@ function scene:show( event )
       bullet:play()
       group_elements:insert(bullet)
       bullet.x = sprite.x + 80
-      bullet.y = sprite.y
+      bullet.y = sprite.y - 25
       local outlineBullet = graphics.newOutline(6, bulletSheet, 2)
       physics.addBody(bullet, { outline=outlineBullet, density=1, bounce=0, friction=1})
       bullet.isBullet = true
@@ -712,7 +710,7 @@ function scene:show( event )
     callingPlasticbag[1] = timer.performWithDelay( 4000 , plasticbagLoop, 1)
     callingPlasticbag[2] = timer.performWithDelay( 18000 , plasticbagLoop, 1)
     callingPlasticbag[3] = timer.performWithDelay( 16500 , plasticbagLoop, 1)
-    callingPlasticbag[4] = timer.performWithDelay( 23500 , plasticbagLoop, 1)
+    callingPlasticbag[4] = timer.performWithDelay( 22500 , plasticbagLoop, 1)
     callingPlasticbag[5] = timer.performWithDelay( 33000 , plasticbagLoop, 1)
     callingPlasticbag[6] = timer.performWithDelay( 43000 , plasticbagLoop, 1)
     callingPlasticbag[7] = timer.performWithDelay( 47000 , plasticbagLoop, 1)
