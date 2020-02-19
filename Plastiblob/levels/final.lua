@@ -6,13 +6,14 @@ local scene = composer.newScene()
 -- Code outside of the scene event functions below will only be executed ONCE unless
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
 -- -----------------------------------------------------------------------------------
-local gameLoop --timer per le animazioni del gioco
-local life
-local totalLifeRect
+local gameLoop --variabile che conterrà il timer per il loop del gioco: mette in loop le animazioni del personaggio e nemico
+local lifeRect --rettangolo Rosso che avrà larghezza 400 e ha il compito di segnare la vita totale del nemico
+local totalLifeRect --rettangolo che segnerà la vita del nemico
 local timerBullet --timer per richiamare l'attacco del nemico
-local table_bullets = {}
-local table_enemy_bullets = {}
-local enemyLife = 400
+local table_bullets = {} --tabella per contenere al suo interno i vari proiettili sparati dal nostro personaggio
+local table_enemy_bullets = {} --tabella per contenere al suo interno i vari proiettili sparati dal nemico
+local enemyLife = 400 --variabile che conterrà la vita del nemico (numero che andrà da 400 a 0)
+local enemySpeed --velocità di scorrimento dei proiettili dei nemici
 
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
@@ -23,19 +24,16 @@ function scene:create( event )
 
   local sceneGroup = self.view
   -- Code here runs when the scene is first created but has not yet appeared on screen
-  group_background = display.newGroup() --group_background conterrà la foto di sfondo che scrollerà
+  group_background = display.newGroup() --group_background conterrà la foto di sfondo
   group_elements = display.newGroup() --group_elements conterrà tutti gli altri elementi dello schermo: sprite del personaggio, nemici e bottoni per uscire dal gioco
   sceneGroup:insert( group_background ) --inserisco il gruppo group_background dentro la scena
   sceneGroup:insert( group_elements ) --inserisco il gruppo group_elements dentro la scena
-  local _w = display.actualContentWidth  -- Width of screen
-  local _h = display.actualContentHeight  -- Height of screen
-  local _x = 0  -- Horizontal centre of screen
   local _y = 0  -- Vertical centre of screen
-  local bg = display.newImageRect("immagini/final/background.png", _w, _h)
+  local bg = display.newImageRect("immagini/final/background.png", display.actualContentWidth, display.actualContentHeight ) --inserisco la foto di sfondo
   bg.anchorY = 0
   bg.anchorX = 0
   bg.x = 0
-  bg.y = _y
+  bg.y = 0
   group_background:insert(bg)
 
   --richiedo la libreria necessaria per inserire la fisica all'interno del livello
@@ -43,7 +41,7 @@ function scene:create( event )
   physics.start()
   -- Overlays collision outlines on normal display objects
   physics.setGravity( 0,41 )
-  physics.setDrawMode( "hybrid" )
+  --physics.setDrawMode( "hybrid" )
   -- The default Corona renderer, with no collision outlines
   --physics.setDrawMode( "normal" )
   -- Shows collision engine outlines only
@@ -69,9 +67,9 @@ function scene:show( event )
       params = { level="final"} --opzioni che mi serviranno per tornare dal game over
     }
 
-    local secondsPlayed = 0 -- conteggio dei secondi in cui sono all'interno del gioco, più secondi passo più è difficile
-    enemySpeed = 12 --velocità iniziale di scorrimento dei proiettili del nemico
+    local secondsPlayed = 0 -- variabile che conterrà il conteggio dei secondi in cui sono all'interno del gioco, più secondi saranno e più veloci andranno i proiettili sparati dal nemico
     local enemySpeed_min = 12 --velocità iniziale di scorrimento dei proiettili del nemico
+    enemySpeed = enemySpeed_min --velocità di scorrimento dei proiettili del nemico, questa variabile andrà ad essere aumentata nel corso del gioco
     local enemySpeed_max = 18 --velocità massima di scorrimento dei proiettili del nemico
     local stop = 0
 
@@ -150,10 +148,10 @@ function scene:show( event )
     totalLifeRect.anchorX = (display.actualContentWidth - 150)
     group_elements:insert(totalLifeRect)
 
-    life = display.newRect( (display.actualContentWidth - 80), 50, enemyLife , 30 ) --diminuendo il terzo fattore diminuisce la vita
-    life:setFillColor( 255 )
-    life.anchorX = (display.actualContentWidth - 150)
-    group_elements:insert(life)
+    lifeRect = display.newRect( (display.actualContentWidth - 80), 50, enemyLife , 30 ) --diminuendo il terzo fattore diminuisce la vita
+    lifeRect:setFillColor( 255 )
+    lifeRect.anchorX = (display.actualContentWidth - 150)
+    group_elements:insert(lifeRect)
 
     --PROIETTILE NEMICO
     local enemyBulletSheetData = { width=160, height=160, numFrames=6, sheetContentWidth=960, sheetContentHeight=160 }
@@ -278,7 +276,7 @@ function scene:show( event )
     function onBulletCollision( event )
       if(tostring(event.other.name) == "enemy") then
         enemyLife = enemyLife - 4
-        life.width = enemyLife
+        lifeRect.width = enemyLife
         group_elements:remove(event.target)
         event.target:removeEventListener( "collision", onBulletCollision ) --rimuovo l'ascoltatore per la collisione di quel sprite
         Runtime:removeEventListener("enterFrame",event.target) --rimuovo l'ascoltatore che lo fa scrollare

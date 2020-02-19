@@ -646,12 +646,16 @@ function scene:show( event )
       --PARTE FINALE: richiamo le funzioni e aggiungo gli elementi allo schermo e ai gruppi
       timeplayed = timer.performWithDelay( 1000, increaseGameSpeed, 0 )
       gameLoop = timer.performWithDelay( time_speed_min, loop, 0 )
-      callingEnemies = timer.performWithDelay( (timeToPlay/6)*1000, enemiesLoop, 0 )
-      callingPlasticbag = timer.performWithDelay( (timeToPlay/plasticToCatch)*1000, plasticbagLoop, plasticToCatch)
 
-      -- AGGIUNTO NEL LIVELLO 3 --
-      callingPool = timer.performWithDelay( (timeToPlay/14)*1000, poolLoop, 0)
-      --callingPlatform = timer.performWithDelay( platformTimeSpawn, platformLoop, 0)
+      callingEnemies = {}
+      callingPlasticbag = {}
+      callingPool = {}
+
+      callingEnemies[1] = timer.performWithDelay( (timeToPlay/6)*1000, enemiesLoop, 0 )
+
+      callingPlasticbag[1] = timer.performWithDelay( (timeToPlay/plasticToCatch)*1000, plasticbagLoop, plasticToCatch)
+
+      callingPool[1] = timer.performWithDelay( (timeToPlay/14)*1000, poolLoop, 0)
     end
   end
 end
@@ -756,11 +760,7 @@ function resetScene( tipo)
   	
     audio.dispose(crunchSound)
     timer.cancel( gameLoop )
-    timer.cancel( callingEnemies )
-    timer.cancel( callingPlasticbag )
     timer.cancel( timeplayed )
-    timer.cancel( callingPool )
-    --timer.cancel( callingPlatform )
     physics.pause()
 
     --ELIMINO I LISTENERS
@@ -772,6 +772,26 @@ function resetScene( tipo)
     Runtime:removeEventListener("enterFrame", bullet)
 
     --SVUOTO LE TABELLE
+    for i=1, #callingEnemies do
+      timer.cancel( callingEnemies[i] )
+      callingEnemies[i] = nil        -- Nil Out Table Instance
+    end
+    for i=1, #callingPlasticbag do
+      timer.cancel( callingPlasticbag[i] )
+      callingPlasticbag[i] = nil        -- Nil Out Table Instance
+    end
+    for i=1, #callingPool do
+      timer.cancel( callingPool[i] )
+      callingPool[i] = nil        -- Nil Out Table Instance
+    end
+    for i=1, #enemies do
+      enemies[i]:removeSelf() -- Optional Display Object Removal
+      enemies[i] = nil        -- Nil Out Table Instance
+    end
+    for i=1, #table_plasticbag do
+      table_plasticbag[i]:removeSelf() -- Optional Display Object Removal
+      table_plasticbag[i] = nil        -- Nil Out Table Instance
+    end
     for i=1, #enemies do
       enemies[i]:removeSelf() -- Optional Display Object Removal
       enemies[i] = nil        -- Nil Out Table Instance
@@ -810,15 +830,22 @@ function resetScene( tipo)
     Runtime:removeEventListener("enterFrame", bullet)
 
     timer.cancel( gameLoop )
-    timer.cancel( callingEnemies )
-    timer.cancel( callingPlasticbag )
     timer.cancel( timeplayed )
-    timer.cancel( callingPool )
-    --timer.cancel( callingPlatform )
-    --timer.cancel( newTimerOut )
     physics.pause()
 
     --SVUOTO LE TABELLE
+    for i=1, #callingEnemies do
+      timer.cancel( callingEnemies[i] )
+      callingEnemies[i] = nil        -- Nil Out Table Instance
+    end
+    for i=1, #callingPlasticbag do
+      timer.cancel( callingPlasticbag[i] )
+      callingPlasticbag[i] = nil        -- Nil Out Table Instance
+    end
+    for i=1, #callingPool do
+      timer.cancel( callingPool[i] )
+      callingPool[i] = nil        -- Nil Out Table Instance
+    end
     for i=1, #enemies do
       enemies[i]:removeSelf() -- Optional Display Object Removal
       enemies[i] = nil        -- Nil Out Table Instance

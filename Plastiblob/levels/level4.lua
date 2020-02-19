@@ -470,7 +470,7 @@ function scene:show( event )
         end
       end
       function goToTheNewScene()
-        composer.gotoScene( "menu-levels", "fade", 500 ) --vado alla nuova scena
+        composer.gotoScene( "levels.final", "fade", 500 ) --vado alla nuova scena
       end
       ----------------------------------------------
       local function increaseGameSpeed(event)	
