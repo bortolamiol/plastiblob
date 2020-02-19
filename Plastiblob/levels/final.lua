@@ -64,9 +64,9 @@ function scene:show( event )
 
   elseif ( phase == "did" ) then
     audio.play( musicFinal, { channel=3, loops=-1 } ) --parte la musica del boss finale
-    
+
     -- Questa tabella OPTIONS la passerò alla schermata di GameOver quando morirò, la schermata di GameOver prenderà in pasto questi parametri e grazie alla variabile 'level' saprà a che livello tornare (ovvero il livello che ha chiamato tale schermata di GameOver)
-    local options = { 
+    local options = {
       effect = "fade",
       time = 1000,
       params = { level="final"} --opzioni che mi serviranno per tornare dal game over
@@ -76,7 +76,7 @@ function scene:show( event )
     local enemySpeed_min = 12 --velocità iniziale di scorrimento dei proiettili del nemico
     enemySpeed = enemySpeed_min --velocità di scorrimento dei proiettili del nemico, questa variabile andrà ad essere aumentata nel corso del gioco
     local enemySpeed_max = 18 --velocità massima di scorrimento dei proiettili del nemico
-    local stop = 0 --variabile che farà andare o meno avanti le funzioni di loop, se è finito il gioco setterò questa variabile a 1 
+    local stop = 0 --variabile che farà andare o meno avanti le funzioni di loop, se è finito il gioco setterò questa variabile a 1
     local groundHeight = 100 --altezza del suolo
     local ground = display.newRect( 0, 0, 99999, groundHeight ) --disegno il suolo
     ground:setFillColor(0,0,0,0) --lo rendo trasparente
@@ -166,8 +166,8 @@ function scene:show( event )
     local bulletSheetData = { width=100, height=100, numFrames=3, sheetContentWidth=300, sheetContentHeight=100 }
     local bulletSheet = graphics.newImageSheet( "immagini/livello-5/ecoproiettile.png", bulletSheetData )
     local bulletData = {
-        { name="ecoproiettile", sheet=bulletSheet, start=1, count=3, time=400, loopCount=0 }
-      }
+      { name="ecoproiettile", sheet=bulletSheet, start=1, count=3, time=400, loopCount=0 }
+    }
 
 
 
@@ -186,8 +186,8 @@ function scene:show( event )
     function sprite.collision( self, event ) --se tocco terra imposto che posso saltare ancora
       if( event.phase == "began" ) then
         if(event.other.name == "ground") then --tocco terra
-            sprite.isJumping = false --non sto più saltando
-            sprite:setSequence("walking")	--lo sprite non sta più saltando ma camminerà, do quindi allo sprite l'animazione della camminata
+          sprite.isJumping = false --non sto più saltando
+          sprite:setSequence("walking")	--lo sprite non sta più saltando ma camminerà, do quindi allo sprite l'animazione della camminata
         end
       end
     end
@@ -206,7 +206,7 @@ function scene:show( event )
 
     function win() --quando entro qui devo mandare alla scena del gameover e resettare la scena
       stop = 1 -- grazie a questo le animazioni personagggi non scrolleranno più
-      local options = { 
+      local options = {
         effect = "crossFade",
         time = 1000,
         params = {level= 6, imagetoshow = 4} --opzioni che mi serviranno per tornare dal game over
@@ -250,7 +250,7 @@ function scene:show( event )
       enemybullet.y = math.random( 400, 600) --la posizione y sarà random tra due fattori --> 400 e 600
       local outlineBullet = graphics.newOutline(6, enemyBulletSheet, 2)  --creo l'outline
       physics.addBody(enemybullet, { outline=outlineBullet, density=1, bounce=0, friction=1})
-      enemybullet.isBullet = true 
+      enemybullet.isBullet = true
       enemybullet.isSensor = true
       enemybullet.bodyType = "kinematic"
       return enemybullet --ritorno l'oggetto appena creato al chiamante
@@ -347,7 +347,6 @@ function scene:show( event )
         table_loop[3]._delay =  table_loop[3]._delay - secondsPlayed * 3 --aggiorno la velcoità di chiamata del timer dei proiettili del nemico, faccio sparare più velocemetne
       end
     end
-    print("arriv")
     table_loop = {}
     table_loop[1] = timer.performWithDelay( 500, loop, 0 ) --richiamo le animazioni di gioco ogni 500 millisecondi
     table_loop[2] = timer.performWithDelay( 1000, increaseGameSpeed, 0 ) --funzione che serve per aumentare la velocità di gioco ogni secondo
@@ -363,39 +362,39 @@ function scene:hide( event )
   local phase = event.phase
 
   if ( phase == "will" ) then
-     -- Code here runs immediately after the scene goes entirely off screen
+    -- Code here runs immediately after the scene goes entirely off screen
     -- Code here runs when the scene is on screen (but is about to go off screen)
-  
-  physics.pause()
-  --timer.cancel(gameLoop)
-  --timer.cancel(timeplayed)
- -- timer.cancel(timerBullet)
 
-  --ELIMINO I LISTENERS
-  sprite:removeEventListener("collision")
+    physics.pause()
+    --timer.cancel(gameLoop)
+    --timer.cancel(timeplayed)
+    -- timer.cancel(timerBullet)
 
-  -- RIMUOVO TUTTI GLI ELEMENTI DALLE TABELLE, CHE POSSOONO COMPRENDERE OGGETTI, EVENTI, LISTENERS E TIMER
-  for i=1, #table_bullets do 
-    Runtime:removeEventListener("enterFrame",  table_bullets[i])
-    table_bullets[i]:removeEventListener( "collision", onBulletCollision )
-    table_bullets[i]:removeSelf() -- Optional Display Object Removal
-    table_bullets[i] = nil        -- Nil Out Table Instance
-  end
+    --ELIMINO I LISTENERS
+    sprite:removeEventListener("collision")
 
-  for i=1, #table_enemy_bullets do 
-    Runtime:removeEventListener("enterFrame",  table_enemy_bullets[i])
-    table_enemy_bullets[i]:removeEventListener( "collision", onEnemyBulletCollision )
-    table_enemy_bullets[i]:removeSelf() -- Optional Display Object Removal
-    table_enemy_bullets[i] = nil        -- Nil Out Table Instance
-  end
-  for i=1, #table_loop do
-    timer.cancel( table_loop[i] )
-    table_loop[i] = nil        -- Nil Out Table Instance
-  end  
+    -- RIMUOVO TUTTI GLI ELEMENTI DALLE TABELLE, CHE POSSOONO COMPRENDERE OGGETTI, EVENTI, LISTENERS E TIMER
+    for i=1, #table_bullets do
+      Runtime:removeEventListener("enterFrame",  table_bullets[i])
+      table_bullets[i]:removeEventListener( "collision", onBulletCollision )
+      table_bullets[i]:removeSelf() -- Optional Display Object Removal
+      table_bullets[i] = nil        -- Nil Out Table Instance
+    end
+
+    for i=1, #table_enemy_bullets do
+      Runtime:removeEventListener("enterFrame",  table_enemy_bullets[i])
+      table_enemy_bullets[i]:removeEventListener( "collision", onEnemyBulletCollision )
+      table_enemy_bullets[i]:removeSelf() -- Optional Display Object Removal
+      table_enemy_bullets[i] = nil        -- Nil Out Table Instance
+    end
+    for i=1, #table_loop do
+      timer.cancel( table_loop[i] )
+      table_loop[i] = nil        -- Nil Out Table Instance
+    end
 
   elseif ( phase == "did" ) then
     composer.removeScene( "levels.final") -- ELIMINO TUTTO CIO' CHE C'E' ALL'INTERNO DELLA SCENA
-end
+  end
 end
 
 
@@ -403,7 +402,7 @@ end
 function scene:destroy( event )
  -- audio.dispose( musicFinal)
   local sceneGroup = self.view
-  
+
 end
 
 
