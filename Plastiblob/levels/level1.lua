@@ -1,8 +1,8 @@
------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 --
 -- PRIMO LIVELLO DEL GIOCO: SALTARE I NEMICI E RACCOGLIERE LA PLASTICA DAL CIELO
 --
------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
 
 -- dichiaro delle variabili che andrò a usare in varie scene del livello
 local localLevel = 1 --VARIABILE CHE CONTIENE IL NUMERO DI LIVELLO A CUI APPARTIENE IL FILE LUA: IN QUESTO CASO SIAMO AL LIVELLO 1
@@ -114,7 +114,7 @@ function scene:show( event )
     ----------------------------------------------------------------------------
     ----------------------------------------------------------------------------
     local enemySpeed_max = 7.5 -- massima velocità di spostamento del nemico
-    local enemySpeed_min = 4-- minima velocità di spostamento del nemico
+    local enemySpeed_min = 4.5-- minima velocità di spostamento del nemico
     local enemySpeed = enemySpeed_min --velocità iniziale di spostamento del nemico, parte dal valore minimo
 
     local frame_speed = 20 --questa sarà la velocità dello scorrimento del nostro sfondo, si sposta di 20 pixel in 20
@@ -580,8 +580,14 @@ function scene:destroy( event )
   local sceneGroup = self.view
   audio.dispose( musicLevel1)
 end
-----------------------------------------------
---FUNZIONE PER AGGIORNARE L'HIGHSCORE
+
+
+----------------------------------------------------------------------------
+  ----------------------------------------------------------------------------
+  -----------------     FUNZIONE PER AGGIORNARE IL DB      -------------------
+  ----------------------------------------------------------------------------
+  ----------------------------------------------------------------------------
+    
 function updateHighScore(scoreCount) --funzione che serve per aggiornare l'high score dell'utente
   local sqlite3 = require( "sqlite3" )
   local path = system.pathForFile( "data.db", system.DocumentsDirectory )
@@ -615,7 +621,7 @@ function updateHighScore(scoreCount) --funzione che serve per aggiornare l'high 
     end
   end
 end
-----------------------------------------------
+----------------------------------------------------------------------------
 
 function resetScene( tipo)
 
