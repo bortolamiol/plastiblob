@@ -63,7 +63,7 @@ function scene:show( event )
     -- Code here runs when the scene is still off screen (but is about to come on screen)
 
   elseif ( phase == "did" ) then
-    audio.play( musicFinal, { channel=3, loops=-1 } ) --parte la musica del boss finale
+    audio.play( musicFinal, { channel=4, loops=-1 } ) --parte la musica del boss finale
 
     -- Questa tabella OPTIONS la passerò alla schermata di GameOver quando morirò, la schermata di GameOver prenderà in pasto questi parametri e grazie alla variabile 'level' saprà a che livello tornare (ovvero il livello che ha chiamato tale schermata di GameOver)
     local options = {
@@ -196,8 +196,8 @@ function scene:show( event )
 
     function gameOver() --quando entro qui devo mandare alla scena del gameover e resettare la scena
       stop = 1 -- grazie a questo le animazioni personagggi non scrolleranno più
-      audio.pause(crunchSound)
-      audio.setMaxVolume(0.03)
+      audio.stop(4)
+      --audio.setMaxVolume(0.03)
       local audiogameover = audio.loadSound("MUSIC/PERDENTE.mp3")
       audio.play(audiogameover)
       composer.gotoScene( "levels.gameover", options ) --vado alla scena del gameover passandogli la tabella Options per sapere dove tornare se si clicca 'retry'
