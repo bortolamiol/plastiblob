@@ -44,6 +44,13 @@ function scene:create( event )
 	titleLogo.anchorY = 0
 	titleLogo.x= contentCenterX
 	titleLogo.y= -100
+
+	-- display del logo Uniud
+	local uniLogo = display.newImageRect( "immagini/menu/uniLogo.png", 200, 200 )
+	uniLogo.anchorX = 0
+	uniLogo.anchorY = 0
+	uniLogo.x = display.contentCenterX-580
+	uniLogo.y = display.contentCenterY+120
 	
 	
 	-- create a widget button (which will loads level1.lua on release)
