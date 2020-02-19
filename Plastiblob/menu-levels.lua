@@ -31,9 +31,9 @@ function scene:show( event )
 		menu = display.newGroup() --group_elements conterrà tutti gli altri elementi dello schermo: sprite del personaggio, nemici e bottoni per uscire dal gioco
 		scene_stars = display.newGroup() --group_elements conterrà tutti gli altri elementi dello schermo: sprite del personaggio, nemici e bottoni per uscire dal gioco
 		
-		sceneGroup:insert( backgroundImage )
-		sceneGroup:insert( menu )
-		sceneGroup:insert( scene_stars )
+		sceneGroup:insert( backgroundImage ) -- il primmo gruppo che si visualizzerà sarà quello dell'immagine di bg
+		sceneGroup:insert( menu ) --questo conterrà le foto dei livelli
+		sceneGroup:insert( scene_stars ) --questo le stelle che sarannno posizionate sopra le foto dei livelli
 
 
 		local musicTrack1 = audio.loadStream("MUSIC/THEME.mp3") --carico musica "tema"
@@ -49,7 +49,7 @@ function scene:show( event )
 		end
 		
 		--creo una variabile che contenga i livelli a cui sono arrivato, se non ho passato nessun livello partirà da 1
-		local livellicompletati 
+		local livellicompletati --variabile che andrà ad essere valorizzata in base al numero di livelli che l'utente ha completato
 		local scores = {}
 		--CREAZIONE DI UN DATABASE PER CONTENERE I LIVELLI
 		-- Require the SQLite library
@@ -72,16 +72,17 @@ function scene:show( event )
 				--print( "Row:", row.level )
 				--Crea una tabella dove inserire i dati che troviamo dentro la tabella dei livelli
 				levels[#levels+1] = {
-					FirstName = row.FirstName,
-					level = row.level,
-					scoreLevel1 = row.scoreLevel1 ,
-					scoreLevel2 = row.scoreLevel2,
-					scoreLevel3 = row.scoreLevel3,
-					scoreLevel4 = row.scoreLevel4,
+					FirstName = row.FirstName, --questa variabile contiene l'ID del giocatore, ovviamente noi avendo il db in locale non avremmo altri utenti, ma nel caso si volesse portare il gioco ad un "online" questa chiave primaria servirebbe che identificare ogni singolo utente che gioca
+					level = row.level, --numero del livello a cui l'utente è arrivato
+					scoreLevel1 = row.scoreLevel1 , --punteggio acquisito nel livello 1
+					scoreLevel2 = row.scoreLevel2, --punteggio acquisito nel livello 2
+					scoreLevel3 = row.scoreLevel3, --punteggio acquisito nel livello 3
+					scoreLevel4 = row.scoreLevel4, --punteggio acquisito nel livello 4
 					print("Livello: " ..row.level .. "  || 1: " ..row.scoreLevel1 .. " || 2: " ..row.scoreLevel2 .. " || 3: " ..row.scoreLevel3 .. " || 4: " ..row.scoreLevel4 ) 
 				}
-				livellicompletati = levels[1].level		
-				scores[1] = levels[1].scoreLevel1
+				livellicompletati = levels[1].level --livelli completati viene valorizzato con qeusta variabile
+				--la tabella scores viene valorizzata, ogni posizione conterrà il punteggio ottenuto nel livello
+				scores[1] = levels[1].scoreLevel1 
 				scores[2] = levels[1].scoreLevel2
 				scores[3] = levels[1].scoreLevel3
 				scores[4] = levels[1].scoreLevel4
@@ -95,13 +96,15 @@ function scene:show( event )
 			db:exec( insertQuery )
 			--dato che la tabella non esisteva vuol dire che è la prima volta che l'utente gioca, perciò lo faccio iniziare dal livello 1
 			livellicompletati = 1
-			scores[1] = 0
+			--dato che ho appena creato la tabella, non ho completato nessun livello --> non ho ottenuto punteggi
+			scores[1] = 0 
 			scores[2] = 0
 			scores[3] = 0
 			scores[4] = 0
 		end
 
 		local function checkStars(score) --funzione che ritorna quante stelle ho raggiunto sul livello
+			--in base al numero di oggetti di plastica raccolti, ritorno delle stelle di merito all'utente
 			local stars
 			if(tonumber(score) <= 3) then --se ho preso meno di 4 plastiche...
 				--ritorno una stella
@@ -113,21 +116,20 @@ function scene:show( event )
 				--ritorno tre stelle
 				stars = 3
 			end 
-			print("ritorno: " ..  stars)
 			return stars
 		end
 		--inserisco le immagini dei livelli dentro un vettore/tabella
-		--per iniziare useremo 8 livelli, creerò quindi un for da 1 a 8 e ogni livello avrà un identificativo dentro i 
+		--per iniziare useremo 4 livelli, creerò quindi un for da 1 a 4 8 e ogni livello avrà un identificativo dentro 'i' 
 		local levels={}
 		for i=1, 4 do
-			local impath
+			local impath --percorso dell'immagine che andremo a valorizzare in seguito
 			--controllo se ho già passato il livello nell'identificativo su cui è posizionata 1
 			if tonumber(livellicompletati) >= tonumber(i) then
 				--assegno al percorso dell'immagine l'immagine corrispondente al livello in modalità SBLOCCATA
-				impath = "immagini/menu/livelli/"..i..".png"
+				impath = "immagini/menu/livelli/"..i..".png" --grazie al ciclo for, riuscirò a valorizzare impath in maniera sempre differente, prima con 1.png, 2.png, 3 ecc
 				if(tonumber(livellicompletati) > 1) then
 					local numberOfStars = checkStars(scores[i]) --quante stelle ha fatto l'utente
-					local starsPath = "immagini/menu/livelli/star"..numberOfStars..".png"
+					local starsPath = "immagini/menu/livelli/star"..numberOfStars..".png" --in base al numero tornato cerco l'immagine giusta (1 o 2 o 3)
 					local starImage = display.newImageRect( scene_stars, starsPath, 200, 200 )
 					starImage.anchorX = 0
 					starImage.anchorY = 0
@@ -147,20 +149,33 @@ function scene:show( event )
 			levels[i].y = 310 --dispongo le immagini a metà dello shcermo
 		end
 		
-		--questa funzione serve per capire quando ho cliccato su un'immagine per andare sul livello cliccato
+		--questa funzione serve per capire quando ho cliccato su un'immagine per andare sulla storia del livello cliccato
 		function levels:touch( event )
 			if event.phase == "began" then
 				--grazie al nome dell'oggetto riesco a capire su quale immagine ho cliccato
 				local nlevel = tostring(event.target.name)
 				--controllo se ho accesso al livello in quanto devo aver superato quello prima
+
+				--per far vedere all'utente la storia, abbiamo creato UN SOLO file lua, che in base al numero di immagini da mostrare fa un ciclo e le mostra
+				--ovviamente dobbiamo dire quante immagini mostrare, per esempio il livello 1 ha bisogno di 5 immagini, il livello 2 di 3 immagini e così via
+				--questo parametro poi lo passeremo grazie alla tabella 'options' che conterrà il nostro parametro 'imagetoshow'
+				if(nlevel == 1) then
+					imagetoshow = 5
+				elseif(nlevel == 2) then
+					imagetoshow = 3
+				elseif(nlevel == 3) then
+					imagetoshow = 2
+				elseif(nlevel == 4) then
+					imagetoshow = 5
+				end
 				local options = {
-					effect = "fade",
-					time = 500,
-					params = { level= nlevel, imagetoshow = 5 }
+					effect = "fade", --animazione
+					time = 500, --tempo che durerà l'animazione
+					params = { level= nlevel, imagetoshow } --parametri che gli passo: il numero del livello a cui andare dopo la storia e il numero di immagini da mostrare
 				  }
-				if(tonumber(livellicompletati) >= tonumber(nlevel)) then
-					local leveltargetpath = "levels.storylevel"
-					composer.gotoScene( leveltargetpath, options)
+				if(tonumber(livellicompletati) >= tonumber(nlevel)) then --se ho il permesso di cliccare sull'immagine..vado al livello
+					local leveltargetpath = "levels.storylevel" --path della storia
+					composer.gotoScene( leveltargetpath, options) --vado alla storia, passandogli la tabella options
 					audio.stop();
 					audio.dispose( musicTrack1 )
 				end
