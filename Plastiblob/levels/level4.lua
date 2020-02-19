@@ -34,6 +34,7 @@ local gameFinished
 local newTimerOut
 local nextScene = "menu-levels"
 local crunchSound = audio.loadSound("MUSIC/crunch.mp3")
+local musicLevel4
 function scene:create( event )
 
   -- Called when the scene's view does not exist.
@@ -41,6 +42,7 @@ function scene:create( event )
   -- INSERT code here to initialize the scene
   -- e.g. add display objects to 'sceneGroup', add touch listeners, etc.
   local sceneGroup = self.view
+  musicLevel4 = audio.loadStream("MUSIC/level4.mp3") --carico la musica level4
   --creo due nuovi gruppi che inserirò all'interno del gruppo 'padre' sceneGroup
   group_tutorial = display.newGroup() --group_background conterrà la foto di sfondo che scrollerà
   group_background = display.newGroup() --group_background conterrà la foto di sfondo che scrollerà
@@ -62,7 +64,7 @@ function scene:show( event )
     physics.start()
     -- Overlays collision outlines on normal display objects
     physics.setGravity( 0,41 )
-    physics.setDrawMode( "hybrid" )
+    --physics.setDrawMode( "hybrid" )
     -- The default Corona renderer, with no collision outlines
     --physics.setDrawMode( "normal" )
     -- Shows collision engine outlines only
@@ -78,6 +80,8 @@ function scene:show( event )
 
       ]]--
     elseif(tutorial == 1) then
+     
+      audio.play( musicLevel4, { channel=3, loops=-1 } ) --parte la musica del livello 4
       --VARIABILE CHE CONTIENE TUTTE LE INFORMAZIONI DEL LIVELLO
       local options = {
         effect = "fade",
@@ -221,18 +225,18 @@ function scene:show( event )
       -- AGGIUNTO NEL LIVELLO 2 ---
 
       --PROIETTILE
-      local bulletSheetData = { width=200, height=84, numFrames=3, sheetContentWidth=600, sheetContentHeight=84 }
-      local bulletSheet = graphics.newImageSheet( "immagini/livello-2/ecoproiettile.png", bulletSheetData )
+      local bulletSheetData = { width=160, height=160, numFrames=4, sheetContentWidth=640, sheetContentHeight=160 }
+      local bulletSheet = graphics.newImageSheet( "immagini/livello-1/plastic-bottle.png", bulletSheetData )
       local bulletData = {
-        { name="ecoproiettile", sheet=bulletSheet, start=1, count=3, time=400, loopCount=0 }
+        { name="plastic-bottle", sheet=plasticbagSheet, start=1, count=4, time=400, loopCount=0 }
+      }
+      --ESPLOSIONE QUANDO SI COLPISCE IL NEMICO CON IL PROIETTILE
+      local explosionSheetData = { width=200, height=200, numFrames=20, sheetContentWidth=1000, sheetContentHeight=800 }
+      local explosionSheet = graphics.newImageSheet( "immagini/livello-2/explosion.png", explosionSheetData )
+      local explosionData = {
+        { name="explosion", sheet=explosionSheet, start=1, count=20, time=400, loopCount=1}
       }
 
-      --ESPLOSIONE QUANDO SI COLPISCE IL NEMICO CON IL PROIETTILE
-      local explosionSheetData = { width=200, height=200, numFrames=12, sheetContentWidth=2400, sheetContentHeight=200 }
-      local explosionSheet = graphics.newImageSheet( "immagini/livello-1/explosion.png", explosionSheetData )
-      local explosionData = {
-        { name="explosion", sheet=explosionSheet, start=1, count=12, time=800, loopCount=1}
-      }
       -- AGGIUNTO NEL LIVELLO 3 --
       
       -- POZZA D'ACQUA ASSASSINA --
@@ -388,7 +392,7 @@ function scene:show( event )
         stop = 1 -- grazie a questo le animazioni personagggi non scrolleranno più
         -- audio
         audio.pause(crunchSound)	
-        audio.setMaxVolume(0.03)	
+        --audio.setMaxVolume(0.03)	
         local audiogameover = audio.loadSound("MUSIC/PERDENTE.mp3")	
         audio.play(audiogameover)
         --audio.play(audiogameover)
@@ -401,7 +405,7 @@ function scene:show( event )
         if( event.phase == "began" ) then
           --tutte le informazioni dell'elemento che ho toccato le troviamo dentro event.other
           if(event.other.name ==  "plasticbag") then --mi sono scontrato con il sacchetto
-            audio.setMaxVolume(0.03)	
+            --audio.setMaxVolume(0.03)	
             audio.play(crunchSound)
             scoreCount = scoreCount+1;
             scoreText.text = scoreCount.."/"..plasticToCatch
@@ -470,7 +474,7 @@ function scene:show( event )
         end
       end
       function goToTheNewScene()
-        composer.gotoScene( "levels.final", "fade", 500 ) --vado alla nuova scena
+        composer.gotoScene( "menu-levels", "fade", 500 ) --vado alla nuova scena
       end
       ----------------------------------------------
       local function increaseGameSpeed(event)	
@@ -591,7 +595,7 @@ function scene:show( event )
           group_elements:insert(bullet)
           bullet.x = sprite.x + 80
           bullet.y = sprite.y
-          local outlineBullet = graphics.newOutline(6, bulletSheet, 2)
+          local outlineBullet= graphics.newOutline(20, bulletSheet, 1)
           physics.addBody(bullet, { outline=outlineBullet, density=1, bounce=0, friction=1})
           bullet.isBullet = true
           bullet.isSensor = true
@@ -619,7 +623,7 @@ function scene:show( event )
             print(sprite.x.."è la posizione del mio sprite")
           elseif (event.x > display.actualContentWidth / 2) and (event.x <= display.contentWidth) then
             --ho cliccato sulla parte destra dello shcermo, devo sparare
-            if(scoreCount > 0) then
+            if(scoreCount >= 0) then
               bulletsLoop()
               scoreCount = scoreCount - 1
               scoreText.text = scoreCount.."/"..plasticToCatch
@@ -634,7 +638,7 @@ function scene:show( event )
           --fa scorrere il nemico nello schermo
           if stop == 0 then
             self.x = self.x - (enemySpeed*2)
-            self.y = ground.y - 135
+            self.y = ground.y - 145
           end
         end
         ------------------------------------------------
@@ -646,7 +650,7 @@ function scene:show( event )
           spine:play()
           group_elements:insert(spine)
           spine.x = display.actualContentWidth + 150
-          spine.y = ground.y - 135
+          spine.y = ground.y - 125
           local outlineSpine = graphics.newOutline(4, spineSheet, 1)
           physics.addBody(spine, { outline=outlineSpine, density=1, bounce=0, friction=1})
           spine.isBullet = true
@@ -830,6 +834,7 @@ function scene:destroy( event )
   --
   -- INSERT code here to cleanup the scene
   -- e.g. remove display objects, remove touch listeners, save state, etc.
+  audio.dispose( musicLevel4) --elimino la musica del livello
   local sceneGroup = self.view
 
 end

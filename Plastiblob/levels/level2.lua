@@ -30,6 +30,7 @@ local gameFinished
 local newTimerOut
 local nextScene = "menu-levels"
 local crunchSound = audio.loadSound("MUSIC/crunch.mp3")
+local musicLevel2
 function scene:create( event )
 
   -- Called when the scene's view does not exist.
@@ -37,6 +38,7 @@ function scene:create( event )
   -- INSERT code here to initialize the scene
   -- e.g. add display objects to 'sceneGroup', add touch listeners, etc.
   local sceneGroup = self.view
+  musicLevel2 = audio.loadStream("MUSIC/level2.mp3")
   ----------------------------------------------------------------------------
   ----------------------------------------------------------------------------
   ------------------------  GRUPPPI DEL DISPLAY  -----------------------------
@@ -67,6 +69,8 @@ function scene:show( event )
     physics.setGravity( 0,41 )
 
   elseif phase == "did" then
+    
+    audio.play( musicLevel2, { channel=3, loops=-1 } ) --parte la musica del livello 2
     ----------------------------------------------------------------------------
     ----------------------------------------------------------------------------
     -------------------------   PARAMETRI DEL LIVELLO  -------------------------
@@ -748,7 +752,7 @@ function scene:destroy( event )
   -- INSERT code here to cleanup the scene
   -- e.g. remove display objects, remove touch listeners, save state, etc.
   local sceneGroup = self.view
-  audio.dispose( musicLevel1)
+  audio.dispose( musicLevel2)
 end
 
 
