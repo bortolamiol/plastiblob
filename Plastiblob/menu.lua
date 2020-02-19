@@ -25,7 +25,6 @@ end
 
 function scene:create( event )
 	local sceneGroup = self.view
-	_G.audioPlaying = 0
 	-- Called when the scene's view does not exist.
 	-- 
 	-- INSERT code here to initialize the scene
@@ -123,7 +122,7 @@ function scene:show( event )
 		
 		--INIZIALIZZO AUDIO
 		composer.isAudioPlayingMenu = 0;
-		audio.setVolume(0.2)
+		--audio.setVolume(0.2)
 		if (composer.isAudioPlaying==1) then
 			print("channel 2 sta già suonando, non fare nulla")
 		elseif(composer.isAudioPlayingMenu==1) then
