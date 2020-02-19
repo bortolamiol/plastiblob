@@ -228,11 +228,11 @@ function scene:show( event )
     castle.y = ground.y - castle.height/2 - groundHeight/2
     group_castle:insert(castle)
 
-    --PROIETTILE
-    local bulletSheetData = { width=200, height=84, numFrames=3, sheetContentWidth=600, sheetContentHeight=84 }
+    --Sprite del proiettile
+    local bulletSheetData = { width=150, height=150, numFrames=7, sheetContentWidth=1050, sheetContentHeight=150 }
     local bulletSheet = graphics.newImageSheet( "immagini/livello-2/ecoproiettile.png", bulletSheetData )
     local bulletData = {
-      { name="ecoproiettile", sheet=bulletSheet, start=1, count=3, time=400, loopCount=0 }
+      { name="ecoproiettile", sheet=bulletSheet, start=1, count=7, time=400, loopCount=0 }
     }
 
     --ESPLOSIONE QUANDO SI COLPISCE IL NEMICO CON IL PROIETTILE
@@ -648,7 +648,7 @@ function scene:show( event )
       group_elements:insert(bullet)
       bullet.x = sprite.x + 80
       bullet.y = sprite.y
-      local outlineBullet = graphics.newOutline(1, bulletSheet, 2)
+      local outlineBullet = graphics.newOutline(1, bulletSheet, 1)
       physics.addBody(bullet, { outline=outlineBullet, density=1, bounce=0, friction=1})
       bullet.isBullet = true
       bullet.isSensor = true

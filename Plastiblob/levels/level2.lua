@@ -68,7 +68,7 @@ function scene:show( event )
     physics.start()
     -- Overlays collision outlines on normal display objects
     physics.setGravity( 0,41 )
-
+    physics.setDrawMode("hybrid")
   elseif phase == "did" then
     
     audio.play( musicLevel2, { channel=3, loops=-1 } ) --parte la musica del livello 2
@@ -230,10 +230,10 @@ function scene:show( event )
     -- AGGIUNTO NEL LIVELLO 2 ---
 
     --PROIETTILE
-    local bulletSheetData = { width=200, height=84, numFrames=3, sheetContentWidth=600, sheetContentHeight=84 }
+    local bulletSheetData = { width=150, height=150, numFrames=7, sheetContentWidth=1050, sheetContentHeight=150 }
     local bulletSheet = graphics.newImageSheet( "immagini/livello-2/ecoproiettile.png", bulletSheetData )
     local bulletData = {
-      { name="ecoproiettile", sheet=bulletSheet, start=1, count=3, time=400, loopCount=0 }
+      { name="ecoproiettile", sheet=bulletSheet, start=1, count=7, time=400, loopCount=0 }
     }
     --ESPLOSIONE QUANDO SI COLPISCE IL NEMICO CON IL PROIETTILE
     local explosionSheetData = { width=200, height=200, numFrames=12, sheetContentWidth=2400, sheetContentHeight=200 }
@@ -612,11 +612,11 @@ function scene:show( event )
       group_elements:insert(bullet)
       bullet.x = sprite.x + 80
       bullet.y = sprite.y - 25
-      local outlineBullet = graphics.newOutline(6, bulletSheet, 2)
+      local outlineBullet = graphics.newOutline(1, bulletSheet, 1)
       physics.addBody(bullet, { outline=outlineBullet, density=1, bounce=0, friction=1})
       bullet.isBullet = true
       bullet.isSensor = true
-      bullet.bodyType = "static"
+      bullet.bodyType = "kinematic"
       return bullet
     end
     ------------------------------------------------
