@@ -651,11 +651,11 @@ function scene:show( event )
       callingPlasticbag = {}
       callingPool = {}
 
-      callingEnemies[1] = timer.performWithDelay( (timeToPlay/6)*1000, enemiesLoop, 0 )
+      callingEnemies[1] = timer.performWithDelay (2000, enemiesLoop, 0 )
 
       callingPlasticbag[1] = timer.performWithDelay( (timeToPlay/plasticToCatch)*1000, plasticbagLoop, plasticToCatch)
 
-      callingPool[1] = timer.performWithDelay( (timeToPlay/14)*1000, poolLoop, 0)
+      --callingPool[1] = timer.performWithDelay( (timeToPlay/14)*1000, poolLoop, 0)
     end
   end
 end
