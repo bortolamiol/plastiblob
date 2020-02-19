@@ -63,15 +63,15 @@ function scene:show( event )
     -- Code here runs when the scene is still off screen (but is about to come on screen)
 
   elseif ( phase == "did" ) then
-    audio.play( musicFinal, { channel=3, loops=-1 } ) --parte la musica del boss finale
-
+   
+   audio.play( musicFinal, { channel=3, loops=-1 } ) --parte la musica del boss finale
+    print("result audio: "..tostring(res))
     -- Questa tabella OPTIONS la passerò alla schermata di GameOver quando morirò, la schermata di GameOver prenderà in pasto questi parametri e grazie alla variabile 'level' saprà a che livello tornare (ovvero il livello che ha chiamato tale schermata di GameOver)
     local options = {
       effect = "fade",
       time = 1000,
       params = { level="final"} --opzioni che mi serviranno per tornare dal game over
     }
-
     local secondsPlayed = 0 -- variabile che conterrà il conteggio dei secondi in cui sono all'interno del gioco, più secondi saranno e più veloci andranno i proiettili sparati dal nemico
     local enemySpeed_min = 12 --velocità iniziale di scorrimento dei proiettili del nemico
     enemySpeed = enemySpeed_min --velocità di scorrimento dei proiettili del nemico, questa variabile andrà ad essere aumentata nel corso del gioco
@@ -313,11 +313,13 @@ function scene:show( event )
     end
     ------------------------------------------------
     local function bulletsLoop() -- funzione che verrà richiamata quando clicco sullo schermo per sparare
-      bullet = createBullet() --creo un'istanza di un oggetto sprite plastic bag
-      table.insert(table_bullets, bullet)
-      bullet:addEventListener( "collision", onBulletCollision )
-      bullet.enterFrame = bulletScroll --lo faccio scrollare, grazie alla funzione plasticbagScroll
-      Runtime:addEventListener("enterFrame", bullet) --assegno all'evento enterframe lo scroll
+     if(stop == 0) then
+        bullet = createBullet() --creo un'istanza di un oggetto sprite plastic bag
+        table.insert(table_bullets, bullet)
+        bullet:addEventListener( "collision", onBulletCollision )
+        bullet.enterFrame = bulletScroll --lo faccio scrollare, grazie alla funzione plasticbagScroll
+        Runtime:addEventListener("enterFrame", bullet) --assegno all'evento enterframe lo scroll
+      end
     end
 
     --------------------------------------------------------------------------
@@ -364,7 +366,8 @@ function scene:hide( event )
   if ( phase == "will" ) then
     -- Code here runs immediately after the scene goes entirely off screen
     -- Code here runs when the scene is on screen (but is about to go off screen)
-
+    composer.isAudioPlaying=0
+    audio.stop( 3 ) --la musica del livello 1 si ferma
     physics.pause()
     --timer.cancel(gameLoop)
     --timer.cancel(timeplayed)
@@ -400,9 +403,7 @@ end
 
 -- destroy()
 function scene:destroy( event )
- -- audio.dispose( musicFinal)
   local sceneGroup = self.view
-
 end
 
 
