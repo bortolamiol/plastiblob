@@ -35,6 +35,7 @@ local newTimerOut
 local nextScene = "menu-levels"
 local crunchSound = audio.loadSound("MUSIC/crunch.mp3")
 local musicLevel4
+local explosionSound4 = audio.loadSound("MUSIC/explosion.mp3") --carico suono esplosione
 function scene:create( event )
 
   -- Called when the scene's view does not exist.
@@ -486,6 +487,57 @@ function scene:show( event )
             castleAppared = 1 --non lo faccio più riapparire
             sprite:removeEventListener("collision")
             Runtime:addEventListener("enterFrame", castleScroll) --chiamo la funzione castleScroll per spostare il castello
+          timer.performWithDelay( 500, function() composer.gotoScene( "menu-levels", "fade", 500 ) end)  --ritorno al menu dei livelli
+        end
+      end
+      button_home:addEventListener( "touch", touch )
+
+      --------------------------------------------------
+      --------- PARTI AGGIUNTE NEL LIVELLO 2 -----------
+      --------------------------------------------------
+
+      -- FUNZIONI PER IL PROIETTILE 'LATTINA DI PLASTICA'
+        local function bulletScroll(self, event)
+          --fa scorrere il sacchetto nello schermo
+          if stop == 0 then
+            self.x = self.x + 10 --fa andare  avanti il proiettile in x senza spostarsi in y
+            if self.x > display.actualContentWidth + 30 then --se c'è un sacchetto di plastica che ha superato il limite di -200, lo togliamo!
+              self:removeEventListener( "collision", onBulletCollision ) --rimuovo l'ascoltatore per la collisione di quel sprite
+              Runtime:removeEventListener("enterFrame",self) --rimuovo l'ascoltatore che lo fa scrollare 
+              group_elements:remove(self)
+              display.remove(self) --rimuove QUEL sacchetto di plastica dal display display
+              local res = table.remove(table_bullets, table.indexOf( table_bullets, self )) --lo rimuove anche dalla tabella dei proeittili
+            end
+          end
+        end
+        ------------------------------------------------
+        -- Global collision handling
+        function onBulletCollision( event )
+          print(tostring(event.other.name))
+          if(tostring(event.other.name) == "enemy") then --se il proiettile si è scontrato contro un nemico allora..
+            enemyKilled = event.other --salvo dentro enemyKilled l'indirizzo che mi porta al nemico ucciso
+            --Riproduco l'animazione dell'esplosione nelle stesse coordinate in cui si trova il nemico nel momento della collisione
+            local explosion = display.newSprite( explosionSheet, explosionData ) --salvo dentro explosion l'animazione dell'esplosione
+            explosion.name = "explosion"
+            group_elements:insert(explosion)
+            explosion.x = enemyKilled.x
+            explosion.y = enemyKilled.y
+            explosion:play()
+            audio.play( explosionSound4 ) --faccio partire audio esplosione
+
+            --rimuovo il nemico dallo schermo
+            Runtime:removeEventListener("enterFrame", enemyKilled) --non faccio più muovere il nemico
+            display.remove(enemyKilled) --rimuovo dal display il nemico
+            local position = table.indexOf(enemies, enemyKilled) --carico dentro la variabile position la posizione del nemico colpito dentro la tabella dei nemici 
+            table.remove(enemies,position) --rimuovo dalla tabella enemies il nemico colpito
+
+            --rimuovo la bottiglia appena lanciata
+            group_elements:remove(event.target)
+            event.target:removeEventListener( "collision", onBulletCollision ) --rimuovo l'ascoltatore per la collisione di quel sprite
+            Runtime:removeEventListener("enterFrame",event.target) --rimuovo l'ascoltatore che lo fa scrollare 
+            display.remove(event.target) --rimuove QUELLA bottiglia di plastica dal display 
+            local res = table.remove(table_bullets, table.indexOf( table_bullets, event.target )) --lo rimuove anche dalla tabella dei proeittili
+            
           end
         end
       end
