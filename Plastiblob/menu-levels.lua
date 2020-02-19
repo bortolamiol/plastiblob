@@ -171,7 +171,7 @@ function scene:show( event )
 				local options = {
 					effect = "fade", --animazione
 					time = 500, --tempo che durerà l'animazione
-					params = { level= nlevel, imagetoshow } --parametri che gli passo: il numero del livello a cui andare dopo la storia e il numero di immagini da mostrare
+					params = { level= nlevel, imagetoshow = imagetoshow } --parametri che gli passo: il numero del livello a cui andare dopo la storia e il numero di immagini da mostrare
 				  }
 				if(tonumber(livellicompletati) >= tonumber(nlevel)) then --se ho il permesso di cliccare sull'immagine..vado al livello
 					local leveltargetpath = "levels.storylevel" --path della storia
