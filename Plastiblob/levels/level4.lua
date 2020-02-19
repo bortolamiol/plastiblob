@@ -884,7 +884,7 @@ local sqlite3 = require( "sqlite3" )
 local path = system.pathForFile( "data.db", system.DocumentsDirectory )
 local db = sqlite3.open( path )
 local levels = {} --creo una  tabella per memorizzare i dati che mi servrà per scegliere se il punteggio è un record o no
-for row in db:nrows( "SELECT level, scoreLevel3 FROM levels" ) do
+for row in db:nrows( "SELECT level, scoreLevel4 FROM levels" ) do
   levels[#levels+1] =
   {
     --FirstName = row.FirstName,
@@ -918,7 +918,7 @@ for row in db:nrows( "SELECT level, scoreLevel3 FROM levels" ) do
     end
   else
     if((tonumber(oldScore) < scoreCount)) then
-      local query =("UPDATE levels SET scoreLevel3 = '" ..scoreCount .. "' WHERE ID = 1")
+      local query =("UPDATE levels SET scoreLevel4 = '" ..scoreCount .. "' WHERE ID = 1")
       local pushQuery = db:exec (query)
       if(pushQuery == 0) then
         print(" Punteggio correttamente modificato!")
