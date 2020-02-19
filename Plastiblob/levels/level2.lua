@@ -671,6 +671,7 @@ function scene:show( event )
     function button_home:touch( event ) --ascoltatore di touch del bottone di home
       if event.phase == "ended" then
         stop = 1 --blocco le animazioni di scorrimento sfondo
+        stopCreatingEnemies=1
         timer.performWithDelay( 500, function() composer.gotoScene( "menu-levels", "fade", 500 ) end)  --ritorno al menu dei livelli
       end
     end
