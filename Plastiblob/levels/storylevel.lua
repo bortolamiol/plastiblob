@@ -42,22 +42,15 @@ function scene:show( event )
         n=1 --parto dalla prima immagine nominata 1 
         local leveltarget = event.params.level
         local numImgs = tostring(event.params.imagetoshow)
-        local continua = display.newImageRect( group_buttons, "immagini/livello-1/storia/continua.png", 100, 70 )
-        continua.anchorX = 0
-        continua.anchorY = 0
-        continua.y = 20
-        continua.x = 1150
-    
-         
-        
+        print(numImgs)
         --funzione per cambiare immagine
-        function continua:touch( event )
+        function continua( event )
             if event.phase == "ended" then
                 n = n + 1
                 imagesToShow(n)
             end
         end
-        continua:addEventListener( "touch", continua )
+        Runtime:addEventListener( "touch", continua )
         
         function imagesToShow( n )
             local imgpath
@@ -87,7 +80,7 @@ function scene:hide( event )
  
     if ( phase == "will" ) then
         -- Code here runs when the scene is on screen (but is about to go off screen)
-        
+        Runtime:removeEventListener( "touch", continua )
     elseif ( phase == "did" ) then
         -- Code here runs immediately after the scene goes entirely off screen
         composer.removeScene("levels.storylevel")
