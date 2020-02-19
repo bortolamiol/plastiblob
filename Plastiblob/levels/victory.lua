@@ -98,7 +98,7 @@ function scene:show( event )
     local plasticToCatch = 7 --numero di oggetti di plastica che l'utente dovrà raccogliere
 
     ----------------PROIETTILE
-    local nameSheetData = { width=400, height=300, numFrames=8, sheetContentWidth=4800, sheetContentHeight=300 }
+    local nameSheetData = { width=400, height=300, numFrames=14, sheetContentWidth=5600, sheetContentHeight=300 }
     local nameSheet = graphics.newImageSheet( "immagini/finale/nomi.png", nameSheetData )
     local borto = {
         { name="borto", sheet=nameSheet, start=1, count=2, time=1400, loopCount=0 }
@@ -119,7 +119,7 @@ function scene:show( event )
       { name="uniud", sheet=nameSheet, start=11, count=2, time=1400, loopCount=0 }
     }
     local logo = {
-      { name="uniud", sheet=nameSheet, start=13, count=2, time=1400, loopCount=0 }
+      { name="logo", sheet=nameSheet, start=13, count=2, time=1400, loopCount=0 }
     }
 
 
@@ -201,7 +201,7 @@ function scene:show( event )
 
     ------------------------------------------------
     function goToTheNewScene()
-      composer.gotoScene( "menu-levels", "fade", 500 ) --vado alla nuova scena
+      composer.gotoScene( "menu-levels", "fade", 2000 ) --vado alla nuova scena
     end
     -----------------------------------------------
 
@@ -226,7 +226,7 @@ function scene:show( event )
       elseif(secondsPlayed == 24) then
         namesLoop(7)
       end
-        if(secondsPlayed >= 50 ) then --se è ora di far finire il gioco, vado al passo successivo
+        if(secondsPlayed >= 32 ) then --se è ora di far finire il gioco, vado al passo successivo
           goToTheNewScene()
         end
       end
