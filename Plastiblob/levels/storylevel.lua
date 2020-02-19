@@ -42,7 +42,7 @@ function scene:show( event )
         n=1 --parto dalla prima immagine nominata 1 
         local leveltarget = event.params.level
         local numImgs = tostring(event.params.imagetoshow)
-        
+        print(numImgs)
         --funzione per cambiare immagine
         function continua( event )
             if event.phase == "ended" then

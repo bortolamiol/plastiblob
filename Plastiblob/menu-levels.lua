@@ -154,24 +154,25 @@ function scene:show( event )
 			if event.phase == "began" then
 				--grazie al nome dell'oggetto riesco a capire su quale immagine ho cliccato
 				local nlevel = tostring(event.target.name)
+				local imagetoshowParam
 				--controllo se ho accesso al livello in quanto devo aver superato quello prima
 
 				--per far vedere all'utente la storia, abbiamo creato UN SOLO file lua, che in base al numero di immagini da mostrare fa un ciclo e le mostra
 				--ovviamente dobbiamo dire quante immagini mostrare, per esempio il livello 1 ha bisogno di 5 immagini, il livello 2 di 3 immagini e così via
-				--questo parametro poi lo passeremo grazie alla tabella 'options' che conterrà il nostro parametro 'imagetoshow'
-				if(nlevel == 1) then
-					imagetoshow = 5
-				elseif(nlevel == 2) then
-					imagetoshow = 3
-				elseif(nlevel == 3) then
-					imagetoshow = 2
-				elseif(nlevel == 4) then
-					imagetoshow = 5
+				--questo parametro poi lo passeremo grazie alla tabella 'options' che conterrà il nostro parametro 'imagetoshowParam'
+				if(tonumber(nlevel) == 1) then
+					imagetoshowParam = 5
+				elseif(tonumber(nlevel) == 2) then
+					imagetoshowParam = 3
+				elseif(tonumber(nlevel) == 3) then
+					imagetoshowParam = 2
+				elseif(tonumber(nlevel) == 4) then
+					imagetoshowParam = 5
 				end
 				local options = {
 					effect = "fade", --animazione
 					time = 500, --tempo che durerà l'animazione
-					params = { level= nlevel, imagetoshow = imagetoshow } --parametri che gli passo: il numero del livello a cui andare dopo la storia e il numero di immagini da mostrare
+					params = { level= nlevel, imagetoshow = imagetoshowParam } --parametri che gli passo: il numero del livello a cui andare dopo la storia e il numero di immagini da mostrare
 				  }
 				if(tonumber(livellicompletati) >= tonumber(nlevel)) then --se ho il permesso di cliccare sull'immagine..vado al livello
 					local leveltargetpath = "levels.storylevel" --path della storia
