@@ -394,8 +394,7 @@ end
 
 -- destroy()
 function scene:destroy( event )
-  audio.stop(musicFinal)
-  audio.dispose( musicFinal)
+ -- audio.dispose( musicFinal)
   local sceneGroup = self.view
   -- Code here runs prior to the removal of scene's view
 
