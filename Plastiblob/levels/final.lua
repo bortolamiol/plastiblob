@@ -362,6 +362,9 @@ function scene:hide( event )
   local phase = event.phase
 
   if ( phase == "will" ) then
+    
+  elseif ( phase == "did" ) then
+    -- Code here runs immediately after the scene goes entirely off screen
     -- Code here runs when the scene is on screen (but is about to go off screen)
     physics.pause()
     --timer.cancel(gameLoop)
@@ -391,8 +394,7 @@ function scene:hide( event )
       table_loop[i] = nil        -- Nil Out Table Instance
     end
 
-  elseif ( phase == "did" ) then
-    -- Code here runs immediately after the scene goes entirely off screen
+    audio.stop( 3 ) --la musica del livello 1 si ferma
     composer.removeScene("levels.final") -- ELIMINO TUTTO CIO' CHE C'E' ALL'INTERNO DELLA SCENA
   end
 end
