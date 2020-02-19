@@ -101,7 +101,7 @@ function scene:show( event )
     local nameSheetData = { width=400, height=300, numFrames=14, sheetContentWidth=5600, sheetContentHeight=300 }
     local nameSheet = graphics.newImageSheet( "immagini/finale/nomi.png", nameSheetData )
     local borto = {
-        { name="borto", sheet=nameSheet, start=1, count=2, time=1400, loopCount=0 }
+      { name="borto", sheet=nameSheet, start=1, count=2, time=1400, loopCount=0 }
     }
     local gabri = {
       { name="borto", sheet=nameSheet, start=3, count=2, time=1400, loopCount=0 }
@@ -144,56 +144,56 @@ function scene:show( event )
 
 
     local function nameScroll(self, event)
-        --fa scorrere il sacchetto nello schermo
-        if stop == 0 then
-          self.x = self.x  - 4 --fa andare  avanti il proiettile in x senza spostarsi in y
-          if self.x < - 500 then --se c'è un sacchetto di plastica che ha superato il limite di -200, lo togliamo!
-            Runtime:removeEventListener("enterFrame",self) --rimuovo l'ascoltatore che lo fa scrollare
-            group_elements:remove(self)
-            display.remove(self) --rimuove QUEL sacchetto di plastica dal display display
-            local res = table.remove(table_names, table.indexOf( table_names, self )) --lo rimuove anche dalla tabella dei proeittili
-          end
+      --fa scorrere il sacchetto nello schermo
+      if stop == 0 then
+        self.x = self.x  - 4 --fa andare  avanti il proiettile in x senza spostarsi in y
+        if self.x < - 500 then --se c'è un sacchetto di plastica che ha superato il limite di -200, lo togliamo!
+          Runtime:removeEventListener("enterFrame",self) --rimuovo l'ascoltatore che lo fa scrollare
+          group_elements:remove(self)
+          display.remove(self) --rimuove QUEL sacchetto di plastica dal display display
+          local res = table.remove(table_names, table.indexOf( table_names, self )) --lo rimuove anche dalla tabella dei proeittili
         end
       end
-  
-     
-      ---------------------------------------------------
-      local function createNames(nametoshow)
-        local name
-        if(nametoshow == 1) then
-          name = display.newSprite( nameSheet, borto )
-        elseif(nametoshow == 2) then
-          name = display.newSprite( nameSheet, gabri )
-        elseif(nametoshow == 3) then
-          name = display.newSprite( nameSheet, mc )
-        elseif(nametoshow == 4) then
-          name = display.newSprite( nameSheet, laston )
-        elseif(nametoshow == 5) then
-          name = display.newSprite( nameSheet, lgp )
-        elseif(nametoshow == 6) then
-          name = display.newSprite( nameSheet, uniud )
-        elseif(nametoshow == 7) then
-          name = display.newSprite( nameSheet, logo )
-        elseif(nametoshow == 8) then
-          name = display.newSprite( winnerSheet, winnerData )
-          
-        end
-        --crea un oggetto di un nuovo sprite del sacchetto e lo aggiunge alla tabella table_plasticbag[]
-        --da implementare meglio, mi faccio passare che tipo di nemico devo inserire
-        name:play()
-        group_elements:insert(name)
-        name.x  = display.actualContentWidth + 200
-        name.y = display.actualContentHeight/2
-        return name
+    end
+
+
+    ---------------------------------------------------
+    local function createNames(nametoshow)
+      local name
+      if(nametoshow == 1) then
+        name = display.newSprite( nameSheet, borto )
+      elseif(nametoshow == 2) then
+        name = display.newSprite( nameSheet, gabri )
+      elseif(nametoshow == 3) then
+        name = display.newSprite( nameSheet, mc )
+      elseif(nametoshow == 4) then
+        name = display.newSprite( nameSheet, laston )
+      elseif(nametoshow == 5) then
+        name = display.newSprite( nameSheet, lgp )
+      elseif(nametoshow == 6) then
+        name = display.newSprite( nameSheet, uniud )
+      elseif(nametoshow == 7) then
+        name = display.newSprite( nameSheet, logo )
+      elseif(nametoshow == 8) then
+        name = display.newSprite( winnerSheet, winnerData )
+
       end
-  
-      ------------------------------------------------
-      local function namesLoop(name)
-        name = createNames(name) --creo un'istanza di un oggetto sprite plastic bag
-        table.insert(table_names, name)
-        name.enterFrame = nameScroll --lo faccio scrollare, grazie alla funzione plasticbagScroll
-        Runtime:addEventListener("enterFrame", name) --assegno all'evento enterframe lo scroll
-      end
+      --crea un oggetto di un nuovo sprite del sacchetto e lo aggiunge alla tabella table_plasticbag[]
+      --da implementare meglio, mi faccio passare che tipo di nemico devo inserire
+      name:play()
+      group_elements:insert(name)
+      name.x  = display.actualContentWidth + 200
+      name.y = display.actualContentHeight/2
+      return name
+    end
+
+    ------------------------------------------------
+    local function namesLoop(name)
+      name = createNames(name) --creo un'istanza di un oggetto sprite plastic bag
+      table.insert(table_names, name)
+      name.enterFrame = nameScroll --lo faccio scrollare, grazie alla funzione plasticbagScroll
+      Runtime:addEventListener("enterFrame", name) --assegno all'evento enterframe lo scroll
+    end
 
     ----------------------------------------------------------------------------
     ----------------------------------------------------------------------------
@@ -238,13 +238,13 @@ function scene:show( event )
       elseif(secondsPlayed == 28) then
         namesLoop(8)
       end
-        if(secondsPlayed >= 37 ) then --se è ora di far finire il gioco, vado al passo successivo
-          goToTheNewScene()
-        end
+      if(secondsPlayed >= 37 ) then --se è ora di far finire il gioco, vado al passo successivo
+        goToTheNewScene()
       end
+    end
 
 
-    
+
     ----------------------------------------------------------------------------
     ----------------------------------------------------------------------------
     ---------------------------------- TIMER  ----------------------------------
@@ -254,8 +254,8 @@ function scene:show( event )
     loops[1] = timer.performWithDelay( 1000, increaseGameSpeed, 0 )
     loops[2] = timer.performWithDelay( time_speed_min, loop, 0 )
     loops[3] = timer.performWithDelay( 2000, namesLoop(1), 0 )
-    
-    
+
+
   end
 end
 
@@ -283,18 +283,18 @@ function scene:destroy( event )
   --
   -- INSERT code here to cleanup the scene
   -- e.g. remove display objects, remove touch listeners, save state, etc.
-  
+
   local sceneGroup = self.view
 end
 
 
 function resetScene()
-    composer.isAudioPlaying=0
-    audio.dispose(crunchSound)
-    for i=1, #loops do
-      timer.cancel( loops[i] )
-      loops[i] = nil        -- Nil Out Table Instance
-    end
+  composer.isAudioPlaying=0
+  audio.dispose(crunchSound)
+  for i=1, #loops do
+    timer.cancel( loops[i] )
+    loops[i] = nil        -- Nil Out Table Instance
+  end
 end
 
 ---------------------------------------------------------------------------------

@@ -222,18 +222,9 @@ function scene:show( event )
     }
     local plasticbagTimeSpawn = 9000
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-    --porta  in cui entrerò a fine livello, in questo livello è la porta che porta ai laboratori
-    castle = display.newImageRect( "immagini/livello-2/last-destination.png", 700, 700 )
-=======
+
     --porta  in cui entrerò a fine livello, in questo livello sono l'entrata delle fogne
     castle = display.newImageRect( "immagini/livello-4/last-destination.png", 500, 500 )
->>>>>>> f68bb041eaa5a58ad71430ae61b41d4168f0f7e2
-=======
-    --porta  in cui entrerò a fine livello, in questo livello sono l'entrata delle fogne
-    castle = display.newImageRect( "immagini/livello-4/last-destination.png", 500, 500 )
->>>>>>> f68bb041eaa5a58ad71430ae61b41d4168f0f7e2
     castle.x = display.actualContentWidth + 800
     castle.y = ground.y - castle.height/2 - groundHeight/2
     group_castle:insert(castle)
@@ -566,7 +557,7 @@ function scene:show( event )
         effect = "fade", --animazione
         time = 500, --tempo che durerà l'animazione
         params = { level= 5, imagetoshow = 2 } --parametri che gli passo: il numero del livello a cui andare dopo la storia e il numero di immagini da mostrare
-        }
+      }
       composer.gotoScene( "levels.storylevel", options) --vado alla nuova scena
     end
 
@@ -898,13 +889,12 @@ function updateHighScore(scoreCount) --funzione che serve per aggiornare l'high 
       level = row.level,
       scoreLevel = row.scoreLevel4
     }
-    --dato che sono all'ultimo livello andrò solo ad aggiornare il punteggio dell'utente nel livello 4 
+    --dato che sono all'ultimo livello andrò solo ad aggiornare il punteggio dell'utente nel livello 4
     local oldScore= levels[1].scoreLevel --salvo il punteggio che è già presente all'interno del database
     local levelReached = levels[1].level --mi scrivo il livello a cui è arrivato l'utente all'interno del gioco, se è l'1 allora aggiorneremo a 2 e gli permetteremo di fare un nuovo livello
-      if((tonumber(oldScore) < scoreCount)) then
-        local query =("UPDATE levels SET scoreLevel4 = '" ..scoreCount .. "' WHERE ID = 1")
-        local pushQuery = db:exec (query)
-      end
+    if((tonumber(oldScore) < scoreCount)) then
+      local query =("UPDATE levels SET scoreLevel4 = '" ..scoreCount .. "' WHERE ID = 1")
+      local pushQuery = db:exec (query)
     end
   end
   if ( db and db:isopen() ) then --chiuso la connessione al database
@@ -920,71 +910,71 @@ function resetScene( tipo)
 
   --ELIMINO PRIMA LE COSE IN COMUNE
   --resetto le variabili per capire se sta suonando la musica di background nel menu o nel menu levels
-    timer.cancel( timeplayed ) --non faccio più andare il  conteggio dei secondi
-    composer.isAudioPlaying=0
-    physics.pause()
+  timer.cancel( timeplayed ) --non faccio più andare il  conteggio dei secondi
+  composer.isAudioPlaying=0
+  physics.pause()
 
-    --elimino i listeners
-    Runtime:removeEventListener("enterFrame",enemy)
-    Runtime:removeEventListener("enterFrame",plasticbag)
-    Runtime:removeEventListener( "touch", touchListener )
-    button_home:removeEventListener( "touch", touch )
-    button_home:removeEventListener( "touch", touch )
+  --elimino i listeners
+  Runtime:removeEventListener("enterFrame",enemy)
+  Runtime:removeEventListener("enterFrame",plasticbag)
+  Runtime:removeEventListener( "touch", touchListener )
+  button_home:removeEventListener( "touch", touch )
+  button_home:removeEventListener( "touch", touch )
 
-    --Svuoto le tabelle
-    --prima svuoto le tabelle che ho usato per richiamare i vari timer di comparsa dei nemici e degli oggetti di plastica
-    for i=1, #callingEnemies do
-      timer.cancel( callingEnemies[i] )
-      callingEnemies[i] = nil
-    end
-    for i=1, #callingBats do
-      timer.cancel( callingBats[i] )
-      callingBats[i] = nil        -- Nil Out Table Instance
-    end
-    for i=1, #callingPlasticbag do
-      timer.cancel( callingPlasticbag[i] )
-      callingPlasticbag[i] = nil        -- Nil Out Table Instance
-    end
-    for i=1, #callingSpine do
-      timer.cancel( callingSpine[i] )
-      callingSpine[i] = nil        -- Nil Out Table Instance
-    end
-    for i=1, #callingPlatform do
-      timer.cancel( callingPlatform[i] )
-      callingPlatform[i] = nil        -- Nil Out Table Instance
-    end
+  --Svuoto le tabelle
+  --prima svuoto le tabelle che ho usato per richiamare i vari timer di comparsa dei nemici e degli oggetti di plastica
+  for i=1, #callingEnemies do
+    timer.cancel( callingEnemies[i] )
+    callingEnemies[i] = nil
+  end
+  for i=1, #callingBats do
+    timer.cancel( callingBats[i] )
+    callingBats[i] = nil        -- Nil Out Table Instance
+  end
+  for i=1, #callingPlasticbag do
+    timer.cancel( callingPlasticbag[i] )
+    callingPlasticbag[i] = nil        -- Nil Out Table Instance
+  end
+  for i=1, #callingSpine do
+    timer.cancel( callingSpine[i] )
+    callingSpine[i] = nil        -- Nil Out Table Instance
+  end
+  for i=1, #callingPlatform do
+    timer.cancel( callingPlatform[i] )
+    callingPlatform[i] = nil        -- Nil Out Table Instance
+  end
 
-    --Ora cancello i dati dalle tabelle che ho usato per memorizzre tutti gli oggetti tra cui i nemici, piattaforme ecc.
-    for i=1, #enemies do
-      enemies[i]:removeSelf() -- Optional Display Object Removal
-      enemies[i] = nil        -- Nil Out Table Instance
-    end
-    for i=1, #table_plasticbag do
-      table_plasticbag[i]:removeSelf() -- Optional Display Object Removal
-      table_plasticbag[i] = nil        -- Nil Out Table Instance
-    end
-    for i=1, #table_bullets do
-      Runtime:removeEventListener("enterFrame",  table_bullets[i])
-      table_bullets[i]:removeEventListener( "collision", onBulletCollision )
-      table_bullets[i]:removeSelf() -- Optional Display Object Removal
-      table_bullets[i] = nil        -- Nil Out Table Instance
-    end
-    for i=1, #table_spine do
-      Runtime:removeEventListener("enterFrame",  table_spine[i])
-      table_spine[i]:removeSelf() -- Optional Display Object Removal
-      table_spine[i] = nil        -- Nil Out Table Instance
-    end
-    for i=1, #table_platform do
-      Runtime:removeEventListener("enterFrame",  table_platform[i])
-      table_platform[i]:removeSelf() -- Optional Display Object Removal
-      table_platform[i] = nil        -- Nil Out Table Instance
-    end
+  --Ora cancello i dati dalle tabelle che ho usato per memorizzre tutti gli oggetti tra cui i nemici, piattaforme ecc.
+  for i=1, #enemies do
+    enemies[i]:removeSelf() -- Optional Display Object Removal
+    enemies[i] = nil        -- Nil Out Table Instance
+  end
+  for i=1, #table_plasticbag do
+    table_plasticbag[i]:removeSelf() -- Optional Display Object Removal
+    table_plasticbag[i] = nil        -- Nil Out Table Instance
+  end
+  for i=1, #table_bullets do
+    Runtime:removeEventListener("enterFrame",  table_bullets[i])
+    table_bullets[i]:removeEventListener( "collision", onBulletCollision )
+    table_bullets[i]:removeSelf() -- Optional Display Object Removal
+    table_bullets[i] = nil        -- Nil Out Table Instance
+  end
+  for i=1, #table_spine do
+    Runtime:removeEventListener("enterFrame",  table_spine[i])
+    table_spine[i]:removeSelf() -- Optional Display Object Removal
+    table_spine[i] = nil        -- Nil Out Table Instance
+  end
+  for i=1, #table_platform do
+    Runtime:removeEventListener("enterFrame",  table_platform[i])
+    table_platform[i]:removeSelf() -- Optional Display Object Removal
+    table_platform[i] = nil        -- Nil Out Table Instance
+  end
 
   if tipo == "gameOver" then
     --cancelllo il timer del gameLoop e i listeners rimasti
     timer.cancel( gameLoop )
     sprite:removeEventListener("collision")
-    
+
   elseif tipo == "gamefinished" then
     --elimino i listeners che ho richiamato nel momento in cui devo far arrivare l'entrata finale
     Runtime:removeEventListener("enterFrame", spriteScrollToCastle)

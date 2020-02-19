@@ -873,7 +873,7 @@ function updateHighScore(scoreCount) --funzione che serve per aggiornare l'high 
       if (tonumber(oldScore)<scoreCount) then --se il nuovo è punteggio è maggiore di quello già presente nel db entro nell'if
         print("devo aumentare di livello e inoltre aumento il punteggio")
         local query =("UPDATE levels SET level ='" .. (levelReached+1) .. "' ,scoreLevel3 = '" ..scoreCount .. "' WHERE ID = 1")
-       local pushQuery = db:exec (query)
+        local pushQuery = db:exec (query)
       elseif (tonumber(oldScore) >= scoreCount) then
         --devo solamente aumentare solo il livello"
         local query =("UPDATE levels SET level ='" .. (levelReached+1) .. "' WHERE ID = 1")
