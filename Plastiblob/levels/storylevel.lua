@@ -73,7 +73,6 @@ function scene:show( event )
                     leveltargetpath = "tutorial" --vado alla pagina di tutorial
                 elseif(tonumber(leveltarget) == 4)  then
                     leveltargetpath = "levels.level4" --vado al livello 4
-                end
                 elseif(tonumber(leveltarget) == 5)  then
                     leveltargetpath = "levels.final" --vado al livello finale
                 end

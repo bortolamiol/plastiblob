@@ -495,7 +495,7 @@ function scene:show( event )
           group_elements:remove(event.other) --lo rimuovo dal gruppo (????? serve??? NON LO SO, VEDIAMO SE DARA' PROBLEMI)
         end
         if(event.other.name ==  "enemy") or (event.other.name ==  "spine") then
-          gameOver()
+          --gameOver()
         end
         if(event.other.name == "ground") or (event.other.name == "platform") then
           sprite.isJumping = false
@@ -793,7 +793,7 @@ function scene:show( event )
     callingBats[7] = timer.performWithDelay( 34500, enemiesBatLoop, 1 )
     callingBats[8] = timer.performWithDelay( 38500, enemiesBatLoop, 1 )
     callingBats[9] = timer.performWithDelay( 42600, enemiesBatLoop, 1 )
-    callingBats[10] = timer.performWithDelay( 48500, enemiesBatLoop, 1 )
+    callingBats[10] = timer.performWithDelay( 51000, enemiesBatLoop, 1 )
     --callingBats[11] = timer.performWithDelay( 55500, enemiesBatLoop, 1 )
     callingBats[11] = timer.performWithDelay( 57500, enemiesBatLoop, 1 )
 

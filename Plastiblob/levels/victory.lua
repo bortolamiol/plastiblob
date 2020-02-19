@@ -34,7 +34,7 @@ function scene:show( event )
         local levelTarget = "levels."..event.params.level
         local button_home 
         local button_retry
-        local background = display.newImageRect(group_background,"immagini/final/vittoria.png",1280,720)
+        local background = display.newImageRect(group_background,"immagini/livello-5/vittoria.png",1280,720)
         background.anchorX = 0
         background.anchorY = 0  
        --bottone per uscire dal livello e tornare al menu del livelli

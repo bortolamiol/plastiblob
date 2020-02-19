@@ -29,7 +29,7 @@ function scene:create( event )
   sceneGroup:insert( group_background ) --inserisco il gruppo group_background dentro la scena
   sceneGroup:insert( group_elements ) --inserisco il gruppo group_elements dentro la scena
   local _y = 0  -- Vertical centre of screen
-  local bg = display.newImageRect("immagini/final/background.png", display.actualContentWidth, display.actualContentHeight ) --inserisco la foto di sfondo
+  local bg = display.newImageRect("immagini/livello-5/background.png", display.actualContentWidth, display.actualContentHeight ) --inserisco la foto di sfondo
   bg.anchorY = 0
   bg.anchorX = 0
   bg.x = 0
