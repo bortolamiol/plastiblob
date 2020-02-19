@@ -655,6 +655,7 @@ function scene:show( event )
       bullet.bodyType = "static"
       return bullet
     end
+
     ------------------------------------------------
     local function bulletsLoop()
       bullet = createBullet() --creo un'istanza di un oggetto sprite plastic bag
@@ -817,6 +818,7 @@ function scene:show( event )
   end
 end
 
+
 function scene:hide( event )
   local sceneGroup = self.view
 
@@ -848,7 +850,6 @@ function scene:destroy( event )
   -- e.g. remove display objects, remove touch listeners, save state, etc.
   audio.dispose( musicLevel3) --elimino la musica del livello
   local sceneGroup = self.view
-
 end
 ----------------------------------------------
 --FUNZIONE PER AGGIORNARE L'HIGHSCORE

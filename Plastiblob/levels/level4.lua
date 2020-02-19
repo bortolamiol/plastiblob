@@ -138,7 +138,7 @@ function scene:show( event )
 
 
     -- Terreno del gioco, un elemento statico e di colore trasparente
-    local groundHeight = 100 --ha un'altezza di 100 px
+    local groundHeight = 90 --ha un'altezza di 100 px
     local ground = display.newRect( 0, 0,99999, groundHeight )
     ground:setFillColor(0,0,0,0) --colore trasparente
     ground.name = "ground" --il nome servirà in fase di collisione con il nostro sprite, per sapere che dovrà togliere l'animazione del salto e tornare su quella della camminata
@@ -497,7 +497,7 @@ function scene:show( event )
           group_elements:remove(event.other) --lo rimuovo dal gruppo (????? serve??? NON LO SO, VEDIAMO SE DARA' PROBLEMI)
         end
         if(event.other.name ==  "enemy") or (event.other.name ==  "spine") then
-          gameOver()
+          --gameOver()
         end
         if(event.other.name == "ground") or (event.other.name == "platform") then
           sprite.isJumping = false
@@ -881,13 +881,13 @@ function updateHighScore(scoreCount) --funzione che serve per aggiornare l'high 
     levels[#levels+1] =
     {
       level = row.level,
-      scoreLevel = row.scoreLevel3
+      scoreLevel = row.scoreLevel4
     }
     local oldScore= levels[1].scoreLevel --salvo il punteggio che è già presente all'interno del database
     local levelReached = levels[1].level --mi scrivo il livello a cui è arrivato l'utente all'interno del gioco, se è l'1 allora aggiorneremo a 2 e gli permetteremo di fare un nuovo livello
     if(tonumber(levelReached) == tonumber(localLevel)) then --se sono al livello 1, devo aumentare il livello
       if (tonumber(oldScore)<scoreCount) then --se il nuovo è punteggio è maggiore di quello già presente nel db entro nell'if
-        local query =("UPDATE levels SET level ='" .. (levelReached+1) .. "' ,scoreLevel3 = '" ..scoreCount .. "' WHERE ID = 1")
+        local query =("UPDATE levels SET level ='" .. (levelReached+1) .. "' ,scoreLevel4 = '" ..scoreCount .. "' WHERE ID = 1")
         local pushQuery = db:exec (query)
       elseif (tonumber(oldScore) >= scoreCount) then --devo solamente aumentare solo il livello"
         local query =("UPDATE levels SET level ='" .. (levelReached+1) .. "' WHERE ID = 1")
@@ -913,28 +913,23 @@ function resetScene( tipo)
 
   --ELIMINO PRIMA LE COSE IN COMUNE
   --resetto le variabili per capire se sta suonando la musica di background nel menu o nel menu levels
-
-  if tipo == "gameOver" then
-    --composer.isAudioPlayingMenu =0;
-    composer.isAudioPlaying=0;
-
+    timer.cancel( timeplayed ) --non faccio più andare il  conteggio dei secondi
     audio.dispose(crunchSound)
-    timer.cancel( gameLoop )
-    timer.cancel( timeplayed )
+    composer.isAudioPlaying=0
     physics.pause()
 
-    --ELIMINO I LISTENERS
-    sprite:removeEventListener("collision")
+    --elimino i listeners
     Runtime:removeEventListener("enterFrame",enemy)
     Runtime:removeEventListener("enterFrame",plasticbag)
-    button_home:removeEventListener( "touch", touch )
     Runtime:removeEventListener( "touch", touchListener )
-    Runtime:removeEventListener("enterFrame", bullet)
+    button_home:removeEventListener( "touch", touch )
+    button_home:removeEventListener( "touch", touch )
 
-    --SVUOTO LE TABELLE
+    --Svuoto le tabelle
+    --prima svuoto le tabelle che ho usato per richiamare i vari timer di comparsa dei nemici e degli oggetti di plastica
     for i=1, #callingEnemies do
       timer.cancel( callingEnemies[i] )
-      callingEnemies[i] = nil        -- Nil Out Table Instance
+      callingEnemies[i] = nil
     end
     for i=1, #callingBats do
       timer.cancel( callingBats[i] )
@@ -952,10 +947,8 @@ function resetScene( tipo)
       timer.cancel( callingPlatform[i] )
       callingPlatform[i] = nil        -- Nil Out Table Instance
     end
-    for i=1, #callingBats do
-      timer.cancel( callingBats[i] )
-      callingBats[i] = nil        -- Nil Out Table Instance
-    end
+
+    --Ora cancello i dati dalle tabelle che ho usato per memorizzre tutti gli oggetti tra cui i nemici, piattaforme ecc.
     for i=1, #enemies do
       enemies[i]:removeSelf() -- Optional Display Object Removal
       enemies[i] = nil        -- Nil Out Table Instance
@@ -980,77 +973,16 @@ function resetScene( tipo)
       table_platform[i]:removeSelf() -- Optional Display Object Removal
       table_platform[i] = nil        -- Nil Out Table Instance
     end
-  elseif tipo == "gamefinished" then
-    audio.dispose(crunchSound)
-    --print("audio disposato nel livello 1")
-    --ELIMINO I LISTENERS
-    timer.cancel( timeplayed )
 
-    Runtime:removeEventListener( "collision", onBulletCollision )
-    Runtime:removeEventListener( "touch", touchListener )
+  if tipo == "gameOver" then
+    --cancelllo il timer del gameLoop e i listeners rimasti
+    timer.cancel( gameLoop )
+    sprite:removeEventListener("collision")
+    
+  elseif tipo == "gamefinished" then
+    --elimino i listeners che ho richiamato nel momento in cui devo far arrivare l'entrata finale
     Runtime:removeEventListener("enterFrame", spriteScrollToCastle)
     Runtime:removeEventListener("enterFrame", castleScroll)
-    Runtime:removeEventListener("enterFrame",enemy)
-    Runtime:removeEventListener("enterFrame",plasticbag)
-    button_home:removeEventListener( "touch", touch )
-    Runtime:removeEventListener("enterFrame", bullet)
-    --timer.cancel( callingEnemies )
-    --timer.cancel( callingPlasticbag )
-    --timer.cancel( callingSpine )
-    --timer.cancel( callingPlatform )
-    --timer.cancel( callingBats )
-    --timer.cancel( newTimerOut )
-    physics.pause()
-
-    --SVUOTO LE TABELLE
-    for i=1, #callingEnemies do
-      timer.cancel( callingEnemies[i] )
-      callingEnemies[i] = nil        -- Nil Out Table Instance
-    end
-    for i=1, #callingBats do
-      timer.cancel( callingBats[i] )
-      callingBats[i] = nil        -- Nil Out Table Instance
-    end
-    for i=1, #callingPlasticbag do
-      timer.cancel( callingPlasticbag[i] )
-      callingPlasticbag[i] = nil        -- Nil Out Table Instance
-    end
-    for i=1, #callingSpine do
-      timer.cancel( callingSpine[i] )
-      callingSpine[i] = nil        -- Nil Out Table Instance
-    end
-    for i=1, #callingPlatform do
-      timer.cancel( callingPlatform[i] )
-      callingPlatform[i] = nil        -- Nil Out Table Instance
-    end
-    for i=1, #callingBats do
-      timer.cancel( callingBats[i] )
-      callingBats[i] = nil        -- Nil Out Table Instance
-    end
-    for i=1, #enemies do
-      enemies[i]:removeSelf() -- Optional Display Object Removal
-      enemies[i] = nil        -- Nil Out Table Instance
-    end
-    for i=1, #table_plasticbag do
-      table_plasticbag[i]:removeSelf() -- Optional Display Object Removal
-      table_plasticbag[i] = nil        -- Nil Out Table Instance
-    end
-    for i=1, #table_bullets do
-      Runtime:addEventListener("enterFrame",  table_bullets[i])
-      table_bullets[i]:removeEventListener( "collision", onBulletCollision )
-      table_bullets[i]:removeSelf() -- Optional Display Object Removal
-      table_bullets[i] = nil        -- Nil Out Table Instance
-    end
-    for i=1, #table_spine do
-      Runtime:removeEventListener("enterFrame",  table_spine[i])
-      table_spine[i]:removeSelf() -- Optional Display Object Removal
-      table_spine[i] = nil        -- Nil Out Table Instance
-    end
-    for i=1, #table_platform do
-      Runtime:removeEventListener("enterFrame",  table_platform[i])
-      table_platform[i]:removeSelf() -- Optional Display Object Removal
-      table_platform[i] = nil        -- Nil Out Table Instance
-    end
   end
 end
 
