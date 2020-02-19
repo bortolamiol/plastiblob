@@ -122,7 +122,7 @@ function scene:show( event )
 
     -- SPRITE DEL NOSTRO NEMICO CHE CAMMINA; IN QUESTO LIVELLO SI TRATTA DI UN SERPENTE
     local enemyWalkingSheetData = { width=600, height=600, numFrames=4, sheetContentWidth=2400, sheetContentHeight=600 }
-    local enemyWalkingSheet = graphics.newImageSheet( "immagini/final/monster.png", enemyWalkingSheetData )
+    local enemyWalkingSheet = graphics.newImageSheet( "immagini/livello-5/monster.png", enemyWalkingSheetData )
     local enemyData = {
       { name="walking", sheet=enemyWalkingSheet, start=1, count=4, time=700, loopCount=0 }
     }
@@ -152,14 +152,14 @@ function scene:show( event )
 
     --PROIETTILE NEMICO
     local enemyBulletSheetData = { width=160, height=160, numFrames=6, sheetContentWidth=960, sheetContentHeight=160 }
-    local enemyBulletSheet = graphics.newImageSheet( "immagini/final/proiettile.png", enemyBulletSheetData )
+    local enemyBulletSheet = graphics.newImageSheet( "immagini/livello-5/proiettile.png", enemyBulletSheetData )
     local enemyBulletData = {
       { name="plastic-bottle", sheet=enemyBulletSheet, start=1, count=6, time=400, loopCount=0 }
     }
 
     --IL NOSTRO PROIETTILE
     local bulletSheetData = { width=100, height=100, numFrames=3, sheetContentWidth=300, sheetContentHeight=100 }
-    local bulletSheet = graphics.newImageSheet( "immagini/final/ecoproiettile.png", bulletSheetData )
+    local bulletSheet = graphics.newImageSheet( "immagini/livello-5/ecoproiettile.png", bulletSheetData )
     local bulletData = {
         { name="ecoproiettile", sheet=bulletSheet, start=1, count=3, time=400, loopCount=0 }
       }

@@ -8,7 +8,6 @@
 local localLevel = 4 --VARIABILE CHE CONTIENE IL NUMERO DI LIVELLO A CUI APPARTIENE IL FILE LUA: IN QUESTO CASO SIAMO AL LIVELLO 1
 local composer = require( "composer" ) --richiedo la libreria composer
 local scene = composer.newScene() --nuova scena composer
-local tutorial = 1 --ho completato il tutorial? se è 0 devo ancora farlo!
 local bg --variabile che durante lo show conterrà le due immagini di sfondo che andranno una dopo l'altra
 local punteggio --variabile che conterrà il mio punteggio del livello
 local sprite --sprite del personaggio
@@ -31,8 +30,6 @@ local timeplayed  --varaiabile che misura da quanti secondi sono all'interno del
 local timeToPlay = 60 --variabile che conterrà quanto l'utente dovrà sopravvivere all'interno del gioco
 local scoreCount    --variabile conteggio punteggio iniziale
 local gameFinished
-local newTimerOut
-local nextScene = "menu-levels"
 local crunchSound = audio.loadSound("MUSIC/crunch.mp3")
 local musicLevel4
 local explosionSound4 = audio.loadSound("MUSIC/explosion.mp3") --carico suono esplosione
@@ -68,6 +65,7 @@ function scene:show( event )
     physics.start()
     -- Overlays collision outlines on normal display objects
     physics.setGravity( 0,41 )
+    physics.setDrawMode( "hybrid" )
 
   elseif phase == "did" then
     audio.play( musicLevel4, { channel=3, loops=-1 } ) --parte la musica del livello 3
@@ -497,7 +495,7 @@ function scene:show( event )
           group_elements:remove(event.other) --lo rimuovo dal gruppo (????? serve??? NON LO SO, VEDIAMO SE DARA' PROBLEMI)
         end
         if(event.other.name ==  "enemy") or (event.other.name ==  "spine") then
-          --gameOver()
+          gameOver()
         end
         if(event.other.name == "ground") or (event.other.name == "platform") then
           sprite.isJumping = false
@@ -553,7 +551,12 @@ function scene:show( event )
     ----------------------------------------------------------------------------
 
     function goToTheNewScene()
-      composer.gotoScene( "menu-levels", "fade", 500 ) --vado alla nuova scena
+      local options = {
+        effect = "fade", --animazione
+        time = 500, --tempo che durerà l'animazione
+        params = { level= 5, imagetoshow = 2 } --parametri che gli passo: il numero del livello a cui andare dopo la storia e il numero di immagini da mostrare
+        }
+      composer.gotoScene( "levels.storylevel", options) --vado alla nuova scena
     end
 
 
@@ -791,8 +794,8 @@ function scene:show( event )
     callingBats[8] = timer.performWithDelay( 38500, enemiesBatLoop, 1 )
     callingBats[9] = timer.performWithDelay( 42600, enemiesBatLoop, 1 )
     callingBats[10] = timer.performWithDelay( 48500, enemiesBatLoop, 1 )
-    callingBats[11] = timer.performWithDelay( 55500, enemiesBatLoop, 1 )
-    callingBats[12] = timer.performWithDelay( 57500, enemiesBatLoop, 1 )
+    --callingBats[11] = timer.performWithDelay( 55500, enemiesBatLoop, 1 )
+    callingBats[11] = timer.performWithDelay( 57500, enemiesBatLoop, 1 )
 
     --piattaforme
     callingPlatform[1] = timer.performWithDelay( 8000, platformLoop, 1)
