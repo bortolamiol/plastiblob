@@ -45,8 +45,8 @@ function scene:show( event )
         local continua = display.newImageRect( group_buttons, "immagini/livello-1/storia/continua.png", 100, 70 )
         continua.anchorX = 0
         continua.anchorY = 0
-        continua.y = 40
-        continua.x = 20
+        continua.y = 20
+        continua.x = 1150
     
          
         

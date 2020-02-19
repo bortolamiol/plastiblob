@@ -40,7 +40,7 @@ function scene:create( event )
   group_background = display.newGroup() --group_background conterrà la foto di sfondo che scrollerà
   group_castle = display.newGroup() --group_elements conterrà tutti gli altri elementi dello schermo: sprite del personaggio, nemici e bottoni per uscire dal gioco
   group_elements = display.newGroup() --group_elements conterrà tutti gli altri elementi dello schermo: sprite del personaggio, nemici e bottoni per uscire dal gioco
-  sceneGroup:insert( group_tutorial ) --inserisco il gruppo group_background dentro la scena
+  sceneGroup:insert( group_tutorial ) --inserisco il gruppo group_tutorial dentro la scena
   sceneGroup:insert( group_background ) --inserisco il gruppo group_background dentro la scena
   sceneGroup:insert( group_castle ) --inserisco il gruppo castle sopra la scena e sotto i personaggi
   sceneGroup:insert( group_elements ) --inserisco il gruppo group_elements dentro la scena
@@ -68,13 +68,7 @@ function scene:show( event )
     audio.play( musicLevel1, { channel=3, loops=-1 } ) --parte la musica del livello 1
 
     if(tutorial == 0) then
-      --[[ DA FARE
-
-
-      --visualizzare il tutorial del gioco, all'interno del gruppo 'group_tutorial'
-
-
-      ]]--
+      
     elseif(tutorial == 1) then
       --VARIABILE CHE CONTIENE TUTTE LE INFORMAZIONI DEL LIVELLO
       local options = {
@@ -110,7 +104,7 @@ function scene:show( event )
       ------------------------------------------------------------
       -- VARIABILI MOLTO IMPORTANTI PER IL GIOCO: VELOCITA' DI GIOCO
       local enemySpeed_max = 7.5 -- massima velocità di spostamento del nemico
-      local enemySpeed_min = 4.5-- minima velocità di spostamento del nemico
+      local enemySpeed_min = 4-- minima velocità di spostamento del nemico
       local enemySpeed = enemySpeed_min --velocità di spostamento del nemico
 
       local frame_speed = 20 --questa sarà la velocità dello scorrimento del nostro sfondo, in base a questa velocità alzeremo anche quella del gioco
@@ -318,7 +312,7 @@ function scene:show( event )
         if( event.phase == "began" ) then
           --tutte le informazioni dell'elemento che ho toccato le troviamo dentro event.other
           if(event.other.name ==  "plasticbag") then --mi sono scontrato con il sacchetto
-            audio.setVolume(0.03)
+            --audio.setVolume(0.03)
             audio.play(crunchSound) --fai partire il suono "crunch"
             scoreCount = scoreCount+1; --aggiorno lo score
             scoreText.text = scoreCount.."/"..plasticToCatch
@@ -333,7 +327,7 @@ function scene:show( event )
             print("mi sono scontrato col nemico")
             audio.pause(crunchSound) --blocco l'audio crunch nel caso stesse suonando
             local audiogameover = audio.loadSound("MUSIC/PERDENTE.mp3") --carico suono "gameover"
-            audio.setVolume(0.03)
+            --audio.setVolume(0.03)
             audio.play(audiogameover) --faccio partire l'audio game over
             resetScene("all")
             composer.gotoScene( "levels.gameover", options )

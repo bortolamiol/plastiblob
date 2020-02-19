@@ -226,10 +226,10 @@ function scene:show( event )
         { name="plastic-bottle", sheet=plasticbagSheet, start=1, count=4, time=400, loopCount=0 }
       }
       --ESPLOSIONE QUANDO SI COLPISCE IL NEMICO CON IL PROIETTILE
-      local explosionSheetData = { width=200, height=200, numFrames=20, sheetContentWidth=1000, sheetContentHeight=800 }
-      local explosionSheet = graphics.newImageSheet( "immagini/livello-2/explosion.png", explosionSheetData )
+      local explosionSheetData = { width=200, height=200, numFrames=12, sheetContentWidth=2400, sheetContentHeight=200 }
+      local explosionSheet = graphics.newImageSheet( "immagini/livello-1/explosion1.png", explosionSheetData )
       local explosionData = {
-        { name="explosion", sheet=explosionSheet, start=1, count=20, time=400, loopCount=1}
+        { name="explosion", sheet=explosionSheet, start=1, count=12, time=800, loopCount=1}
       }
 
       -- AGGIUNTO NEL LIVELLO 3 --
@@ -386,7 +386,7 @@ function scene:show( event )
         stopCreatingEnemies = 1
         -- audio
         audio.pause(crunchSound)	
-        audio.setMaxVolume(0.03)	
+        --audio.setMaxVolume(0.03)	
         local audiogameover = audio.loadSound("MUSIC/PERDENTE.mp3")	
         audio.play(audiogameover)
         --audio.play(audiogameover)
@@ -399,7 +399,7 @@ function scene:show( event )
         if( event.phase == "began" ) then
           --tutte le informazioni dell'elemento che ho toccato le troviamo dentro event.other
           if(event.other.name ==  "plasticbag") then --mi sono scontrato con il sacchetto
-            audio.setMaxVolume(0.03)	
+           -- audio.setMaxVolume(0.03)	
             audio.play(crunchSound)
             scoreCount = scoreCount+1;
             scoreText.text = scoreCount.."/"..plasticToCatch

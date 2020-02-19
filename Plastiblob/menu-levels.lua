@@ -37,7 +37,7 @@ function scene:show( event )
 
 
 		local musicTrack1 = audio.loadStream("MUSIC/THEME.mp3") --carico musica "tema"
-		audio.setVolume(0.2)
+		--audio.setVolume(0.2)
 		
 		--controllo se c'è già dell'audio che suona
 		if (composer.isAudioPlayingMenu==1) then
