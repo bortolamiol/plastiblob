@@ -65,7 +65,7 @@ function scene:show( event )
     physics.start()
     -- Overlays collision outlines on normal display objects
     physics.setGravity( 0,41 )
-    physics.setDrawMode( "hybrid" )
+    --physics.setDrawMode( "hybrid" )
 
   elseif phase == "did" then
     audio.play( musicLevel4, { channel=3, loops=-1 } ) --parte la musica del livello 3
@@ -223,7 +223,7 @@ function scene:show( event )
     local plasticbagTimeSpawn = 9000
 
     --porta  in cui entrerò a fine livello, in questo livello sono l'entrata delle fogne
-    castle = display.newImageRect( "immagini/livello-2/last-destination.png", 700, 700 )
+    castle = display.newImageRect( "immagini/livello-4/last-destination.png", 500, 500 )
     castle.x = display.actualContentWidth + 800
     castle.y = ground.y - castle.height/2 - groundHeight/2
     group_castle:insert(castle)

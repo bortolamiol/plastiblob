@@ -68,7 +68,7 @@ function scene:show( event )
     physics.start()
     -- Overlays collision outlines on normal display objects
     physics.setGravity( 0,41 )
-    physics.setDrawMode("hybrid")
+    --physics.setDrawMode("hybrid")
   elseif phase == "did" then
     
     audio.play( musicLevel2, { channel=3, loops=-1 } ) --parte la musica del livello 2
