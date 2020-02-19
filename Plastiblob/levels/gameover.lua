@@ -1,14 +1,6 @@
 local composer = require( "composer" )
  
 local scene = composer.newScene()
--- -----------------------------------------------------------------------------------
--- Code outside of the scene event functions below will only be executed ONCE unless
--- the scene is removed entirely (not recycled) via "composer.removeScene()"
--- -----------------------------------------------------------------------------------
-
--- -----------------------------------------------------------------------------------
--- Scene event functions
--- -----------------------------------------------------------------------------------
  
 -- create()
 function scene:create( event )
@@ -19,8 +11,7 @@ function scene:create( event )
     group_buttons = display.newGroup() --group_elements conterrà tutti gli altri elementi dello schermo: sprite del personaggio, nemici e bottoni per uscire dal gioco
     
     sceneGroup:insert( group_background ) --inserisco il gruppo group_background dentro la scena
-    sceneGroup:insert( group_buttons ) --inserisco il gruppo castle sopra la scena e sotto i personaggi
-    print(event.params.level)
+    sceneGroup:insert( group_buttons ) --inserisco il gruppo grooup_buttons sopra la scena e sotto i personaggi
 end
  
 -- show()
@@ -31,14 +22,15 @@ function scene:show( event )
         -- Code here runs when the scene is still off screen (but is about to come on screen)
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
-        local levelTarget = "levels."..event.params.level
-        local button_home 
-        local button_retry
-        local background = display.newImageRect(group_background,"immagini/menu/sfondo-menu.png",1280,720)
+        local levelTarget = "levels."..event.params.level --Event.params contiene i parametri che si passano alla scena dal chiamante, in questo caso noi prendiamo la variabile level che conterrà il livello in cui dovremmo tornare in fase di 'retry'
+        local button_home  --variabile per il bottone di home
+        local button_retry --variabile per il bottone di retry
+        local background = display.newImageRect(group_background,"immagini/menu/sfondo-menu.png",1280,720) --foto di sfondo
         background.anchorX = 0
         background.anchorY = 0  
-       --bottone per uscire dal livello e tornare al menu del livelli
 
+
+       --bottone per uscire dal livello e tornare al menu del livelli
         button_home = display.newImageRect(group_buttons, "immagini/menu/home.png", 200, 200 )
         button_home.anchorX =  0
         button_home.anchorY =  0
@@ -53,7 +45,7 @@ function scene:show( event )
         end
         button_home:addEventListener( "touch", touch )
 
-        --bottone per uscire dal livello e ricominciare
+        --bottone per ricominciare il livello
         button_retry = display.newImageRect( group_buttons,"immagini/menu/restart.png", 200, 200 )
         button_retry.anchorX =  0
         button_retry.anchorY =  0
@@ -63,7 +55,7 @@ function scene:show( event )
 
         function button_retry:touch( event )
         if event.phase == "began" then
-            timer.performWithDelay( 500, function() composer.gotoScene( levelTarget, "fade", 200 ) end)  --ricomicio
+            timer.performWithDelay( 500, function() composer.gotoScene( levelTarget, "fade", 200 ) end)  --ricomicio il livello puntando al percorso 'levelTarget' valorizzato sopra
         end
     end
     button_retry:addEventListener( "touch", touch )
@@ -80,7 +72,7 @@ function scene:hide( event )
  
     elseif ( phase == "did" ) then
         -- Code here runs immediately after the scene goes entirely off screen
-        composer.removeScene( "levels.gameover" )
+        composer.removeScene( "levels.gameover" ) --rimuovo completamente la scena
     end
 end
  
