@@ -33,29 +33,27 @@ function scene:show( event )
         -- Code here runs when the scene is still off screen (but is about to come on screen)
  
     elseif ( phase == "did" ) then
-        -- Code here runs when the scene is entirely on screen
+        local leveltarget = event.params.level 
+        --CREO UNO SPRITE 1280 X 720 CHE CONTERRA' L'IMMAGINE DEL TUTORIAL
+        
+        --l'immagine del tutorial cambia in base a che livello sono, se sono al primo livello mostrerà un'immagine, al due un'altra e così via..
         local tutorialSheetData = { width=1280, height=720, numFrames=3, sheetContentWidth=3840, sheetContentHeight=720 }
-        local tutorialSheet = graphics.newImageSheet( "immagini/tutorial/jumptutorial.png", tutorialSheetData )
+        --grazie al parametro passato dalla scena precedente riesco a capire che immagine mostrare dei tutorial
+        -- le immagini sono rinominate in base al livello a cui fanno riferimento: tutorial1.png, tutorial2.png e tutorial3.png
+        local impath = "immagini/tutorial/tutorial"..leveltarget ..".png"
+        local tutorialSheet = graphics.newImageSheet( impath, tutorialSheetData )
         local tutorialData = {{ name="tutorial", sheet=tutorialSheet, start=1, count=3, time=4000, loopCount=0 }}
         local tutorialSprite = display.newSprite (tutorialSheet, tutorialData)
         tutorialSprite.x = display.actualContentWidth/2
         tutorialSprite.y = display.actualContentHeight/2
         tutorialSprite:play();
-        
         sceneGroup:insert(tutorialSprite)
-        local goToLevelBtn = display.newImageRect("immagini/tutorial/continua.png", 150, 105)
-        goToLevelBtn.x = display.actualContentWidth/2
-        goToLevelBtn.y = display.actualContentWidth/2
-        local options =
-        {
-            effect = "fade",
-            time = 400
-        }
-        sceneGroup:insert(goToLevelBtn)
-        function goToLevel (touch)
-             composer.gotoScene("levels.level1",options)
+        
+        function goToLevel()
+            local levelTo = "levels.level"..leveltarget --punto al livello in base al paramettro passato dalla scena precedente
+             composer.gotoScene(levelTo, "fade", 500)
         end
-        goToLevelBtn:addEventListener("touch", goToLevel)
+        Runtime:addEventListener("touch", goToLevel)
              
     end
 end
@@ -69,7 +67,7 @@ function scene:hide( event )
  
     if ( phase == "will" ) then
         -- Code here runs when the scene is on screen (but is about to go off screen)
- 
+        Runtime:removeEventListener("touch", goToLevel)
     elseif ( phase == "did" ) then
         -- Code here runs immediately after the scene goes entirely off screen
         composer.removeScene("tutorial")
