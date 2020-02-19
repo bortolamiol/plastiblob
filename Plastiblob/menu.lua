@@ -80,14 +80,39 @@ function scene:create( event )
 	playBtn:addEventListener("touch", onPlayBtnRelease)
 	playBtn:play()
 
+	--bottone per cancellare i dati dal database
+	local deletedata = display.newImageRect( "immagini/menu/x.png", 80, 80 )
+	deletedata.anchorX =  0
+	deletedata.anchorY =  0
+	deletedata.x = display.actualContentWidth - 100
+	deletedata.y = display.actualContentHeight - 100
+
 	-- aggiungiamo la musica di background del menù
 
 	musicTrack1 = audio.loadStream("MUSIC/THEME.mp3")
 
-
+	--funzione per cancellare i dati dal database
+	function deletedata:touch( event )
+		if event.phase == "began" then
+			--cancello i  dati dal database
+			-- Require the SQLite library
+			local sqlite3 = require( "sqlite3" )	
+			-- Create a file path for the database file "data.db"
+			local path = system.pathForFile( "data.db", system.DocumentsDirectory )
+			-- Open the database for access
+			local db = sqlite3.open( path )
+			--controllo se la tabella 'levels' esiste già, sennò la devo creare
+			local deletedb = [[DROP TABLE levels;]]
+			local s = db:exec( deletedb )
+			print(s)
+			return true
+		end
+	end
+	deletedata:addEventListener( "touch", goback )
 	sceneGroup:insert( background )
 	sceneGroup:insert( titleLogo)
 	sceneGroup:insert( playBtn )
+	sceneGroup:insert(deletedata)
 	sceneGroup:insert(uniLogo)
 end
 
