@@ -230,10 +230,10 @@ function scene:show( event )
     -- AGGIUNTO NEL LIVELLO 2 ---
 
     --PROIETTILE
-    local bulletSheetData = { width=150, height=150, numFrames=7, sheetContentWidth=1050, sheetContentHeight=150 }
+    local bulletSheetData = { width=150, height=150, numFrames=3, sheetContentWidth=450, sheetContentHeight=150 }
     local bulletSheet = graphics.newImageSheet( "immagini/livello-2/ecoproiettile.png", bulletSheetData )
     local bulletData = {
-      { name="ecoproiettile", sheet=bulletSheet, start=1, count=7, time=400, loopCount=0 }
+      { name="ecoproiettile", sheet=bulletSheet, start=1, count=3, time=400, loopCount=0 }
     }
     --ESPLOSIONE QUANDO SI COLPISCE IL NEMICO CON IL PROIETTILE
     local explosionSheetData = { width=200, height=200, numFrames=12, sheetContentWidth=2400, sheetContentHeight=200 }
