@@ -98,7 +98,7 @@ function scene:show( event )
     local plasticToCatch = 7 --numero di oggetti di plastica che l'utente dovrà raccogliere
 
     ----------------PROIETTILE
-    local nameSheetData = { width=400, height=300, numFrames=8, sheetContentWidth=3200, sheetContentHeight=300 }
+    local nameSheetData = { width=400, height=300, numFrames=8, sheetContentWidth=4800, sheetContentHeight=300 }
     local nameSheet = graphics.newImageSheet( "immagini/finale/nomi.png", nameSheetData )
     local borto = {
         { name="borto", sheet=nameSheet, start=1, count=2, time=1400, loopCount=0 }
@@ -111,6 +111,15 @@ function scene:show( event )
     }
     local laston = {
       { name="borto", sheet=nameSheet, start=7, count=2, time=1400, loopCount=0 }
+    }
+    local lgp = {
+      { name="lgp", sheet=nameSheet, start=9, count=2, time=1400, loopCount=0 }
+    }
+    local uniud = {
+      { name="uniud", sheet=nameSheet, start=11, count=2, time=1400, loopCount=0 }
+    }
+    local logo = {
+      { name="uniud", sheet=nameSheet, start=13, count=2, time=1400, loopCount=0 }
     }
 
 
@@ -151,7 +160,13 @@ function scene:show( event )
         elseif(nametoshow == 3) then
           name = display.newSprite( nameSheet, mc )
         elseif(nametoshow == 4) then
-           name = display.newSprite( nameSheet, laston )
+          name = display.newSprite( nameSheet, laston )
+        elseif(nametoshow == 5) then
+          name = display.newSprite( nameSheet, lgp )
+        elseif(nametoshow == 6) then
+          name = display.newSprite( nameSheet, uniud )
+        elseif(nametoshow == 7) then
+          name = display.newSprite( nameSheet, logo )
         end
         --crea un oggetto di un nuovo sprite del sacchetto e lo aggiunge alla tabella table_plasticbag[]
         --da implementare meglio, mi faccio passare che tipo di nemico devo inserire
@@ -199,12 +214,17 @@ function scene:show( event )
       secondsPlayed = secondsPlayed + 1 --ogni secondo che passa aumento questa variabile che tiene conto di quanto tempo è passato
       print("seconds played: " ..secondsPlayed)
       if(secondsPlayed == 4) then
-        print("ooo")
         namesLoop(2)
       elseif(secondsPlayed == 8) then
         namesLoop(3)
       elseif(secondsPlayed == 12) then
         namesLoop(4)
+      elseif(secondsPlayed == 16) then
+        namesLoop(5)
+      elseif(secondsPlayed == 20) then
+        namesLoop(6)
+      elseif(secondsPlayed == 24) then
+        namesLoop(7)
       end
         if(secondsPlayed >= 50 ) then --se è ora di far finire il gioco, vado al passo successivo
           goToTheNewScene()
