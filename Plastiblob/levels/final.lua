@@ -14,6 +14,7 @@ local table_bullets = {} --tabella per contenere al suo interno i vari proiettil
 local table_enemy_bullets = {} --tabella per contenere al suo interno i vari proiettili sparati dal nemico
 local enemyLife = 400 --variabile che conterrà la vita del nemico (numero che andrà da 400 a 0)
 local enemySpeed --velocità di scorrimento dei proiettili dei nemici
+local musicFinal
 
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
@@ -23,6 +24,7 @@ local enemySpeed --velocità di scorrimento dei proiettili dei nemici
 function scene:create( event )
 
   local sceneGroup = self.view
+  musicFinal = audio.loadStream("MUSIC/finalBoss.mp3") --carico la musica finalBoss
   -- Code here runs when the scene is first created but has not yet appeared on screen
   group_background = display.newGroup() --group_background conterrà la foto di sfondo
   group_elements = display.newGroup() --group_elements conterrà tutti gli altri elementi dello schermo: sprite del personaggio, nemici e bottoni per uscire dal gioco
@@ -60,6 +62,8 @@ function scene:show( event )
     -- Code here runs when the scene is still off screen (but is about to come on screen)
 
   elseif ( phase == "did" ) then
+    audio.play( musicFinal, { channel=3, loops=-1 } ) --parte la musica del boss finale
+    
     -- Questa tabella OPTIONS la passerò alla schermata di GameOver quando morirò, la schermata di GameOver prenderà in pasto questi parametri e grazie alla variabile 'level' saprà a che livello tornare (ovvero il livello che ha chiamato tale schermata di GameOver)
     local options = { 
       effect = "fade",
@@ -390,7 +394,8 @@ end
 
 -- destroy()
 function scene:destroy( event )
-
+  audio.stop(musicFinal)
+  audio.dispose( musicFinal)
   local sceneGroup = self.view
   -- Code here runs prior to the removal of scene's view
 
