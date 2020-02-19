@@ -113,6 +113,7 @@ function scene:create( event )
 	sceneGroup:insert( titleLogo)
 	sceneGroup:insert( playBtn )
 	sceneGroup:insert(deletedata)
+	sceneGroup:insert(uniLogo)
 end
 
 function scene:show( event )

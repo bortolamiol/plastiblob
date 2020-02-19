@@ -25,5 +25,5 @@ audio.setVolume(1, {channel=4} )
 
 -- load menu screen
 --NON CANCELLARE LA PROSSIMA RIGA
---composer.gotoScene( "menu-levels" )
-composer.gotoScene( "levels.victory" )
+composer.gotoScene( "menu" )
+--composer.gotoScene( "levels.victory" )
