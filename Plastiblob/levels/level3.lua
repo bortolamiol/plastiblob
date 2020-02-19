@@ -350,20 +350,22 @@ function scene:show( event )
       local function createPlasticbag()
         --crea un oggetto di un nuovo sprite del sacchetto e lo aggiunge alla tabella table_plasticbag[]
         --da implementare meglio, mi faccio passare che tipo di nemico devo inserire
-        local plasticbag = display.newSprite( plasticbagSheet, plasticbagData )
-        plasticbag.name = "plasticbag"
-        plasticbag:play()
-        group_elements:insert(plasticbag)
-        plasticbag.x = display.actualContentWidth + 65
-        plasticbag.y = 200
-        local frameIndePlasticbag = 1;
-        local outlinePlasticbag = graphics.newOutline(20, plasticbagSheet, frameIndePlasticbag)
-        physics.addBody(plasticbag, { outline=outlinePlasticbag, density=1, bounce=0, friction=1})
-        plasticbag.isBullet = true
-        plasticbag.isSensor = true
-        plasticbag.bodyType = "static"
-        table.insert(table_plasticbag, plasticbag)
-        return plasticbag
+        if(stopCreatingEnemies == 0 ) then
+          local plasticbag = display.newSprite( plasticbagSheet, plasticbagData )
+          plasticbag.name = "plasticbag"
+          plasticbag:play()
+          group_elements:insert(plasticbag)
+          plasticbag.x = display.actualContentWidth + 65
+          plasticbag.y = 200
+          local frameIndePlasticbag = 1;
+          local outlinePlasticbag = graphics.newOutline(20, plasticbagSheet, frameIndePlasticbag)
+          physics.addBody(plasticbag, { outline=outlinePlasticbag, density=1, bounce=0, friction=1})
+          plasticbag.isBullet = true
+          plasticbag.isSensor = true
+          plasticbag.bodyType = "static"
+          table.insert(table_plasticbag, plasticbag)
+          return plasticbag
+        end
       end
       ------------------------------------------------
       local function plasticbagLoop()
@@ -387,7 +389,7 @@ function scene:show( event )
         stopCreatingEnemies = 1
         -- audio
         audio.pause(crunchSound)	
-        audio.setMaxVolume(0.03)	
+        --audio.setMaxVolume(0.03)	
         local audiogameover = audio.loadSound("MUSIC/PERDENTE.mp3")	
         audio.play(audiogameover)
         --audio.play(audiogameover)
@@ -400,7 +402,7 @@ function scene:show( event )
         if( event.phase == "began" ) then
           --tutte le informazioni dell'elemento che ho toccato le troviamo dentro event.other
           if(event.other.name ==  "plasticbag") then --mi sono scontrato con il sacchetto
-            audio.setMaxVolume(0.03)	
+           -- audio.setMaxVolume(0.03)	
             audio.play(crunchSound)
             scoreCount = scoreCount+1;
             scoreText.text = scoreCount.."/"..plasticToCatch
@@ -528,6 +530,7 @@ function scene:show( event )
       function button_home:touch( event )
         if event.phase == "ended" then
           stop = 1
+          stopCreatingEnemies = 1
           timer.performWithDelay( 500, function() composer.gotoScene( "menu-levels", "fade", 500 ) end)  --ritorno al menu dei livelli
         end
       end

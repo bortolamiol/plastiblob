@@ -200,7 +200,6 @@ function scene:show( event )
       local plasticbagData = {
         { name="plastic", sheet=plasticbagSheet, start=1, count=4, time=500, loopCount=0 }
       }
-      local plasticbagTimeSpawn = 5000
 
       --CASTELLO DI SABBIA IN CUI ENTRERO' A FINE LIVELLO
       castle = display.newImageRect( "immagini/livello-2/last-destination.png", 700, 700 )
@@ -343,7 +342,7 @@ function scene:show( event )
         stop = 1 -- grazie a questo le animazioni personagggi non scrolleranno più
         -- audio
         audio.pause(crunchSound)	
-        audio.setMaxVolume(0.03)	
+        --audio.setMaxVolume(0.03)	
         local audiogameover = audio.loadSound("MUSIC/PERDENTE.mp3")	
         audio.play(audiogameover)
         --audio.play(audiogameover)
@@ -356,7 +355,7 @@ function scene:show( event )
         if( event.phase == "began" ) then
           --tutte le informazioni dell'elemento che ho toccato le troviamo dentro event.other
           if(event.other.name ==  "plasticbag") then --mi sono scontrato con il sacchetto
-            audio.setMaxVolume(0.03)	
+            --audio.setMaxVolume(0.03)	
             audio.play(crunchSound)
             scoreCount = scoreCount+1;
             scoreText.text = scoreCount.."/"..plasticToCatch
@@ -367,7 +366,8 @@ function scene:show( event )
             group_elements:remove(event.other) --lo rimuovo dal gruppo (????? serve??? NON LO SO, VEDIAMO SE DARA' PROBLEMI)
           end
           if(event.other.name ==  "enemy") or (event.other.name ==  "pool") then
-            gameOver()
+            --gameOver()
+            print("MORttooooooooooo")
           end
           if(event.other.name == "ground") or (event.other.name == "platform") then
               sprite.isJumping = false
@@ -442,8 +442,6 @@ function scene:show( event )
             if (castleAppared == 0 ) then --se non ho già fatto apparire il castello, lo faccio apparire	
               print("dovrebbe apparire il castello")	
               castleAppared = 1 --non lo faccio più riapparire	
-              timer.cancel( callingEnemies ) --non chiamo più nemici	
-              timer.cancel( callingPlasticbag ) --non chiamo più sacchetti di plastica	
               sprite:removeEventListener("collision")	
               Runtime:addEventListener("enterFrame", castleScroll) --chiamo la funzione castleScroll per spostare il castello	
             end	
@@ -577,7 +575,7 @@ function scene:show( event )
           pool.name = "pool"
           pool:play()
           group_elements:insert(pool)
-          pool.x = display.actualContentWidth + 50
+          pool.x = display.actualContentWidth + 150
           pool.y = ground.y - 100
           local outlinePool = graphics.newOutline(5, poolSheet, 8)
           physics.addBody(pool, { outline=outlinePool, density=1, bounce=0, friction=1})
@@ -647,15 +645,41 @@ function scene:show( event )
       timeplayed = timer.performWithDelay( 1000, increaseGameSpeed, 0 )
       gameLoop = timer.performWithDelay( time_speed_min, loop, 0 )
 
-      callingEnemies = {}
-      callingPlasticbag = {}
-      callingPool = {}
+      --rendo queste tre variabili delle tabelle di oggetti che conterranno vari timer che andranno a richiamare i sacchetti di plastica e i nemici
+      callingEnemies = {} --andrà a richiamare i serpente
+      callingPlasticbag = {} --andrà a richiamare i sacchetti di plastica da raccogliere
+      callingPool = {} --andrà a richiamare le pozze di acido
 
-      callingEnemies[1] = timer.performWithDelay (2000, enemiesLoop, 0 )
+      --RICHIAMO I NEMICI
+      callingEnemies[1] = timer.performWithDelay (1500, enemiesLoop, 1 )
+      callingEnemies[2] = timer.performWithDelay (7000, enemiesLoop, 0 )
+      callingEnemies[3] = timer.performWithDelay (13000, enemiesLoop, 0 )
+      callingEnemies[4] = timer.performWithDelay (19000, enemiesLoop, 1 )
+      callingEnemies[5] = timer.performWithDelay (55000, enemiesLoop, 1 )
+      callingEnemies[6] = timer.performWithDelay (58000, enemiesLoop, 1 )
 
-      callingPlasticbag[1] = timer.performWithDelay( (timeToPlay/plasticToCatch)*1000, plasticbagLoop, plasticToCatch)
+      --RICHIAMO LE POZZE DI ACIDO
+      callingPool[1] = timer.performWithDelay( (timeToPlay/14)*1000, poolLoop, 0)
+      callingPool[2] = timer.performWithDelay( 16000, poolLoop, 1)
+      callingPool[3] = timer.performWithDelay( 39000, poolLoop, 1)
+      callingPool[4] = timer.performWithDelay( 20000, poolLoop, 1)
+      callingPool[5] = timer.performWithDelay( 39000, poolLoop, 1)
+      callingPool[6] = timer.performWithDelay( 45000, poolLoop, 1)
+      callingPool[7] = timer.performWithDelay( 50000, poolLoop, 1)
+      callingPool[8] = timer.performWithDelay( 67000, poolLoop, 1)
 
-      --callingPool[1] = timer.performWithDelay( (timeToPlay/14)*1000, poolLoop, 0)
+       --RICHIAMO I SACCHETTI DI PLASTICA
+     callingPlasticbag[1] = timer.performWithDelay( 4000 , plasticbagLoop, 1)
+      callingPlasticbag[2] = timer.performWithDelay( 18000 , plasticbagLoop, 1)
+      callingPlasticbag[3] = timer.performWithDelay( 16500 , plasticbagLoop, 1)
+      callingPlasticbag[4] = timer.performWithDelay( 23500 , plasticbagLoop, 1)
+      callingPlasticbag[5] = timer.performWithDelay( 33000 , plasticbagLoop, 1)
+      callingPlasticbag[6] = timer.performWithDelay( 43000 , plasticbagLoop, 1)
+      callingPlasticbag[7] = timer.performWithDelay( 47000 , plasticbagLoop, 1)
+      callingPlasticbag[8] = timer.performWithDelay( 51000 , plasticbagLoop, 1)
+      callingPlasticbag[9] = timer.performWithDelay( 57000 , plasticbagLoop, 1)
+      callingPlasticbag[10] = timer.performWithDelay( 62000 , plasticbagLoop, 1)
+
     end
   end
 end
