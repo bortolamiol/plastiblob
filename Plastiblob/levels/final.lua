@@ -14,6 +14,7 @@ local table_bullets = {} --tabella per contenere al suo interno i vari proiettil
 local table_enemy_bullets = {} --tabella per contenere al suo interno i vari proiettili sparati dal nemico
 local enemyLife = 400 --variabile che conterrà la vita del nemico (numero che andrà da 400 a 0)
 local enemySpeed --velocità di scorrimento dei proiettili dei nemici
+local table_loop
 local musicFinal
 
 -- -----------------------------------------------------------------------------------
@@ -342,13 +343,14 @@ function scene:show( event )
         secondsPlayed = secondsPlayed + 1 --ogni secondo che passa aumento questa variabile che tiene conto di quanto tempo è passato
         local x_enemySpeed = ((enemySpeed_max * secondsPlayed)/40) --aggiungo un incremento alla velocità di gioco facendo una proporzione sul tempo di gioco passato
         enemySpeed = enemySpeed_min + x_enemySpeed --la velocità è data dalla velocità minima (2) + il risultato della proporzione
-        timerBullet._delay = timerBullet._delay - secondsPlayed * 3 --aggiorno la velcoità di chiamata del timer dei proiettili del nemico, faccio sparare più velocemetne
+        table_loop[3]._delay =  table_loop[3]._delay - secondsPlayed * 3 --aggiorno la velcoità di chiamata del timer dei proiettili del nemico, faccio sparare più velocemetne
       end
     end
-
-    gameLoop = timer.performWithDelay( 500, loop, 0 ) --richiamo le animazioni di gioco ogni 500 millisecondi
-    timeplayed = timer.performWithDelay( 1000, increaseGameSpeed, 0 ) --funzione che serve per aumentare la velocità di gioco ogni secondo
-    timerBullet = timer.performWithDelay( 1500, enemyBulletsLoop, 0 ) --richiamo lo sparo del nemico
+    print("arriv")
+    table_loop = {}
+    table_loop[1] = timer.performWithDelay( 500, loop, 0 ) --richiamo le animazioni di gioco ogni 500 millisecondi
+    table_loop[2] = timer.performWithDelay( 1000, increaseGameSpeed, 0 ) --funzione che serve per aumentare la velocità di gioco ogni secondo
+    table_loop[3] = timer.performWithDelay( 1500, enemyBulletsLoop, 0 ) --richiamo lo sparo del nemico
   end
 end
 
@@ -360,11 +362,14 @@ function scene:hide( event )
   local phase = event.phase
 
   if ( phase == "will" ) then
+    
+  elseif ( phase == "did" ) then
+    -- Code here runs immediately after the scene goes entirely off screen
     -- Code here runs when the scene is on screen (but is about to go off screen)
     physics.pause()
-    timer.cancel(gameLoop)
-    timer.cancel(timeplayed)
-    timer.cancel(timerBullet)
+    --timer.cancel(gameLoop)
+    --timer.cancel(timeplayed)
+   -- timer.cancel(timerBullet)
 
     --ELIMINO I LISTENERS
     sprite:removeEventListener("collision")
@@ -384,9 +389,12 @@ function scene:hide( event )
       table_enemy_bullets[i]:removeSelf() -- Optional Display Object Removal
       table_enemy_bullets[i] = nil        -- Nil Out Table Instance
     end
+    for i=1, #table_loop do
+      timer.cancel( table_loop[i] )
+      table_loop[i] = nil        -- Nil Out Table Instance
+    end
 
-  elseif ( phase == "did" ) then
-    -- Code here runs immediately after the scene goes entirely off screen
+    audio.stop( 3 ) --la musica del livello 1 si ferma
     composer.removeScene("levels.final") -- ELIMINO TUTTO CIO' CHE C'E' ALL'INTERNO DELLA SCENA
   end
 end
