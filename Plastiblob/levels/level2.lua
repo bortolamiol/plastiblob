@@ -366,7 +366,7 @@ function scene:show( event )
             group_elements:remove(event.other) --lo rimuovo dal gruppo (????? serve??? NON LO SO, VEDIAMO SE DARA' PROBLEMI)
           end
           if(event.other.name ==  "enemy") or (event.other.name ==  "pool") then
-            --gameOver()
+            gameOver()
             print("MORttooooooooooo")
           end
           if(event.other.name == "ground") or (event.other.name == "platform") then
