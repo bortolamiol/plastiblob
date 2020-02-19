@@ -24,7 +24,7 @@ function scene:create( event )
   -- INSERT code here to initialize the scene
   -- e.g. add display objects to 'sceneGroup', add touch listeners, etc.
   local sceneGroup = self.view
-  musicLevel3 = audio.loadStream("MUSIC/level2.mp3") --carico la traccia audio level3
+  musicLevel3 = audio.loadStream("MUSIC/finale.mp3") --carico la traccia audio level3
   --creo due nuovi gruppi che inserirò all'interno del gruppo 'padre' sceneGroup
   group_background = display.newGroup() --group_background conterrà la foto di sfondo che scrollerà
   group_castle = display.newGroup() --group_elements conterrà tutti gli altri elementi dello schermo: sprite del personaggio, nemici e bottoni per uscire dal gioco
@@ -49,7 +49,7 @@ function scene:show( event )
     physics.setGravity( 0,41 )
 
   elseif phase == "did" then
-    audio.play( musicLevel3, { channel=3, loops=-1 } ) --parte la musica del livello 3
+    audio.play( musicLevel3, { channel=3, loops=1 } ) --parte la musica del livello 3
 
     ----------------------------------------------------------------------------
     ----------------------------------------------------------------------------
@@ -123,6 +123,13 @@ function scene:show( event )
     }
 
 
+    --il nostro sprite che alziamo la tazza del programmatore
+    local winnerSheetData = { width=700, height=700, numFrames=2, sheetContentWidth=1400, sheetContentHeight=700 }
+    local winnerSheet = graphics.newImageSheet( "immagini/finale/noi.png", winnerSheetData )
+    local winnerData = {
+      { name="winner", sheet=winnerSheet, start=1, count=2, time=1000, loopCount=0 }
+    }
+
     table_names = {} --conterrà tutti i nomi passati sullo schermo
 
 
@@ -167,6 +174,9 @@ function scene:show( event )
           name = display.newSprite( nameSheet, uniud )
         elseif(nametoshow == 7) then
           name = display.newSprite( nameSheet, logo )
+        elseif(nametoshow == 8) then
+          name = display.newSprite( winnerSheet, winnerData )
+          
         end
         --crea un oggetto di un nuovo sprite del sacchetto e lo aggiunge alla tabella table_plasticbag[]
         --da implementare meglio, mi faccio passare che tipo di nemico devo inserire
@@ -201,7 +211,7 @@ function scene:show( event )
 
     ------------------------------------------------
     function goToTheNewScene()
-      composer.gotoScene( "menu-levels", "fade", 2000 ) --vado alla nuova scena
+      composer.gotoScene( "menu", "fade", 2000 ) --vado alla nuova scena
     end
     -----------------------------------------------
 
@@ -225,8 +235,10 @@ function scene:show( event )
         namesLoop(6)
       elseif(secondsPlayed == 24) then
         namesLoop(7)
+      elseif(secondsPlayed == 28) then
+        namesLoop(8)
       end
-        if(secondsPlayed >= 32 ) then --se è ora di far finire il gioco, vado al passo successivo
+        if(secondsPlayed >= 37 ) then --se è ora di far finire il gioco, vado al passo successivo
           goToTheNewScene()
         end
       end
@@ -255,10 +267,10 @@ function scene:hide( event )
 
   if event.phase == "will" then
     resetScene()
+    audio.stop( 3 ) --la musica del livello 1 si ferma
 
   elseif phase == "did" then
     --cancella tutto il contenuto all'interno di una scena senza salvare i contenuti
-    audio.stop( 3 ) --la musica del livello 1 si ferma
     audio.dispose( musicLevel3) --elimino la musica del livello
     composer.removeScene( "levels.victory")
   end
