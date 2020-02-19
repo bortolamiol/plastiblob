@@ -41,7 +41,7 @@ function scene:create( event )
   -- INSERT code here to initialize the scene
   -- e.g. add display objects to 'sceneGroup', add touch listeners, etc.
   local sceneGroup = self.view
-  musicLevel3 = audio.loadStream("MUSIC/level3.mp3") --carico la traccia audio level3
+  musicLevel3 = audio.loadStream("MUSIC/level2.mp3") --carico la traccia audio level3
   --creo due nuovi gruppi che inserirò all'interno del gruppo 'padre' sceneGroup
   group_background = display.newGroup() --group_background conterrà la foto di sfondo che scrollerà
   group_castle = display.newGroup() --group_elements conterrà tutti gli altri elementi dello schermo: sprite del personaggio, nemici e bottoni per uscire dal gioco

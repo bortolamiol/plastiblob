@@ -754,6 +754,7 @@ function scene:show( event )
     function button_home:touch( event ) --ascoltatore di touch del bottone di home
       if event.phase == "ended" then
         stop = 1 --blocco le animazioni di scorrimento sfondo
+        stopCreatingEnemies = 1
         timer.performWithDelay( 500, function() composer.gotoScene( "menu-levels", "fade", 500 ) end)  --ritorno al menu dei livelli
       end
     end
@@ -900,7 +901,7 @@ function resetScene( tipo)
   --resetto le variabili per capire se sta suonando la musica di background nel menu o nel menu levels
 
   if tipo == "gameOver" then
-    --composer.isAudioPlayingMenu =0;
+    composer.isAudioPlayingMenu =0;
     composer.isAudioPlaying=0;
 
     audio.dispose(crunchSound)
