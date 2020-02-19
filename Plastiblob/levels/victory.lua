@@ -5,35 +5,18 @@
 -----------------------------------------------------------------------------------------
 
 -- dichiaro delle variabili che andrò a usare in varie scene del livello
-local localLevel = 3 --VARIABILE CHE CONTIENE IL NUMERO DI LIVELLO A CUI APPARTIENE IL FILE LUA: IN QUESTO CASO SIAMO AL LIVELLO 1
 local composer = require( "composer" ) --richiedo la libreria composer
 local scene = composer.newScene() --nuova scena composer
-local tutorial = 1 --ho completato il tutorial? se è 0 devo ancora farlo!
+
 local bg --variabile che durante lo show conterrà le due immagini di sfondo che andranno una dopo l'altra
-local punteggio --variabile che conterrà il mio punteggio del livello
-local sprite --sprite del personaggio
-local enemies = {} --sprite dei nemici
-local table_plasticbag = {} --tabella che conterrà al suo interno i sacchetti di plastica che sono sullo schermo
-local table_bullets = {} --tabella che conterrà al suo interno i proiettili che sono sullo schermo
-local table_spine = {} --tabella che conterrà al suo interno le pozze d'acqua che sono sullo schermo
-local table_platform = {} --tabella che conterrà al suo interno le piattaforme che saranno sullo schermo
-local button_home --bottone per uscire dal livello e tornare alla button_home dei livelli
 local stop =  0 --variabile che servirà per capire se stoppare il gioco
 local stopCreatingEnemies =  0 --variabile che servirà per capire se stoppare il gioco
-local callingEnemies
-local castle
-local platform --variabile che conterrà al suo interno l'immagine della piattaforma che sarà visualizzata nel gioco
-local callingPlasticbag
-local callingSpine
 local timeplayed  --varaiabile che misura da quanti secondi sono all'interno del gioco e farà cambiare la velocità
 local timeToPlay = 70 --variabile che conterrà quanto l'utente dovrà sopravvivere all'interno del gioco
 local scoreCount    --variabile conteggio punteggio iniziale
 local gameFinished
-local newTimerOut
-local nextScene = "menu-levels"
-local crunchSound = audio.loadSound("MUSIC/crunch.mp3")
-local musicLevel3
-local explosionSound3 = audio.loadSound("MUSIC/explosion.mp3") --carico suono esplosione
+local table_names
+local loops
 function scene:create( event )
 
   -- Called when the scene's view does not exist.
@@ -68,7 +51,6 @@ function scene:show( event )
   elseif phase == "did" then
     audio.play( musicLevel3, { channel=3, loops=-1 } ) --parte la musica del livello 3
 
-
     ----------------------------------------------------------------------------
     ----------------------------------------------------------------------------
     -------------------   VARIE VARIABILI DI FUNZIONAMENTO  --------------------
@@ -86,13 +68,13 @@ function scene:show( event )
     local _y = 0  -- Vertical centre of screen
 
     bg={} -- 'vettore' che conterrà i due sfondi del gioco
-    bg[1] = display.newImageRect("immagini/livello-3/background.png", _w, _h)
+    bg[1] = display.newImageRect("immagini/finale/background.png", _w, _h)
     bg[1].anchorY = 0
     bg[1].anchorX = 0
     bg[1].x = 0
     bg[1].y = _y
     group_background:insert(bg[1])
-    bg[2] = display.newImageRect("immagini/livello-3/background.png", _w, _h)
+    bg[2] = display.newImageRect("immagini/finale/background.png", _w, _h)
     bg[2].anchorY = 0
     bg[2].anchorX = 0
     bg[2].x = _w
@@ -108,7 +90,7 @@ function scene:show( event )
     local enemySpeed_min = 4 -- minima velocità di spostamento del nemico
     local enemySpeed = enemySpeed_min --velocità iniziale di spostamento del nemico, parte dal valore minimo
 
-    local frame_speed = 10 --questa sarà la velocità dello scorrimento del nostro sfondo, si sposta di 20 pixel in 20
+    local frame_speed = 5 --questa sarà la velocità dello scorrimento del nostro sfondo, si sposta di 20 pixel in 20
 
     local time_speed_min = 20 -- ogni quanti millisecondi verranno chiamate le funzioni di loop (esempio di sfondo group_background)
     local time_speed_max = 10 -- massimo di velocità che time_speed può raggiungere
@@ -116,16 +98,13 @@ function scene:show( event )
     local plasticToCatch = 7 --numero di oggetti di plastica che l'utente dovrà raccogliere
 
     ----------------PROIETTILE
-    local bulletSheetData = { width=200, height=84, numFrames=3, sheetContentWidth=600, sheetContentHeight=84 }
-    local bulletSheet = graphics.newImageSheet( "immagini/finale/ecoproiettile.png", bulletSheetData )
-    local bulletData = {
-        { name="berna", sheet=bulletSheet, start=1, count=3, time=1400, loopCount=0 }
-        { name="borto", sheet=bulletSheet, start=1, count=3, time=1400, loopCount=0 }
-        { name="gabri", sheet=bulletSheet, start=1, count=3, time=1400, loopCount=0 }
-        { name="simo", sheet=bulletSheet, start=1, count=3, time=1400, loopCount=0 }
-        { name="corso", sheet=bulletSheet, start=1, count=3, time=1400, loopCount=0 }
+    local nameSheetData = { width=400, height=300, numFrames=2, sheetContentWidth=800, sheetContentHeight=300 }
+    local nameSheet = graphics.newImageSheet( "immagini/finale/aleborto.png", nameSheetData )
+    local nameData = {
+        { name="borto", sheet=sex, start=1, count=2, time=1400, loopCount=0 }
     }
 
+    table_names = {} --conterrà tutti i nomi passati sullo schermo
 
 
     local function moveBackground(self) --funzione dello scroll del gioco
@@ -137,57 +116,41 @@ function scene:show( event )
       end
     end
 
-    ----------------------------------------------------------------------------
-    ----------------------------------------------------------------------------
-    ---------------- FUNZIONI PER IL PRIMO NEMICO DEL GIOCO --------------------
-    ----------------------------------------------------------------------------
-    ----------------------------------------------------------------------------
 
-    ----------------------------------------------------------------------------
-    ----------------------------------------------------------------------------
-    ------------- FUNZIONI PER IL PROIETTILE E LATTINA DI PLASTICA --------------
-    ----------------------------------------------------------------------------
-    ----------------------------------------------------------------------------
-
-    local function bulletScroll(self, event)
+    local function nameScroll(self, event)
         --fa scorrere il sacchetto nello schermo
         if stop == 0 then
+          print(self.x)
           self.x = self.x  - 5 --fa andare  avanti il proiettile in x senza spostarsi in y
-          if self.x > display.actualContentWidth + 30 then --se c'è un sacchetto di plastica che ha superato il limite di -200, lo togliamo!
+          if self.x < - 30 then --se c'è un sacchetto di plastica che ha superato il limite di -200, lo togliamo!
+            print("ooo")
             Runtime:removeEventListener("enterFrame",self) --rimuovo l'ascoltatore che lo fa scrollare
             group_elements:remove(self)
             display.remove(self) --rimuove QUEL sacchetto di plastica dal display display
-            local res = table.remove(table_bullets, table.indexOf( table_bullets, self )) --lo rimuove anche dalla tabella dei proeittili
+            local res = table.remove(table_names, table.indexOf( table_names, self )) --lo rimuove anche dalla tabella dei proeittili
           end
         end
       end
   
      
       ---------------------------------------------------
-      local function createBullet()
+      local function createNames()
         --crea un oggetto di un nuovo sprite del sacchetto e lo aggiunge alla tabella table_plasticbag[]
         --da implementare meglio, mi faccio passare che tipo di nemico devo inserire
-        local bullet = display.newSprite( bulletSheet, bulletData )
-        bullet.name = "bullet"
-        bullet:play()
-        group_elements:insert(bullet)
-        bullet.x = sprite.x + 80
-        bullet.y = sprite.y
-        local outlineBullet = graphics.newOutline(1, bulletSheet, 2)
-        physics.addBody(bullet, { outline=outlineBullet, density=1, bounce=0, friction=1})
-        bullet.isBullet = true
-        bullet.isSensor = true
-        bullet.bodyType = "static"
-        return bullet
+        local name = display.newSprite( nameSheet, nameData )
+        name:play()
+        group_elements:insert(name)
+        name.x  = display.actualContentWidth + 200
+        name.y = display.actualContentHeight/2
+        return name
       end
   
       ------------------------------------------------
-      local function bulletsLoop()
-        bullet = createBullet() --creo un'istanza di un oggetto sprite plastic bag
-        table.insert(table_bullets, bullet)
-        bullet:addEventListener( "collision", onBulletCollision )
-        bullet.enterFrame = bulletScroll --lo faccio scrollare, grazie alla funzione plasticbagScroll
-        Runtime:addEventListener("enterFrame", bullet) --assegno all'evento enterframe lo scroll
+      local function namesLoop()
+        name = createNames() --creo un'istanza di un oggetto sprite plastic bag
+        table.insert(table_names, name)
+        name.enterFrame = nameScroll --lo faccio scrollare, grazie alla funzione plasticbagScroll
+        Runtime:addEventListener("enterFrame", name) --assegno all'evento enterframe lo scroll
       end
 
     ----------------------------------------------------------------------------
@@ -230,9 +193,10 @@ function scene:show( event )
     ---------------------------------- TIMER  ----------------------------------
     ----------------------------------------------------------------------------
     ----------------------------------------------------------------------------
-    timeplayed = timer.performWithDelay( 1000, increaseGameSpeed, 0 )
-    gameLoop = timer.performWithDelay( time_speed_min, loop, 0 )
-
+    loops = {}
+    loops[1] = timer.performWithDelay( 1000, increaseGameSpeed, 0 )
+    loops[2] = timer.performWithDelay( time_speed_min, loop, 0 )
+    loops[3] = timer.performWithDelay( 2000, namesLoop, 1 )
     
   end
 end
@@ -249,6 +213,7 @@ function scene:hide( event )
   elseif phase == "did" then
     --cancella tutto il contenuto all'interno di una scena senza salvare i contenuti
     audio.stop( 3 ) --la musica del livello 1 si ferma
+    audio.dispose( musicLevel3) --elimino la musica del livello
     composer.removeScene( "levels.victory")
   end
 
@@ -260,7 +225,7 @@ function scene:destroy( event )
   --
   -- INSERT code here to cleanup the scene
   -- e.g. remove display objects, remove touch listeners, save state, etc.
-  audio.dispose( musicLevel3) --elimino la musica del livello
+  
   local sceneGroup = self.view
 end
 
