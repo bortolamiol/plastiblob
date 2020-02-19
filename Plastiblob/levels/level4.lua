@@ -495,7 +495,7 @@ function scene:show( event )
           group_elements:remove(event.other) --lo rimuovo dal gruppo (????? serve??? NON LO SO, VEDIAMO SE DARA' PROBLEMI)
         end
         if(event.other.name ==  "enemy") or (event.other.name ==  "spine") then
-          --gameOver()
+          gameOver()
         end
         if(event.other.name == "ground") or (event.other.name == "platform") then
           sprite.isJumping = false
@@ -918,7 +918,6 @@ function resetScene( tipo)
   --ELIMINO PRIMA LE COSE IN COMUNE
   --resetto le variabili per capire se sta suonando la musica di background nel menu o nel menu levels
     timer.cancel( timeplayed ) --non faccio più andare il  conteggio dei secondi
-    audio.dispose(crunchSound)
     composer.isAudioPlaying=0
     physics.pause()
 
