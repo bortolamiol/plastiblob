@@ -115,13 +115,17 @@ function scene:show( event )
 
     local plasticToCatch = 7 --numero di oggetti di plastica che l'utente dovrà raccogliere
 
-    
+    ----------------PROIETTILE
+    local bulletSheetData = { width=200, height=84, numFrames=3, sheetContentWidth=600, sheetContentHeight=84 }
+    local bulletSheet = graphics.newImageSheet( "immagini/finale/ecoproiettile.png", bulletSheetData )
+    local bulletData = {
+        { name="berna", sheet=bulletSheet, start=1, count=3, time=1400, loopCount=0 }
+        { name="borto", sheet=bulletSheet, start=1, count=3, time=1400, loopCount=0 }
+        { name="gabri", sheet=bulletSheet, start=1, count=3, time=1400, loopCount=0 }
+        { name="simo", sheet=bulletSheet, start=1, count=3, time=1400, loopCount=0 }
+        { name="corso", sheet=bulletSheet, start=1, count=3, time=1400, loopCount=0 }
+    }
 
-    --porta  in cui entrerò a fine livello, in questo livello sono l'entrata delle fogne
-    castle = display.newImageRect( "immagini/livello-3/last-destination.png", 700, 700 )
-    castle.x = display.actualContentWidth + 800
-    castle.y = (display.contentHeight-50) - castle.height/2 - 50
-    group_castle:insert(castle)
 
 
     local function moveBackground(self) --funzione dello scroll del gioco
@@ -139,17 +143,52 @@ function scene:show( event )
     ----------------------------------------------------------------------------
     ----------------------------------------------------------------------------
 
-    local function enemyScroll(self, event)
-      --fa scorrere il nemico nello schermo
-      if stop == 0 then
-        self.x = self.x - (enemySpeed*2)
+    ----------------------------------------------------------------------------
+    ----------------------------------------------------------------------------
+    ------------- FUNZIONI PER IL PROIETTILE E LATTINA DI PLASTICA --------------
+    ----------------------------------------------------------------------------
+    ----------------------------------------------------------------------------
 
-        if(self.id == 1) then --se sono il pipistrello allora mantengo l'altezza in y
-          self.y = (display.contentHeight / 2) - 90
+    local function bulletScroll(self, event)
+        --fa scorrere il sacchetto nello schermo
+        if stop == 0 then
+          self.x = self.x  - 5 --fa andare  avanti il proiettile in x senza spostarsi in y
+          if self.x > display.actualContentWidth + 30 then --se c'è un sacchetto di plastica che ha superato il limite di -200, lo togliamo!
+            Runtime:removeEventListener("enterFrame",self) --rimuovo l'ascoltatore che lo fa scrollare
+            group_elements:remove(self)
+            display.remove(self) --rimuove QUEL sacchetto di plastica dal display display
+            local res = table.remove(table_bullets, table.indexOf( table_bullets, self )) --lo rimuove anche dalla tabella dei proeittili
+          end
         end
       end
-    end
-    
+  
+     
+      ---------------------------------------------------
+      local function createBullet()
+        --crea un oggetto di un nuovo sprite del sacchetto e lo aggiunge alla tabella table_plasticbag[]
+        --da implementare meglio, mi faccio passare che tipo di nemico devo inserire
+        local bullet = display.newSprite( bulletSheet, bulletData )
+        bullet.name = "bullet"
+        bullet:play()
+        group_elements:insert(bullet)
+        bullet.x = sprite.x + 80
+        bullet.y = sprite.y
+        local outlineBullet = graphics.newOutline(1, bulletSheet, 2)
+        physics.addBody(bullet, { outline=outlineBullet, density=1, bounce=0, friction=1})
+        bullet.isBullet = true
+        bullet.isSensor = true
+        bullet.bodyType = "static"
+        return bullet
+      end
+  
+      ------------------------------------------------
+      local function bulletsLoop()
+        bullet = createBullet() --creo un'istanza di un oggetto sprite plastic bag
+        table.insert(table_bullets, bullet)
+        bullet:addEventListener( "collision", onBulletCollision )
+        bullet.enterFrame = bulletScroll --lo faccio scrollare, grazie alla funzione plasticbagScroll
+        Runtime:addEventListener("enterFrame", bullet) --assegno all'evento enterframe lo scroll
+      end
 
     ----------------------------------------------------------------------------
     ----------------------------------------------------------------------------
@@ -165,35 +204,11 @@ function scene:show( event )
     end
 
 
-    ----------------------------------------------------------------------------
-    ----------------------------------------------------------------------------
-    ------- FUNZIONI PER LO SCROLL DEL CASTELLO FINALE DOVE ENTRERO'  ----------
-    ----------------------------------------------------------------------------
-    ----------------------------------------------------------------------------
-    function castleScroll() --funzione per far apparire nello schermo un castello in cui il blob entrerà
-      --in modo molto ignorante sposta il castello verso il nostro personaggio e ci vado incontro
-      if(castle.x > (display.actualContentWidth- (display.actualContentWidth / 4))) then --mando avanti il castello di sabbia fino ad un certo punto
-        castle.x = castle.x - 20 --sposto il castello di 20 pixel
-      else
-        Runtime:removeEventListener("enterFrame", castleScroll) -- rimuovo l'evento event scroll
-        gameFinished = 1 --imposto la variabile a 1, grazie a questo eliminerò anche le funzioni che ho creato qui  sopra
-        timer.cancel( gameLoop ) --non mando più avanti lo sfondo di background
-        Runtime:addEventListener("enterFrame", spriteScrollToCastle) --faccio parire la funzione che manderà avanti di un po' lo scroll
-      end
-    end
-
-    ----------------------------------------------------------------------------
-
-    function spriteScrollToCastle() --avvicina lo sprite al castello
-      local CastlePosition = castle.x - 20 --piglio la posizione del castello
-      
-    end
-    ----------------------------------------------------------------------------
-
+    ------------------------------------------------
     function goToTheNewScene()
       composer.gotoScene( "menu-levels", "fade", 500 ) --vado alla nuova scena
     end
-
+    -----------------------------------------------
 
     ----------------------------------------------------------------------------
     ----------------------------------------------------------------------------
@@ -204,10 +219,7 @@ function scene:show( event )
       secondsPlayed = secondsPlayed + 1 --ogni secondo che passa aumento questa variabile che tiene conto di quanto tempo è passato
       print("seconds played: " ..secondsPlayed)
         if(secondsPlayed >= 50 ) then --se è ora di far finire il gioco, vado al passo successivo
-          if (castleAppared == 0 ) then --se non ho già fatto apparire il castello, lo faccio apparire
-            castleAppared = 1 --non lo faccio più riapparire
-            Runtime:addEventListener("enterFrame", castleScroll) --chiamo la funzione castleScroll per spostare il castello
-          end
+          goToTheNewScene()
         end
       end
 
