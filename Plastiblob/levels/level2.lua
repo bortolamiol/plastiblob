@@ -265,7 +265,7 @@ function scene:show( event )
         enemy.name = "enemy"
         enemy:play()
         group_elements:insert(enemy)
-        enemy.x = display.actualContentWidth  + 10
+        enemy.x = display.actualContentWidth  + 100
         enemy.y = ground.y-150
         frameIndexNemico = 1;
         local outlineNemico = graphics.newOutline(5, enemyWalkingSheet, frameIndexNemico)
@@ -652,16 +652,16 @@ function scene:show( event )
 
       --RICHIAMO I NEMICI
       callingEnemies[1] = timer.performWithDelay (1500, enemiesLoop, 1 )
-      callingEnemies[2] = timer.performWithDelay (7000, enemiesLoop, 0 )
-      callingEnemies[3] = timer.performWithDelay (13000, enemiesLoop, 0 )
-      callingEnemies[4] = timer.performWithDelay (19000, enemiesLoop, 1 )
-      callingEnemies[5] = timer.performWithDelay (55000, enemiesLoop, 1 )
+      callingEnemies[2] = timer.performWithDelay (7000, enemiesLoop, 0)
+      callingEnemies[3] = timer.performWithDelay (13000, enemiesLoop, 1 )
+      callingEnemies[4] = timer.performWithDelay (25000, enemiesLoop, 1 )
+      callingEnemies[5] = timer.performWithDelay (52000, enemiesLoop, 1 )
       callingEnemies[6] = timer.performWithDelay (58000, enemiesLoop, 1 )
 
       --RICHIAMO LE POZZE DI ACIDO
-      callingPool[1] = timer.performWithDelay( (timeToPlay/14)*1000, poolLoop, 0)
-      callingPool[2] = timer.performWithDelay( 16000, poolLoop, 1)
-      callingPool[3] = timer.performWithDelay( 39000, poolLoop, 1)
+      callingPool[1] = timer.performWithDelay( (timeToPlay/14)*1000, poolLoop, 1)
+      callingPool[2] = timer.performWithDelay( 12000, poolLoop, 0)
+      callingPool[3] = timer.performWithDelay( 18000, poolLoop, 1)
       callingPool[4] = timer.performWithDelay( 20000, poolLoop, 1)
       callingPool[5] = timer.performWithDelay( 39000, poolLoop, 1)
       callingPool[6] = timer.performWithDelay( 45000, poolLoop, 1)
@@ -779,7 +779,7 @@ end
 
 function resetScene( tipo)
   if tipo == "gameOver" then
-    --composer.isAudioPlayingMenu =0;	
+    composer.isAudioPlayingMenu =0;	
     composer.isAudioPlaying=0;	
   	
     audio.dispose(crunchSound)
@@ -841,6 +841,8 @@ function resetScene( tipo)
       table_platform[i] = nil        -- Nil Out Table Instance
     end
   elseif tipo == "gamefinished" then
+    composer.isAudioPlayingMenu =0;	
+    composer.isAudioPlaying=0;	
     audio.dispose(crunchSound)	
     print("audio disposato nel livello 1")
     --ELIMINO I LISTENERS
